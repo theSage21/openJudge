@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block head %}
+{% endblock %}
+
+{%block body%}
+    {% if form.errors %}
+        <p style="color: red;">Your username and password didn't match. Please try again.</p>
+    {% endif %}
+
+    <form role='form' method="post" action="{% url 'django.contrib.auth.views.login' %}" class='form'>
+        {% csrf_token %}
+        <h2 class="form-heading">Please Login</h2>
+        {{ form }}
+        <button class="btn btn-lg btn-success btn-block" type="submit">Login</button>
+        <input type="hidden" name="next" value="{{ next }}" />
+    </form>
+
+{%endblock%}

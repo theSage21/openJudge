@@ -1,0 +1,35 @@
+{%extends 'question/home.html'%}
+{%block question%}
+    Question {{question.pk}}
+    <hr>
+    {{question.text}}
+    <hr>
+    <h3>Your submission</h3>
+    <form action={%url 'question:question' question.id%} method='post' enctype="multipart/form-data">
+    {%csrf_token%}
+    {{attempt_form}}
+    <input type='submit' value='Submit' ></input>
+    </form>
+    <hr>
+    <h3>Attempts so far</h3>
+    <table border='1px'>
+    <thead>
+        <tr>
+            <th>Sr</th>
+            <th>Time</th>
+            <th>Check</th>
+            <th>Traceback</th>
+        </tr>
+    </thead>
+    <tbody >
+    {%for att in attempts%}
+        <tr>
+            <td>{{forloop.counter}}</td>
+            <td>{{att.stamp}}</td>
+            <td>{{att.correct}}</td>
+            <td><pre>{{att.traceback}}</pre></td>
+        </tr>
+    {%endfor%}
+    </tbody>
+    </table>
+{%endblock%}

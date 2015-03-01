@@ -1,0 +1,10 @@
+{%extends 'base.html'%}
+
+{%block body%}
+    {%for q in questions%}
+        <a href={{q.get_absolute_url}} >Q.{{forloop.counter}}</a>
+    {%endfor%}
+    <hr>
+    {%block question%}
+    {%endblock%}
+{%endblock%}
