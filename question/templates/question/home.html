@@ -2,9 +2,11 @@
 
 {%block body%}
     {%for q in questions%}
-        <a href={{q.get_absolute_url}} >Q.{{forloop.counter}}</a>
+        <a class='btn btn-warning'  href={{q.get_absolute_url}} >Q.{{forloop.counter}}</a>
     {%endfor%}
-    <hr>
+    <br>
+    <div class='container'>
     {%block question%}
     {%endblock%}
+    </div>
 {%endblock%}

@@ -1,6 +1,19 @@
 {%extends 'question/home.html'%}
 {%block question%}
+    <table class='table'>
+    <thead>
+        <tr>
+            <th>Rank</th>
+            <th>Player</th>
+        </tr>
+    </thead>
+    <tbody>
     {%for p in players%}
-    {{p}}
+        <tr>
+            <td>{{forloop.counter}}</td>
+            <td>{{p.teamname}}</td>
+        </tr>
     {%endfor%}
+    </tbody>
+    </table>
 {%endblock%}

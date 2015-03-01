@@ -1,10 +1,63 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Programming-CSSSC</title>
-    </head>
-    <body>
-    {%block body%}
+    <!-- Meta, title, CSS, favicons, etc. -->
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>DigitVaran</title>
+    {%block head%}
     {%endblock%}
+
+    <!-- Stylesheets -->
+    {%load staticfiles%}
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="{%static 'css/bootstrap.min.css'%}">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="{%static 'css/bootstrap-theme.min.css'%}">
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="{%static 'js/bootstrap.min.js'%}"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    </head>
+
+
+    <body>
+    <div class='container text-left'>
+    <h1>Programming</h1>
+        <nav class='navbar navbar-inverse' role='navigation'>
+        <div class='navbar-header'>
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-1">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        </div><!--navbar-header-->
+        <div class='collapse navbar-collapse' id='navbar-collapse-1'>
+            <ul class='nav navbar-nav'>
+                <li><a href={%url 'home' %}>Home</a></li>
+                <li><a href={%url 'question:home' %}>Questions</a></li>
+                <li><a href={%url 'question:scoreboard'%}>Scoreboard</a></li>
+            </ul>
+        </div><!-- Navbar-collapes-->
+        </nav>
+    </div><!-- container text-left-->
+    <div class='container'>
+    {%block body%}
+    <div class='container text-center'>
+    <div class='md-col-8 lead'>
+        Programming Contest.
+        <ol>
+            <li>Visit a question</li>
+            <li>Upload your source code. Select your language</li>
+            <li>Have a look at your submissions. Traceback will be provided where possible.</li>
+            <li>Solve as many as you can</li>
+        </ol>
+    </div>
+    </div>
+    {%endblock%}
+    </div>
     </body>
+
 </html>

@@ -1,18 +1,18 @@
 {%extends 'question/home.html'%}
 {%block question%}
-    Question {{question.pk}}
+    <h2>Question {{question.pk}}</h2>
     <hr>
     {{question.text}}
     <hr>
-    <h3>Your submission</h3>
     <form action={%url 'question:question' question.id%} method='post' enctype="multipart/form-data">
     {%csrf_token%}
-    {{attempt_form}}
-    <input type='submit' value='Submit' ></input>
+    {%load crispy_forms_tags%}
+    {{attempt_form|crispy}}
+    <input type='submit' value='Submit'  class='btn btn-success'></input>
     </form>
     <hr>
     <h3>Attempts so far</h3>
-    <table border='1px'>
+    <table class='table table-bordered table-hover'>
     <thead>
         <tr>
             <th>Sr</th>
