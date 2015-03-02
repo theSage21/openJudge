@@ -1,3 +1,0 @@
-echo arjoonn
-asdasds
-exit

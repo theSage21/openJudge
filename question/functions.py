@@ -28,7 +28,7 @@ class CheckServer:
             f=open(str(self.attemptid),'r')
             lines=''.join(f.readlines())
             f.close()
-            os.syatem('rm '+str(self.attemptid))
+            os.system('rm '+str(self.attemptid))
             return False,lines
         else:
             #check outputs
