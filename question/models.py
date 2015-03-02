@@ -10,8 +10,17 @@ class Player(User):
     score=models.IntegerField(default=0)
     teamname=models.CharField(max_length=100)
     def calculate_score(self):
-        attempts=Attempt.objects.filter(player=self,correct=True).count()
-        self.score=attempts
+        #since sqlite3 does not support distinct
+        #otherwise
+        #count=Attempt.objects.fitler(player=self,correct=True).order_by('question').distinct('question').count()
+        attempts=Attempt.objects.filter(player=self,correct=True)
+        q_done=[]
+        count=0
+        for att in attempts:
+            if att.question not in q_done:
+                q_done.append(att.question)
+                count+=1
+        self.score=count
         self.save()
 
 class Question(models.Model):
@@ -44,7 +53,10 @@ class Attempt(models.Model):
         print(testpath)
         print(codepath)
         ck_ser=functions.CheckServer(codepath,testpath,self.language.wrapper.path,self.pk)
-        ck_ser.run()
+        run_success,feedback=ck_ser.run()
+        self.correct=run_success
+        if not run_success:self.traceback=feedback
+        self.save()
         #----------------------
     def is_correct(self):
         if self.correct!=None:return self.correct#if code has already been run and tested
