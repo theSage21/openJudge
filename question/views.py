@@ -1,11 +1,14 @@
 from django.shortcuts import render,get_object_or_404,redirect
 from django.contrib.auth.decorators import login_required
 from question import models
+from django.conf import settings
+import datetime
 
 def home(request):
     data={}
     template='question/home.html'
     data['questions']=models.Question.objects.all()
+    data['time']=settings.START_TIME+datetime.timedelta(0,60*60*3,0)
     return render(request,template,data)
 
 @login_required
@@ -18,6 +21,7 @@ def quest(request,q_no):
     data['question']=question
     data['attempt_form']=models.AttemptForm()
     data['attempts']=models.Attempt.objects.filter(player=request.user,question=question).order_by('stamp')
+    data['time']=settings.START_TIME+datetime.timedelta(0,60*60*3,0)
     if request.method=='POST':
         form=models.AttemptForm(request.POST,request.FILES)
         if form.is_valid():
@@ -36,4 +40,5 @@ def scoreboard(request):
     players=models.Player.objects.all()
     for pl in players:pl.calculate_score()
     data['players']=models.Player.objects.all().order_by('-score').values('teamname','score')
+    data['time']=settings.START_TIME+datetime.timedelta(0,60*60*3,0)
     return render(request,template,data)

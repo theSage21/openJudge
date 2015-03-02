@@ -7,6 +7,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 """
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import datetime
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
@@ -79,3 +80,5 @@ TEMPLATE_DIRS=[os.path.join(BASE_DIR,'templates')]
 STATICFILES_DIRS=[os.path.join(BASE_DIR,'staticfiles')]
 TEST_DIRS=os.path.join(BASE_DIR,'test_cases')
 SITE_ID=1
+
+START_TIME=datetime.datetime(2015, 3, 4, 14, 30, 0, 0)
