@@ -15,7 +15,7 @@ SECRET_KEY = 'payu)u+wl7^8jol+9srk+vh%&@5o%sv9dvlys_099@_q_$84og'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = (
@@ -68,8 +68,11 @@ USE_ETAGS=True
 LOGIN_URL='/login/'
 STATIC_URL = '/static/'
 MEDIA_URL="/media/"
-STATIC_ROOT=os.path.join(BASE_DIR,'static_files')
-MEDIA_ROOT=os.path.join(BASE_DIR,'media_files')
+LOGIN_URL='/login/'
+LOGIN_REDIRECT_URL='/question/'
+
+STATIC_ROOT=os.path.join(BASE_DIR,'assets','static')
+MEDIA_ROOT=os.path.join(BASE_DIR,'assets','media')
 #----------------
 
 TEMPLATE_DIRS=[os.path.join(BASE_DIR,'templates')]

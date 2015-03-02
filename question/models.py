@@ -9,6 +9,10 @@ from question import functions
 class Player(User):
     score=models.IntegerField(default=0)
     teamname=models.CharField(max_length=100)
+    def calculate_score(self):
+        attempts=Attempt.objects.filter(player=self,correct=True).count()
+        self.score=attempts
+        self.save()
 
 class Question(models.Model):
     def __str__(self):return str(self.id)+str(self.text[:20])+' ...'
@@ -16,7 +20,6 @@ class Question(models.Model):
     test_file=models.FileField(upload_to='test_file')
     def get_absolute_url(self):
         return reverse('question:question',kwargs={'q_no':self.id})
-
 class Language(models.Model):
     def __str__(self):return self.name
     name=models.CharField(max_length=100)
@@ -32,6 +35,7 @@ class Attempt(models.Model):
     language=models.ForeignKey(Language,related_name='attempt_language')
     #-----------------------------------
     stamp=models.DateTimeField(auto_now_add=True)#timestamp of attempt
+
     def check_attempt(self):
         print('Checking attempt')
         #------------------
@@ -48,6 +52,8 @@ class Attempt(models.Model):
         else:self.correct=False
         self.save()
         return self.correct
+    class Meta:
+        ordering=['correct','stamp']
 
 class AttemptForm(forms.ModelForm):
     class Meta:

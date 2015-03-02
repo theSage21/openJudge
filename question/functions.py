@@ -12,7 +12,9 @@ class CheckServer:
     def run(self):
         wrapper=self.lang.strip()
         arguments=' '.join([self.code.strip(),self.test.strip()])
+        pre='chmod u+x '+self.code.strip()+';'
+        pre+='chmod u+x '+wrapper+';'
         print('------------------------------------')
         print(self.attemptid)
-        print(wrapper+' '+arguments)
+        print(' '.join([pre,wrapper,arguments]))
         print('------------------------------------')

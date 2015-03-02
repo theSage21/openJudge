@@ -1,2 +1,3 @@
 #! /bin/bash
-gunicorn -b 127.0.0.1:8000 --log-file=- website.wsgi:application
+SOCKFILE=/home/ghost/dev/programming/gunicorn.sock
+gunicorn -b unix:$SOCKFILE --log-file=- website.wsgi:application

@@ -6,5 +6,4 @@ echo "-----------------------------------------------"
 echo "Comparing outputs"
 cmp temp_output temp_output_file
 echo "Comparison complete"
-rm temp_output temp_output_file
 exit

@@ -2,7 +2,9 @@
 {%block question%}
     <h2>Question {{question.pk}}</h2>
     <hr>
+    <pre class='bg-info'>
     {{question.text}}
+    </pre>
     <hr>
     <form action={%url 'question:question' question.id%} method='post' enctype="multipart/form-data">
     {%csrf_token%}

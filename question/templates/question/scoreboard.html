@@ -3,17 +3,20 @@
     <table class='table'>
     <thead>
         <tr>
-            <th>Rank</th>
+            <th>Score</th>
             <th>Player</th>
         </tr>
     </thead>
     <tbody>
     {%for p in players%}
         <tr>
-            <td>{{forloop.counter}}</td>
+            <td>{{p.score}}</td>
             <td>{{p.teamname}}</td>
         </tr>
     {%endfor%}
     </tbody>
     </table>
+    <script>
+        window.location.reload;
+    </script>
 {%endblock%}

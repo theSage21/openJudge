@@ -33,5 +33,7 @@ def quest(request,q_no):
 def scoreboard(request):
     data={}
     template='question/scoreboard.html'
-    data['players']=models.Player.objects.all().order_by('score').values('teamname')
+    players=models.Player.objects.all()
+    for pl in players:pl.calculate_score()
+    data['players']=models.Player.objects.all().order_by('-score').values('teamname','score')
     return render(request,template,data)
