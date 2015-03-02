@@ -1,6 +1,5 @@
 {%extends 'question/home.html'%}
 {%block question%}
-    <h2>Question {{question.pk}}</h2>
     <hr>
     <pre class='bg-info'>{{question.text}}
     </pre>
@@ -16,18 +15,20 @@
     <table class='table table-bordered table-hover'>
     <thead>
         <tr>
-            <th>Sr</th>
+            <th>Sr,Attempt_ID</th>
             <th>Time</th>
             <th>Check</th>
+            <th>Language</th>
             <th>Traceback</th>
         </tr>
     </thead>
     <tbody >
     {%for att in attempts%}
         <tr>
-            <td>{{forloop.counter}}</td>
+            <td>{{forloop.counter}},{{att.pk}}</td>
             <td>{{att.stamp}}</td>
             <td>{{att.correct}}</td>
+            <td>{{att.language}}</td>
             <td><pre>{{att.traceback}}</pre></td>
         </tr>
     {%endfor%}

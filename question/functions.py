@@ -1,14 +1,26 @@
 import os
 import time
 from django.contrib.auth.models import User
+def read(fn):
+    f=open(fn,'r')
+    lines=f.readlines()
+    f.close()
+    return ''.join(lines).strip()
 def clean_file(filename):
     """Opens a file and removes trailing things from it and writes it back"""
-    f=open(filename,'r')
-    lines=''.join(f.readlines())
-    f.close()
+    lines=read(filename)
     f=open(filename,'w')
     f.writelines(lines.strip())
     f.close()
+def check_output(f1,f2):
+    lines1=read(f1).split('\n')
+    lines2=read(f2).split('\n')
+    for i in range(len(lines1)):
+        a=lines1[i]
+        b=lines2[i]
+        a,b=float(a),float(b)
+        if abs(a-b)>1e-5:return False
+    return True
 class CheckServer:
     def __init__(self,codepath,testpath,language,attemptid):
         print('Spinning up a check server')
@@ -25,9 +37,7 @@ class CheckServer:
         exit_code=os.system(command+'>'+str(self.attemptid))
         if exit_code!=0:
             #check the error logs
-            f=open(str(self.attemptid),'r')
-            lines=''.join(f.readlines())
-            f.close()
+            lines=read(str(self.attemptid))
             os.system('rm '+str(self.attemptid))
             return False,lines
         else:
@@ -35,8 +45,6 @@ class CheckServer:
             #rewrite the files to have same length
             clean_file('temp_output')
             clean_file('temp_output_file')
-            diff=os.system('cmp temp_output temp_output_file')
-            print(diff)
-            if diff==0:return True,None
+            out=check_output('temp_output','temp_output_file')
+            if out:return True,None
             else:return False,'Output does not match the test case output'
-            
