@@ -81,4 +81,4 @@ STATICFILES_DIRS=[os.path.join(BASE_DIR,'staticfiles')]
 TEST_DIRS=os.path.join(BASE_DIR,'test_cases')
 SITE_ID=1
 
-START_TIME=datetime.datetime(2015, 3, 4, 14, 30, 0, 0)
+START_TIME=datetime.datetime(2015, 3, 3, 14, 30, 0, 0)

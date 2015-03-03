@@ -13,13 +13,16 @@ def clean_file(filename):
     f.writelines(lines.strip())
     f.close()
 def check_output(f1,f2):
-    lines1=read(f1).split('\n')
-    lines2=read(f2).split('\n')
-    for i in range(len(lines1)):
-        a=lines1[i]
-        b=lines2[i]
-        a,b=float(a),float(b)
-        if abs(a-b)>1e-5:return False
+    try:
+        lines1=read(f1).split('\n')
+        lines2=read(f2).split('\n')
+        for i in range(len(lines2)):
+            a=lines1[i]
+            b=lines2[i]
+            a,b=float(a),float(b)
+            if abs(a-b)>1e-5:return False
+    except:
+        return False
     return True
 class CheckServer:
     def __init__(self,codepath,testpath,language,attemptid):
