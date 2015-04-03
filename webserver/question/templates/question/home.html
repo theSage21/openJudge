@@ -1,0 +1,14 @@
+{%extends 'base.html'%}
+{%block title%}Programming{%endblock%}
+
+{%block body%}
+<p class='lead'>
+Each question has some marks associated with it. Marks are computed as follows:-<br>
+Marks=(Correct Attempts)/(Total checked attempts)
+
+<br><br>
+A player is awarded the marks associated with a question at the time of attempt. The attempt however changes the marks of the question.
+<br>
+This guarantees that no ties are ever encountered. Players are ranked according to score.
+</p>
+{%endblock%}

@@ -2,7 +2,8 @@ OpenJudge
 =========
 
 A judge I made to judge the simple programming competitions in college.
-Supports python3,java,c++,c.
+A django based web server to provide the interface.
+A linux shell based python mashup to provide the checking of the code.
 
 Useage
 ------

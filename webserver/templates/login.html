@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    {% load bootstrap %}
+    {% load static %}
+    <link rel='stylesheet' href='{% static "auth.css" %}'>
+{% endblock %}
+
+{%block body%}
+<div class='col-md-4 text-center'>
+    {% if form.errors %}
+        <p style="color: red;">Your username and password didn't match. Please try again.</p>
+    {% endif %}
+
+    <form role='form' method="post" action="{% url 'django.contrib.auth.views.login' %}" class='form'>
+        {% csrf_token %}
+        <h2 class="form-heading">Please Login</h2>
+        {{ form | bootstrap }}
+        <button class="btn btn-lg btn-success btn-block" type="submit">Login</button>
+        <input type="hidden" name="next" value="{{ next }}" />
+    </form>
+<hr>
+{%load socialaccount%}
+<a href={%provider_login_url "facebook" method="oauth2"%}><img height=50 alt='Login with Facebook' src={%static 'facebook.png'%}  /></a>
+</div>
+{%endblock%}

@@ -1,0 +1,31 @@
+{%extends 'base.html'%}
+{%block title%}LeaderBoard{%endblock%}
+
+{%block body%}
+<ul class='list-inline'>
+    {%for q in questions%}  
+        <li>{{q.qno}}|{{q.get_score}}</li>
+    {%endfor%}
+</ul>
+<hr>
+<div class='table-responsive'>
+    <table class='table table-hover'>
+        <thead><tr>
+            <th>Rank</th>
+            <th>Player</th>
+            <th>Score</th>
+            <th>LastSolve</th>
+        </tr></thead>
+        <tbody>
+            {%for p in players%}
+                <tr>
+                    <td>{{forloop.counter}}</td>
+                    <td>{{p}}</td>
+                    <td>{{p.score}}</td>
+                    <td>{{p.last_solved}}</td>
+                </tr>
+            {%endfor%}
+        </tbody>
+    </table>
+</div>
+{%endblock%}
