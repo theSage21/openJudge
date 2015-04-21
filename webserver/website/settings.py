@@ -67,3 +67,5 @@ TEMPLATE_DIRS=[os.path.join(BASE_DIR,'templates')]
 STATICFILES_DIRS=[os.path.join(BASE_DIR,'staticfiles')]
 LOGIN_REDIRECT_URL='/'
 LOGIN_URL='/login/'
+
+CHECK_SERVER_ADDRESS=('127.0.0.1',7000)

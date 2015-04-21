@@ -16,4 +16,4 @@ Usage
 2. run the server with ./runserver
 
 I recommend a virtualenv with all the requirements satisfied.
-
+Do not forget to enter the correct check server address in website/settings.py

@@ -41,8 +41,8 @@ class Attempt(models.Model):
         if self.correct!=None:return self.correct
         else:
             data=self.__get_json__()
-            result=function.ask_check_server(data)
-            if (None!=result):
+            result=functions.ask_check_server(data)
+            if (result!=None):
                 verdict,self.remarks=result
                 self.save()
             else: verdict=None

@@ -8,4 +8,5 @@ urlpatterns=patterns('player.views',
     url(r'^question/(?P<qno>\d+)/$','question',name='question'),
     url(r'^question/(?P<qno>\d+)/details/$','question_details',name='question_details'),
     url(r'^language/(?P<lno>\d+)/details/$','language_details',name='language_details'),
+    url(r'^detail_list/','detail_list',name='detail_list'),
 )

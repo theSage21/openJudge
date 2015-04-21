@@ -63,3 +63,17 @@ def language_details(request,lno):
     data['wrap']=language.wrapper.url
     data['misc']=language.details
     return JsonResponse(data)
+def detail_list(request):
+    data={}
+    questions=models.Question.objects.all()
+    data['question']={}
+    for q in questions:
+        data['question'][str(q.pk)]={'inp':q.answer.infile.url,
+                                    'out':q.answer.outfile.url,
+                                    'type':q.answer.answer_type.pk}
+    languages=models.Language.objects.all()
+    data['language']={}
+    for l in languages:
+        data['language'][str(l.pk)]={'wrap':l.wrapper.url,
+                                    'misc':l.details}
+    return JsonResponse(data)
