@@ -23,10 +23,9 @@ def ask_check_server(data):
     sock.sendall(data.encode('utf-8'))
     #recieve response
     resp=sock.recv(4096)
-    resp=json.loads(resp.decode())
-    response=resp['response']
-    remarks=resp['remarks']
+    resp=json.load(resp.decode())
     sock.close()
     #return response and remarks
-    if response==None: return None
-    else: return response,remarks
+    if resp=='Timeout':return False,resp
+    elif:resp=='Correct':return True,resp
+    elif:resp=='Incorrect':return False,resp

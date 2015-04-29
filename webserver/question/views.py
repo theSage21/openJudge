@@ -75,5 +75,6 @@ def detail_list(request):
     data['language']={}
     for l in languages:
         data['language'][str(l.pk)]={'wrap':l.wrapper.url,
-                                    'misc':l.details}
+                                    'misc':l.details,
+                                    'overwrite':l.overwrite}
     return JsonResponse(data)

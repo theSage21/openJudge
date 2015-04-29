@@ -1,6 +1,6 @@
 #! /bin/bash
-echo "python2.sh <codepath> <testpath>"
+echo "python2.sh <input_path> <source_code>"
 echo "-----------------------------------------------"
-python3 /home/ghost/dev/programming/wrappers/input.py $2|python2 $1 >temp_output
+python3 ./input.py $1|python2 $2 >temp_output
 echo "-----------------------------------------------"
 exit

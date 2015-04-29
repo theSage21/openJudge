@@ -1,114 +1,125 @@
-import os
-import time
+import os,time
 import json
 from socket import *
+from urllib.request import urlopen
 
-def read(fn,strip=True):
-    f=open(fn,'r')
-    lines=f.readlines()
-    f.close()
-    if strip: return ''.join(lines).strip()
-    else:return ''.join(lines)
-def clean_file(filename):
-    """Opens a file and removes trailing things from it and writes it back"""
-    lines=read(filename)
+def get_file_fom_url(url,overwrite=False):
+    """Retrieves file from given url and saves to disk.
+    returns absolute filepath.
+    If overwrite is true overwrites an existing file"""
+    page=urlopen(url)
+    filename=url.split('/')[-1]
+    if os.path.exists(filename) and not overwrite:
+        from random import random
+        no=str(int(random()*100))
+        filename+='_'+no
     f=open(filename,'w')
-    f.writelines(lines.strip())
+    f.writelines(page.readlines())
     f.close()
+    return os.path.join(os.getcwd(),filename)
 def is_alive(pid):
-    """Checks if a process is alive"""
-    res=os.system('ps -e | grep '+str(pid))
-    if res==0:return True
-    elif res==256:return False
-    else:return None
-def check_output(f1,f2,error=True):
-    "If error=True check for numerical values with error margins"
-    try:
-        lines1=read(f1).split('\n')
-        lines2=read(f2).split('\n')
-        for i in range(len(lines2)):
-            a=lines1[i]
-            b=lines2[i]
-            if error:
-                a,b=float(a),float(b)
-                if abs(a-b)>1e-5:return False
-            else:
-                return a==b
-    except:
-        return False
+    """Checks if a process is alive. UNIX centric"""
+    val=os.system('ps -e|grep '+str(pid))
+    if val==256:return False
+    elif val=0:return True
+def result_of_execution(out_expected):
+    """Checks if expected and obtained outputs match"""
+    f=open(out_expected,'r')
+    lines_expected=f.readlines()
+    f.close()
+    f=open('temp_output','r')
+    lines_got=f.readlines()
+    f.close()
+    for i in range(max(len(lines_expected),len(lines_got))):
+        exp=lines_expected[i]
+        got=lines_got[i]
+        if exp.strip()!=got.strip():return False
     return True
 
-class CheckSlave:
-    """The slave which checks the attempt.
-    A new checkslave is created for each attempt and is killed
-    after the attempt has been checked"""
-    def __init__(self,master_address,name):
-        """Receive an attempt id,
-        codepath: absolute path to the code
-        testpath: absolute path to test files
-        wrapper: absolute path to the required wrapper
-        """
-        print('Gave birth to a slave.')
-        print('Slave id: ',name)
-        self.master=master_address
-        self.name=name
-        #for internal communications
+class Slave:
+    def __init__(self,listen_address,webserver):
+        self.addr=listen_address
+        self.webserver=webserver
+        self.__get_question_details()
+        #----------
         self.sock=socket()
+        self.sock.bind(self.addr)
+        self.sock.listen(5)
+        #----------
+        self.processes=[]#list of processes created.
+    def __get_question_details(self):
+        """Gets question details and language wrappers from the webserver"""
+        self.check_data={}
+        url=self.webserver+'/question/detail_list/'
+        url='http://'+url
+        #we let the exception fall through
+        #as without this nothing works
+        page=urlopen(url)
+        text=''.join((i for i in page.readlines())
+        data=json.loads(text)
+        #replace urls by filepaths
+        for q in data['question'].keys():
+            url='http://'+self.webserver+data['question'][q]['inp']
+            filename=get_file_from_url(url)
+            data['question'][q]['inp']=filename
+            url='http://'+self.webserver+data['question'][q]['out']
+            filename=get_file_from_url(url)
+            data['question'][q]['out']=filename
+        for q in data['language'].keys():
+            url='http://'+self.webserver+data['language'][q]['wrap']
+            filename=get_file_from_url(url)
+            data['language'][q]['wrap']=filename
+            #Make executable
+            os.system('chmod u+x '+filename)
+        self.check_data=data
+    def __process_request(self,data):
+        """Process a request."""
+        print(data['pk'])
+        lang=data['language']
+        qno=data['qno']
+        wrap=self.check_data['language'][lang]['wrap']#---
+        inp=self.check_data['question'][qno]['inp']#---
+        out=self.check_data['question'][qno]['out']#---
+        #-----
+        overwrite=self.check_data['language'][lang]['overwrite']
+        source=get_file_from_url(data['source'],overwrite)#---
+        #------create the command line command
+        command+=' '.join((wrap,inp,source))
+        #------execute the command
         pid=os.fork()
-        self.pid=pid
         if pid==0:#child
-            self.stature='worker'
-            self.sock.connect(('127.0.0.1',8888))
-        else:#parent
-            self.stature='comms'
-            self.sock.bind(('127.0.0.1':8888))
-            self.accept(5)
-            self.comms,adr=self.sock.accept()
-            self.sock.close()
-            self.sock=socket()
-            self.__connect_to_master()
-            self.jobs={}
-    def __connect_to_master(self):
-        self.sock.connect(self.master)
-        self.sock.sendall(('Slave name: '+str(self.name)).encode('utf-8'))
-        data=self.sock.recv(512)
-        if data.decode()!='Registered':
-            print('I cannot connect to master. Here is what i recieved:\n',data.decode(),'-'*40)
-    def __new_job(self):
-        while True:
-            #recieve new job
-            d=self.sock.recv(4096)
-            #send update to master
-            self.sock.sendall(json.dumps(self.jobs).encode('utf-8'))
-            d=json.loads(d.decode())
-            if d['pk'] not in self.jobs.keys(): return d
-    def __dispatch_job_to_worker(self,job):
-        "For comms"
-        data=self.__new_job()
-    def __get_and_do_job(self):
-        "For worker"
-        #get new job
-        #do job
-        #prepare the command line statements
-        wrapper=wrapper.strip()
-        arguments=' '.join([code.strip(),test_path.strip()])
-        pre='chmod u+x '+code.strip()+';'
-        pre+='chmod u+x '+wrapper+';'
-        command=(' '.join([pre,wrapper,arguments]))
-        #execute the command
-        exit_code=os.system(command+'>'+str(self.attemptid))
-        #check the exit code
-        if exit_code!=0:
-            #check the error logs
-            lines=read(str(self.attemptid))
-            os.system('rm '+str(self.attemptid))
-            return False,lines
+            os.system(command)
         else:
-            #check outputs
-            #rewrite the files to have same length
-            clean_file('temp_output')
-            clean_file('temp_output_file')
-            out=check_output('temp_output','temp_output_file')
-            if out:return True,None
-            else:return False,'Output does not match the test case output.'
-        os.kill(os.getpid(),1)
+            start=time.time()
+            while is_alive(pid):
+                if time.time()-start>30:
+                    os.kill(pid,1)
+                    return 'Timeout'
+                else:time.sleep(1)
+            if result_of_execution(out):
+                return 'Correct'
+            else:return 'Incorrect'
+        #--------main thread resumes
+    def __recalculate_alive_processes(self):
+        """Calculates how many of the processes in self.processes
+        are alive. removes the dead ones"""
+        alive=[]
+        for proc in self.processes:
+            if is_alive(proc):alive.append(proc)
+        self.processes=alive
+    def __print_running_checks(self):
+        """Prints the process numbers of running checks"""
+        print('|'.join(map(str,self.processes)))
+    def run(self):
+        self.__recalculate_alive_processes()
+        self.__print_running_checks()
+        com,adr=self.sock.accept()
+        pid=os.fork()#Fork a new check
+        if pid==0:
+            data=com.recv(4096)
+            data=json.loads(data.decode())
+            result=self.__process_request(data)
+            result=json.dumps(result)
+            com.sendall(result.encode('utf-8'))
+            com.close()
+        else: self.processes.append(pid)

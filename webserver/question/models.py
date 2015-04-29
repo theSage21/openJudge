@@ -1,3 +1,4 @@
+import json
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.timezone import now
@@ -15,6 +16,7 @@ class Language(models.Model):
     name=models.CharField(max_length=100)
     details=models.TextField()
     wrapper=models.TextField()
+    overwrite=models.BooleanField(default=False,help_text='overwrite required for storing the source code')
 
 class Attempt(models.Model):
     """An attempt on a question"""
@@ -41,12 +43,12 @@ class Attempt(models.Model):
         if self.correct!=None:return self.correct
         else:
             data=self.__get_json__()
-            result=functions.ask_check_server(data)
-            if (result!=None):
-                verdict,self.remarks=result
-                self.save()
-            else: verdict=None
-            return verdict
+            data=json.dumps(data)
+            result,comment=functions.ask_check_server(data)
+            self.correct=result
+            self.remarks=comment
+            self.save()
+            return self.correct
 
 class Question(models.Model):
     """A question in the competition"""
