@@ -26,6 +26,6 @@ def ask_check_server(data):
     resp=json.load(resp.decode())
     sock.close()
     #return response and remarks
-    if resp=='Timeout':return False,resp
-    elif:resp=='Correct':return True,resp
-    elif:resp=='Incorrect':return False,resp
+    if resp =='Timeout':return False, resp
+    elif resp=='Correct':return True,resp
+    elif resp=='Incorrect':return False,resp
