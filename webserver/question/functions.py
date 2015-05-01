@@ -27,5 +27,5 @@ def ask_check_server(data):
     sock.close()
     #return response and remarks
     if resp=='Timeout':return False,resp
-    elif:resp=='Correct':return True,resp
-    elif:resp=='Incorrect':return False,resp
+    elif resp=='Correct':return True,resp
+    elif resp=='Incorrect':return False,resp

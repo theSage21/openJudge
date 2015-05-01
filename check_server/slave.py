@@ -1,3 +1,6 @@
+#Call from command line and provide as argument
+#the webaddress and the self listening address
+
 import os,time
 import json
 from socket import *
@@ -17,11 +20,13 @@ def get_file_fom_url(url,overwrite=False):
     f.writelines(page.readlines())
     f.close()
     return os.path.join(os.getcwd(),filename)
+
 def is_alive(pid):
     """Checks if a process is alive. UNIX centric"""
-    val=os.system('ps -e|grep '+str(pid))
-    if val==256:return False
-    elif val=0:return True
+    try: os.kill((pid),0)
+    except ProcessLookupError:return False
+    else:return True
+
 def result_of_execution(out_expected):
     """Checks if expected and obtained outputs match"""
     f=open(out_expected,'r')
@@ -37,7 +42,8 @@ def result_of_execution(out_expected):
     return True
 
 class Slave:
-    def __init__(self,listen_address,webserver):
+    def __init__(self,webserver,listen_address=('0.0.0.0',9000)):
+        print("Anouncing loyalty to the web address")
         self.addr=listen_address
         self.webserver=webserver
         self.__get_question_details()
@@ -45,6 +51,7 @@ class Slave:
         self.sock=socket()
         self.sock.bind(self.addr)
         self.sock.listen(5)
+        print("Slave active at: ",self.sock.getsockname())
         #----------
         self.processes=[]#list of processes created.
     def __get_question_details(self):
@@ -123,3 +130,8 @@ class Slave:
             com.sendall(result.encode('utf-8'))
             com.close()
         else: self.processes.append(pid)
+
+if __name__='__main__':
+    webaddress=input("Enter webaddress:\nExample: 129.168.1.15:8000\n:- ")
+    sl=Slave(webaddress)
+    sl.run()
