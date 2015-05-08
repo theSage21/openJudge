@@ -62,7 +62,7 @@ class Slave:
         #we let the exception fall through
         #as without this nothing works
         page=urlopen(url)
-        text=''.join((i for i in page.readlines()))
+        text=''.join((i.decode() for i in page.readlines()))
         data=json.loads(text)
         #replace urls by filepaths
         for q in data['question'].keys():
@@ -132,6 +132,7 @@ class Slave:
         else: self.processes.append(pid)
 
 if __name__=='__main__':
-    webaddress=input("Enter webaddress:\nExample: 129.168.1.15:8000\n:- ")
+    #webaddress=input("Enter webaddress:\nExample: 129.168.1.15:8000\n:- ")
+    webaddress='127.0.0.1:8000'
     sl=Slave(webaddress)
     sl.run()
