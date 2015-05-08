@@ -1,7 +1,7 @@
 from django.conf.urls import patterns,include,url
 
 
-urlpatterns=patterns('player.views',
+urlpatterns=patterns('question.views',
     url(r'^$','home',name='home'),
     url(r'^leaderboard/$','leaderboard',name='leaderboard'),
     url(r'^question/$','question_home',name='question_home'),

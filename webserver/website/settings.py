@@ -31,6 +31,7 @@ INSTALLED_APPS = (
     'bootstrapform',
     #----------------
     'question',
+    'contest',
 )
 
 MIDDLEWARE_CLASSES = (

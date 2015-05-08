@@ -15,7 +15,7 @@ class Language(models.Model):
     def __str__(self):return self.name
     name=models.CharField(max_length=100)
     details=models.TextField()
-    wrapper=models.TextField()
+    wrapper=models.FileField(upload_to='wrappers')
     overwrite=models.BooleanField(default=False,help_text='overwrite required for storing the source code')
 
 class Attempt(models.Model):

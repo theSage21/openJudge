@@ -30,27 +30,28 @@ class ProfileTest(TestCase):
     def test_str_function(self):
         p=create_profile()
         self.assertEqual(type(p.__str__()),type(''))
-class LanguageTest(models.Model):
+class LanguageTest(TestCase):
     def test_str_function(self):
         l=create_language()
         self.assertEqual(l.name,l.__str__())
 class AttemptTest(TestCase):
-    def test_str_function(self)
+    def test_str_function(self):
         a=models.Attempt()
         a.question=create_question()
         a.player=create_profile()
         self.assertEqual(a.__str__(),q.__str__()+' - '+p.__str__())
 class QuestionTest(TestCase):
-    def test_str_function(self)
+    def test_str_function(self):
         q=create_question()
         self.assertEqual(q.__str__(),q.title)
-    def test_get_score(self)
+    def test_get_score(self):
+        pass
 class AnswerTest(TestCase):
-    def test_str_function(self)
+    def test_str_function(self):
         a=create_answer()
         self.assertEqual(a.__str__(),a.question.__str__())
 class AnswerTest(TestCase):
-    def test_str_function(self)
+    def test_str_function(self):
         t=create_answer_type()
         self.assertEqual(t.__str__(),t.name)
 class LanguageTest(TestCase):
