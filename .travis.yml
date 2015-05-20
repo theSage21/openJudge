@@ -1,0 +1,10 @@
+language: python
+sudo: flase
+python:
+  - "3.4"
+# command to install dependencies
+install:
+  - pip install -r requirements-dev.txt --allow-all-external
+# command to run tests
+script:
+  - flake8

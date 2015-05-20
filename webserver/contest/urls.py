@@ -1,6 +1,6 @@
-from django.conf.urls import patterns,include,url
+from django.conf.urls import patterns, url
 
 
-urlpatterns=patterns('contest.views',
-    url(r'^$','home',name='home'),
-)
+urlpatterns = patterns('contest.views',
+                       url(r'^$', 'home', name='home'),
+                       )

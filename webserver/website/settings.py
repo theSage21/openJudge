@@ -14,10 +14,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 SECRET_KEY = 'ts3$31g4d2rc=&g+elh&b4m^5=pz!87(v^)nk1p&e917cp-*w('
 
 DEBUG = True
-#DEBUG = False
+# DEBUG = False
 TEMPLATE_DEBUG = DEBUG
-if DEBUG: ALLOWED_HOSTS = []
-else:ALLOWED_HOSTS=['*']
+if DEBUG:
+    ALLOWED_HOSTS = []
+else:
+    ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -29,7 +31,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bootstrapform',
-    #----------------
+    # ----------------
     'question',
     'contest',
 )
@@ -60,13 +62,13 @@ USE_L10N = False
 USE_TZ = False
 
 STATIC_URL = '/static/'
-MEDIA_URL='/media/'
-STATIC_ROOT=os.path.join(BASE_DIR,'static_files')
-MEDIA_ROOT=os.path.join(STATIC_ROOT,'media_files')
+MEDIA_URL = '/media/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static_files')
+MEDIA_ROOT = os.path.join(STATIC_ROOT, 'media_files')
 
-TEMPLATE_DIRS=[os.path.join(BASE_DIR,'templates')]
-STATICFILES_DIRS=[os.path.join(BASE_DIR,'staticfiles')]
-LOGIN_REDIRECT_URL='/'
-LOGIN_URL='/login/'
+TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'staticfiles')]
+LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = '/login/'
 
-CHECK_SERVER_ADDRESS=('127.0.0.1',9000)
+CHECK_SERVER_ADDRESS = ('127.0.0.1', 9000)
