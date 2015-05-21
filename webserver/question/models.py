@@ -46,7 +46,7 @@ class Attempt(models.Model):
 
     def is_correct(self):
         """Checks if the attempt was correct"""
-        if self.correct! = None:
+        if self.correct is not None:
             return self.correct
         else:
             data = self.__get_json__()
