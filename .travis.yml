@@ -1,5 +1,5 @@
 language: python
-sudo: flase
+
 python:
   - "3.4"
 # command to install dependencies

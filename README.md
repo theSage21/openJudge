@@ -1,5 +1,6 @@
 OpenJudge
 =========
+[![Build Status](https://travis-ci.org/theSage21/openJudge.svg)](https://travis-ci.org/theSage21/openJudge)
 
 A judge I made to judge the simple programming competitions in college.
 A django based web server to provide the interface and a python3 based
