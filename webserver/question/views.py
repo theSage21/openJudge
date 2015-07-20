@@ -47,11 +47,16 @@ def question(request, qno):
             form.question = data['question']
             form.marks = data['question'].get_marks()
             form.save()
+            form.is_correct()  # force a check request
             return redirect('question', qno=qno)
     return render(request, template, data)
 
 
 def question_details(request, qno):
+    """
+    Details pertaining to a question to be used by the
+    Check server
+    """
     data = {}
     qno = int(qno)
     question = get_object_or_404(models.Question, qno=qno)
@@ -63,6 +68,9 @@ def question_details(request, qno):
 
 
 def language_details(request, lno):
+    """
+    Language details to be use by the Check server
+    """
     data = {}
     lno = int(lno)
     language = get_object_or_404(models.Language, lno=lno)
@@ -73,6 +81,10 @@ def language_details(request, lno):
 
 
 def detail_list(request):
+    """
+    A JSON containing all details pertaining to all questions
+    and languages on the server
+    """
     data = {}
     questions = models.Question.objects.all()
     data['question'] = {}

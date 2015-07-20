@@ -7,6 +7,10 @@ from question import functions
 
 
 class Profile(User):
+    """
+    A user profile.
+    Stores scores and other data
+    """
     def __str__(self):
         return self.user.__str__()
     score = models.FloatField(default=0.0)
@@ -14,7 +18,8 @@ class Profile(User):
 
 
 class Language(models.Model):
-    """A programming language which is available on the check server"""
+    """A programming language which is available on the check server.
+    """
     def __str__(self):
         return self.name
     name = models.CharField(max_length=100)
@@ -37,23 +42,29 @@ class Attempt(models.Model):
     remarks = models.TextField()  # Remarks from the check server go there
 
     def __get_json__(self):
+        """
+        Return essential data as json string
+        """
         data = {'pk': self.pk,
                 'qno': self.question.qno,
                 'source': self.source.url,
                 'language': self.language.pk,
                 }
+        data = json.dumps(data)
         return data
 
     def is_correct(self):
-        """Checks if the attempt was correct"""
+        """Checks if the attempt was correct
+        By contacting the ceck server."""
         if self.correct is not None:
             return self.correct
         else:
             data = self.__get_json__()
-            data = json.dumps(data)
             result, comment = functions.ask_check_server(data)
             self.correct = result
             self.remarks = comment
+            if self.correct is not None:
+                self.marks = self.question.get_score()
             self.save()
             return self.correct
 
@@ -81,7 +92,8 @@ class Question(models.Model):
 
 class AnswerType(models.Model):
     """Used to determine which type of checking to use.
-    Error tolerant or exact"""
+    Error tolerant or exact.
+    For future use."""
 
     def __str__(self):
         return self.name
