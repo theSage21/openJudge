@@ -4,6 +4,7 @@ from json import loads, dumps
 from socket import socket, SO_REUSEADDR, SOL_SOCKET
 from urllib.request import urlopen, urlretrieve
 
+
 def get_file_from_url(url, folder, overwrite=False):
     "Get file from url. Overwrite if overwrite-True"
     # create storage path
@@ -20,12 +21,14 @@ def get_file_from_url(url, folder, overwrite=False):
     fl_name, _ = urlretrieve(url, complete_path)
     return os.path.join(os.getcwd(), fl_name)
 
+
 def get_json(url):
     "Get json from url and return dict"
     page = urlopen(url)
     text = page.read().decode()
     data = loads(text)
     return data
+
 
 def is_alive(pid):
     "Check if process is alive"
@@ -36,6 +39,7 @@ def is_alive(pid):
         return False
     else:
         return True
+
 
 def check_execution(out_expected, outfile, check_error=None):
     "Check if output is correct."
@@ -57,6 +61,7 @@ def check_execution(out_expected, outfile, check_error=None):
             if abs(eval(exp.strip()) - eval(got.strip())) > eval(check_error):
                 return False
     return True
+
 
 class Slave:
     def __init__(self,
