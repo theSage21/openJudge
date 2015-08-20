@@ -1,0 +1,43 @@
+{%extends 'base.html'%}
+{%block title%}Question {{question.qno}}{%endblock%}
+
+{%block body%}
+    <div class='container text-left'>
+        {% if questions %}
+            <ol>
+            {% for ques in questions %}
+                <li><a href={{ ques.get_absolute_url }}>{{ques.title}}</a></li>
+            {% endfor %}
+            </ol>
+        {% elif question %}
+            <h3>{{question.qno}}</h3><h4>{{question.title}}</h4>
+            <pre>{{question.text}}</pre>
+            <hr>
+            <form role='form' action={%url "question:question" question.qno %} method='post' enctype="multipart/form-data">
+            {%csrf_token%}
+            {%load bootstrap%}
+            {{answer_form|bootstrap}}
+            <input type='submit' class='btn btn-success' value='Submit'></input>
+            </form>
+            <hr>
+        </div>
+        <div class='table-responsive'>
+            <table class='table table-hover'>
+                <thead><tr>
+                    <th>Result-Status</th>
+                    <th>Time-Stamp</th>
+                    <th>Remarks</th>
+                </tr></thead>
+                <tbody>
+                    {%for a in attempts%}
+                        <tr>
+                            <td>{{a.is_correct}}</td>
+                            <td>{{a.stamp}}</td>
+                            <td><pre>{{a.remarks}}</pre></td>
+                        </tr>
+                    {%endfor%}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{%endblock%}

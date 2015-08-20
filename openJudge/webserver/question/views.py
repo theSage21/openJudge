@@ -4,13 +4,6 @@ from question import models
 from django.http import JsonResponse
 
 
-def home(request):
-    """Homepage of the contest"""
-    data = {}
-    template = 'question/home.html'
-    return render(request, template, data)
-
-
 def leaderboard(request):
     """The scoreboard"""
     data = {}
@@ -42,13 +35,13 @@ def question(request, qno):
         data['answer_form'] = models.AttemptForm(request.POST, request.FILES)
         if data['answer_form'].is_valid():
             form = data['answer_form']
-            form.save(commit=False)
+            form = form.save(commit=False)
             form.player = request.user.profile
             form.question = data['question']
             form.marks = data['question'].get_marks()
             form.save()
             form.is_correct()  # force a check request
-            return redirect('question', qno=qno)
+            return redirect('question:question', qno=qno)
     return render(request, template, data)
 
 

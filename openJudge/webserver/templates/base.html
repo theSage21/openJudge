@@ -35,9 +35,8 @@
             <ul class='nav navbar-nav'>
                 <li><a href={%url 'question:home' %}> <span class='glyphicon glyphicon-home'></span> Home</a></li>
                 <li><a href={%url 'question:leaderboard'%}><span class="glyphicon glyphicon-registration-mark"></span> Leaderboard</a></li>
-                <li><a href={%url 'question:question_home'%}> <span class='glyphicon glyphicon-search'></span> Questions</a></li>
                 {% if request.user.is_authenticated %}
-                <li> {{user.profile}} Logout</a>
+                <li> {{user.profile}} <a href={% url 'login' %}>Logout</a>
                 {% else %}
                 <li>
                     <a href={%url "login"%}>Login</a>

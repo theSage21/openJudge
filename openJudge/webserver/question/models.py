@@ -1,4 +1,4 @@
-import json
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.timezone import now
@@ -11,8 +11,6 @@ class Profile(User):
     A user profile.
     Stores scores and other data
     """
-    def __str__(self):
-        return self.user.__str__()
     score = models.FloatField(default=0.0)
     last_solved = models.DateTimeField(default=now)
 
@@ -46,11 +44,10 @@ class Attempt(models.Model):
         Return essential data as json string
         """
         data = {'pk': self.pk,
-                'qno': self.question.qno,
+                'qno': self.question.pk,
                 'source': self.source.url,
                 'language': self.language.pk,
                 }
-        data = json.dumps(data)
         return data
 
     def is_correct(self):
@@ -61,12 +58,13 @@ class Attempt(models.Model):
         else:
             data = self.__get_json__()
             result, comment = functions.ask_check_server(data)
-            self.correct = result
-            self.remarks = comment
-            if self.correct is not None:
-                self.marks = self.question.get_score()
-            self.save()
-            return self.correct
+            if result is not None:
+                self.correct = result
+                self.remarks = comment
+                if self.correct is not None:
+                    self.marks = self.question.get_marks()
+                self.save()
+                return self.correct
 
 
 class Question(models.Model):
@@ -79,7 +77,7 @@ class Question(models.Model):
     def __str__(self):
         return self.title
 
-    def get_score(self):
+    def get_marks(self):
         """Get the current score for a question"""
         total_attempts = Attempt.objects.filter(question=self).exclude(correct=None).count()
         correct_attempts = Attempt.objects.filter(question=self, correct=True).count()
@@ -88,6 +86,9 @@ class Question(models.Model):
         else:
             score = float(correct_attempts) / float(total_attempts)
         return score
+
+    def get_absolute_url(self):
+        return reverse('question:question', kwargs={'qno': self.qno})
 
 
 class AnswerType(models.Model):
@@ -114,4 +115,4 @@ class Answer(models.Model):
 class AttemptForm(ModelForm):
     class Meta:
         model = Attempt
-        exclude = ['player', 'question', 'stamp', 'correct']
+        exclude = ['player', 'question', 'stamp', 'correct', 'marks', 'remarks']

@@ -8,6 +8,4 @@ cp $class_file ./
 output_file=${class_file##*/}
 output_call_name=${output_file%.class}
 echo $output_file
-python3 input.py $2|java $output_call_name>>temp_output
-echo "--------------------------------------------------"
-exit
+python3 INPUT $2|java $output_call_name>>temp_output
