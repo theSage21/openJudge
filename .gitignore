@@ -53,3 +53,7 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# openJudge
+check_data/
+static_files/

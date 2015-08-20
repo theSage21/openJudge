@@ -119,7 +119,7 @@ echo -e "$RED Installing Nginx $NC"
 sudo apt-get install nginx
 sudo service nginx start
 
-sudo echo "
+echo "
 upstream app_server_djangoapp {
     server unix:$setup_folder/gunicorn_socket fail_timeout=0;
 }
@@ -129,8 +129,8 @@ server {
  
     keepalive_timeout 5;
     # path for static files
-    root $setup_folder/webserver/static_files/;#make sure this exists
-    location / {
+    root $setup_folder/webserver/static_files/;" > $setup_folder/openJudge
+echo '    location / {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header Host $http_host;
         proxy_redirect off;
@@ -139,13 +139,15 @@ server {
             break;
         }
     }
-}" > /etc/nginx/sites-available/openJudge
+}' >> $setup_folder/openJudge
+sudo mv $setup_folder/openJudge /etc/nginx/sites-available/openJudge
 
 cd /etc/nginx/sites-enabled/
-sudo ln /etc/nginx/sites-available/dung_website
+sudo ln /etc/nginx/sites-available/openJudge
 sudo service nginx reload
 
 echo -e "$PWD Completed Nginx setup $NC"
 
 cd $setup_folder
+sed -i "s/LOCATION/$setup_folder/" runserver.sh
 pip install -r ../requirements.txt
