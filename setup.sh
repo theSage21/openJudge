@@ -1,9 +1,16 @@
 #! /bin/bash
-source ./env/bin/activate
-cd openJudge
-setup_folder=$PWD
 RED='\033[0;31m'
 NC='\033[0m' # No Color
+
+if source ./env/bin/activate; then
+    echo "Virtualenv found"
+else
+    virtualenv -p python3 env
+    source env/bin/activate
+fi
+
+cd openJudge
+setup_folder=$PWD
 
 #CHECKSERVER SETUP
 echo -e "$RED Checkserver Setup started.$NC"
@@ -106,3 +113,39 @@ python3 data_creator.py
 echo -e "$RED ==================================================== $NC"
 rm data_creator.py
 rm -rf calibration
+
+echo -e "$RED Installing Nginx $NC"
+
+sudo apt-get install nginx
+sudo service nginx start
+
+sudo echo "
+upstream app_server_djangoapp {
+    server unix:$setup_folder/gunicorn_socket fail_timeout=0;
+}
+server {
+    listen 0.0.0.0:80;
+    server_name  .example.com;
+ 
+    keepalive_timeout 5;
+    # path for static files
+    root $setup_folder/webserver/static_files/;#make sure this exists
+    location / {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_redirect off;
+        if (!-f $request_filename) {
+            proxy_pass http://app_server_djangoapp;
+            break;
+        }
+    }
+}" > /etc/nginx/sites-available/openJudge
+
+cd /etc/nginx/sites-enabled/
+sudo ln /etc/nginx/sites-available/dung_website
+sudo service nginx reload
+
+echo -e "$PWD Completed Nginx setup $NC"
+
+cd $setup_folder
+pip install -r ../requirements.txt

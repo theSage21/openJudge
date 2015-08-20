@@ -40,6 +40,7 @@ INSTALLED_APPS = (
     'bootstrapform',
     'question',
     'contest',
+    'gunicorn',
 )
 
 MIDDLEWARE_CLASSES = (
