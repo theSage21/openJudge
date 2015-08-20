@@ -122,7 +122,7 @@ class Slave:
         url = 'http://' + self.web + data['source']
         source = get_file_from_url(url, 'source', overwrite)
 
-        outfile = ''.join(sample('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', 10))
+        outfile = 'check_data/temp/OUT_' + ''.join(sample('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', 10))
 
         permissions_modifier = 'chmod u+x ' + wrap + ' && \n'
         print('Generating command:')

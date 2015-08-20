@@ -1,5 +1,4 @@
 import os
-import sys
 
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "website.settings")
@@ -7,6 +6,6 @@ if __name__ == "__main__":
     import django
     django.setup()
     p = Profile()
-    p.username=input('Username:')
+    p.username = input('Username:')
     p.set_password(input('Password:'))
     p.save()

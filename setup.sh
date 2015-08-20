@@ -11,6 +11,7 @@ echo -e "$RED Checkserver Setup started.$NC"
 mkdir check_data
 mkdir check_data/wrappers check_data/inputs 
 mkdir check_data/outputs check_data/source
+mkdir check_data/temp
 # copy wrappers to the appropriate folders
 cp wrappers/* check_data/wrappers/
 # add absolute path to the wrappers
