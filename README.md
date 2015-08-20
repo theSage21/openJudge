@@ -43,3 +43,8 @@ virtualenv -p python3 env
 source env/bin/activate
 pip install -r requirements-dev.txt
 ```
+
+Known Pitfalls
+--------------
+
+- There are no timeouts. An infinite loop will keep the checkserver busy forever.
