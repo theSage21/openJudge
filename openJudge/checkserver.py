@@ -5,6 +5,10 @@ from socket import socket, SO_REUSEADDR, SOL_SOCKET
 from urllib.request import urlopen, urlretrieve
 
 
+def get_random_string(l=10):
+    return ''.join(sample('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', l))
+
+
 def get_file_from_url(url, folder, overwrite=False):
     "Get file from url. Overwrite if overwrite-True"
     # create storage path
@@ -14,7 +18,7 @@ def get_file_from_url(url, folder, overwrite=False):
     # get file name
     filename = url.split('/')[-1]
     if not overwrite and os.path.exists(filename):
-        salt = ''.join(sample('abcdefghijklmnopqrstuvwxyz', 5))
+        salt = get_random_string()
         filename = salt + filename
     # get resources
     complete_path = os.path.join(path, filename)
@@ -70,6 +74,7 @@ class Slave:
                  listen_addr=('127.0.0.1', 9000),  # where should this slave listen
                  timeout_limit=30  # how long to wait for timeout?
                  ):
+        self.name = 'joblist_' + listen_addr[1]  # name of slave listening at assigned port
         print('Waking up the slave')
         self.addr = listen_addr
         self.web = webserver
@@ -83,6 +88,13 @@ class Slave:
         print('The slave is learning about the contest.')
         self.check_data = self.__setup()
         print('Slave awaiting orders at: ', self.sock.getsockname())
+        self.job_list = self.__load_jobs()
+
+    def __load_jobs(self):
+        "Load jobs according to self name"
+        with open(self.name, 'r') as fl:
+            data = loads(fl.read().decode())
+        return data
 
     def __shutdown(self):
         # kill existing jobs
@@ -92,6 +104,10 @@ class Slave:
         print('Cutting all communications')
         # close comms
         self.sock.close()
+        # save job list
+        with open(self.name, 'w') as fl:
+            data = dumps(self.job_list)
+            fl.write(data)
 
     def __setup(self):
         "Obtain language data and question data"
@@ -127,7 +143,7 @@ class Slave:
         url = 'http://' + self.web + data['source']
         source = get_file_from_url(url, 'source', overwrite)
 
-        outfile = 'check_data/temp/OUT_' + ''.join(sample('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', 10))
+        outfile = 'check_data/temp/OUT_' + get_random_string()
 
         permissions_modifier = 'chmod u+x ' + wrap + ' && \n'
         print('Generating command:')
@@ -166,8 +182,12 @@ class Slave:
                 com, ard = self.sock.accept()
                 data = com.recv(4096)
                 data = loads(data.decode())
-                result = self.__process_request(data)
-                result = dumps(result)
+                if data['pk'] not in self.job_list.keys():  # First time for processing
+                    result = self.__process_request(data)
+                    self.job_list[data['pk']] = result  # add to joblist
+                    result = dumps(result)
+                else:  # not first time
+                    result = dumps(self.job_list[data['pk']])
                 com.sendall(result.encode('utf-8'))
                 com.close()
             except KeyboardInterrupt:
