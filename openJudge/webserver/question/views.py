@@ -36,11 +36,13 @@ def question(request, qno):
         if data['answer_form'].is_valid():
             form = data['answer_form']
             form = form.save(commit=False)
+            print(form.source.name)
             form.player = request.user.profile
             form.question = data['question']
             form.marks = data['question'].get_marks()
             form.save()
             form.is_correct()  # force a check request
+            print(form.source.name)
             return redirect('question:question', qno=qno)
     return render(request, template, data)
 

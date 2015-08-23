@@ -33,7 +33,7 @@ class Attempt(models.Model):
     player = models.ForeignKey('Profile', related_name='player')
     question = models.ForeignKey('Question', related_name='question')
     language = models.ForeignKey('Language', related_name='language')
-    source = models.FileField(upload_to='%t/')
+    source = models.FileField(upload_to='source')
     correct = models.NullBooleanField(default=None)
     stamp = models.DateTimeField(auto_now_add=True)
     marks = models.FloatField()
@@ -58,11 +58,11 @@ class Attempt(models.Model):
         else:
             data = self.__get_json__()
             result, comment = functions.ask_check_server(data)
+            print('Result: ', result, comment)
             if result is not None:
                 self.correct = result
                 self.remarks = comment
-                if self.correct is not None:
-                    self.marks = self.question.get_marks()
+                self.marks += self.question.get_marks()
                 self.save()
                 return self.correct
 

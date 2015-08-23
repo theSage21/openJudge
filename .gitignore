@@ -57,3 +57,4 @@ target/
 # openJudge
 check_data/
 static_files/
+joblist*

@@ -4,15 +4,18 @@ from json import loads, dumps
 from socket import socket, SO_REUSEADDR, SOL_SOCKET
 from urllib.request import urlopen, urlretrieve
 
+check_data_folder = 'check_data'
 
 def get_random_string(l=10):
+    "Returns a string of random alphabets of 'l' length"
     return ''.join(sample('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', l))
 
 
 def get_file_from_url(url, folder, overwrite=False):
     "Get file from url. Overwrite if overwrite-True"
+    global check_data_folder
     # create storage path
-    path = os.path.join('check_data', folder)
+    path = os.path.join(check_data_folder, folder)
     if not os.path.exists(path):
         os.makedirs(path)
     # get file name
@@ -74,7 +77,7 @@ class Slave:
                  listen_addr=('127.0.0.1', 9000),  # where should this slave listen
                  timeout_limit=30  # how long to wait for timeout?
                  ):
-        self.name = 'joblist_' + listen_addr[1]  # name of slave listening at assigned port
+        self.name = 'joblist_' + str(listen_addr[1])  # name of slave listening at assigned port
         print('Waking up the slave')
         self.addr = listen_addr
         self.web = webserver
@@ -92,8 +95,11 @@ class Slave:
 
     def __load_jobs(self):
         "Load jobs according to self name"
-        with open(self.name, 'r') as fl:
-            data = loads(fl.read().decode())
+        try:
+            with open(self.name, 'r') as fl:
+                data = loads(fl.read())
+        except FileNotFoundError:
+            data = {}
         return data
 
     def __shutdown(self):
@@ -132,6 +138,7 @@ class Slave:
     def __process_request(self, data):
         # TODO: check if question exists in case someone is malicious
         # setup
+        global check_data_folder
         print('Prepping for check')
         lang, qno = str(data['language']), str(data['qno'])
 
@@ -143,7 +150,7 @@ class Slave:
         url = 'http://' + self.web + data['source']
         source = get_file_from_url(url, 'source', overwrite)
 
-        outfile = 'check_data/temp/OUT_' + get_random_string()
+        outfile = check_data_folder + '/temp/OUT_' + get_random_string()
 
         permissions_modifier = 'chmod u+x ' + wrap + ' && \n'
         print('Generating command:')
