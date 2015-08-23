@@ -6,6 +6,7 @@ from urllib.request import urlopen, urlretrieve
 
 check_data_folder = 'check_data'
 
+
 def get_random_string(l=10):
     "Returns a string of random alphabets of 'l' length"
     return ''.join(sample('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', l))
@@ -98,7 +99,7 @@ class Slave:
         try:
             with open(self.name, 'r') as fl:
                 data = loads(fl.read())
-        except FileNotFoundError:
+        except:
             data = {}
         return data
 
