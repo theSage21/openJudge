@@ -21,7 +21,7 @@ class bcolors:  # for printing in terminal with colours
 
 
 def get_result(return_val, out, outfile):
-    if return_val == -1:
+    if return_val is None:
         result = 'Timeout'
         print(bcolors.OKBLUE + result + bcolors.ENDC)
     elif return_val != 0:
@@ -111,7 +111,7 @@ def run_command(cmd, timeout=30):
         signal.alarm(0)  # reset the alarm
     except Timeout:
         proc.terminate()
-        ret_val = -1
+        ret_val = None
         stderrdata = b''
     else:
         ret_val = proc.returncode
