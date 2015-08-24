@@ -9,17 +9,32 @@ from urllib.request import urlopen, urlretrieve
 check_data_folder = 'check_data'
 
 
+class bcolors:  # for printing in terminal with colours
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
+
 def get_result(return_val, out, outfile):
     if return_val == -1:
         result = 'Timeout'
+        print(bcolors.OKBLUE + result + bcolors.ENDC)
     elif return_val != 0:
         print('ERROR: Return value non zero: ', return_val)
         result = 'Error'
+        print(bcolors.WARNING + result + bcolors.ENDC)
     elif return_val == 0:
         if check_execution(out, outfile):
             result = 'Correct'
+            print(bcolors.OKGREEN + result + bcolors.ENDC)
         else:
             result = 'Incorrect'
+            print(bcolors.FAIL + result + bcolors.ENDC)
     else:
         result = 'Contact host. Something wierd is happening to your code.'
     return result
@@ -196,9 +211,8 @@ class Slave:
         print('Executing')
         return_val, stderr = run_command(command, self.timeout_limit)
         result = get_result(return_val, out, outfile)
-        print(result)
         remarks = stderr
-        print(remarks)
+        print(bcolors.BOLD + remarks + bcolors.ENDC)
         print('-'*50)
         return result, remarks
 
