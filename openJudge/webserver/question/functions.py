@@ -33,7 +33,7 @@ def ask_check_server(data,
         sock.sendall(data.encode('utf-8'))
         # recieve response
         resp = sock.recv(4096)
-        resp = loads(resp.decode())
+        resp, remarks = loads(resp.decode())
         sock.close()
         # return response and remarks
         if resp == 'Timeout':
@@ -42,6 +42,8 @@ def ask_check_server(data,
             return True, resp
         elif resp == 'Incorrect':
             return False, resp
+        elif resp == 'Error':
+            return False, remarks
 
 
 def is_correct(attempt):

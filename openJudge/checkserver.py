@@ -1,10 +1,28 @@
 import os
+import signal
+import subprocess
 from random import sample
 from json import loads, dumps
 from socket import socket, SO_REUSEADDR, SOL_SOCKET
 from urllib.request import urlopen, urlretrieve
 
 check_data_folder = 'check_data'
+
+
+def get_result(return_val, out, outfile):
+    if return_val == -1:
+        result = 'Timeout'
+    elif return_val != 0:
+        print('ERROR: Return value non zero: ', return_val)
+        result = 'Error'
+    elif return_val == 0:
+        if check_execution(out, outfile):
+            result = 'Correct'
+        else:
+            result = 'Incorrect'
+    else:
+        result = 'Contact host. Something wierd is happening to your code.'
+    return result
 
 
 def get_random_string(l=10):
@@ -38,28 +56,13 @@ def get_json(url):
     return data
 
 
-def is_alive(pid):
-    "Check if process is alive"
-    # UNIX centric hack. Improve and make cross platform.
-    try:
-        os.kill(pid, 0)
-    except os.ProcessLookupError:
-        return False
-    else:
-        return True
-
-
 def check_execution(out_expected, outfile, check_error=None):
     "Check if output is correct."
     # get output files
-    print(out_expected)
-    print(outfile)
     with open(out_expected, 'r') as f:
         lines_expected = f.readlines()
     with open(outfile, 'r') as f:
         lines_got = f.readlines()
-    print(lines_expected)
-    print(lines_got)
     # check line by line
     for got, exp in zip(lines_got, lines_expected):
         if check_error is None:  # exact checking
@@ -71,12 +74,41 @@ def check_execution(out_expected, outfile, check_error=None):
     return True
 
 
+def run_command(cmd, timeout=30):
+    "Run the command and wait for timeout time before killing"
+    class Timeout(Exception):  # class for timeout exception
+        pass
+
+    def alarm_handler(signum, frame):
+        "Raise the alarm of timeout"
+        raise Timeout
+
+    proc = subprocess.Popen(cmd,
+                            stderr=subprocess.PIPE,
+                            stdout=subprocess.PIPE,
+                            shell=True
+                            )
+
+    signal.signal(signal.SIGALRM, alarm_handler)
+    signal.alarm(timeout)  # 5 minutes
+    try:
+        stdoutdata, stderrdata = proc.communicate()
+        signal.alarm(0)  # reset the alarm
+    except Timeout:
+        proc.terminate()
+        ret_val = -1
+        stderrdata = b''
+    else:
+        ret_val = proc.returncode
+    return ret_val, stderrdata.decode()
+
+
 class Slave:
     def __init__(self,
                  webserver='127.0.0.1:8000',  # where is the webserver
                  language_url='/question/detail_list/',  # what us the language data url
                  listen_addr=('127.0.0.1', 9000),  # where should this slave listen
-                 timeout_limit=30  # how long to wait for timeout?
+                 timeout_limit=10  # how long to wait for timeout?
                  ):
         self.name = 'joblist_' + str(listen_addr[1])  # name of slave listening at assigned port
         print('Waking up the slave')
@@ -86,6 +118,7 @@ class Slave:
         self.timeout_limit = timeout_limit
         self.processes = []
         self.sock = socket()
+        # ----------------------
         self.sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         self.sock.bind(self.addr)
         self.sock.listen(5)
@@ -121,23 +154,25 @@ class Slave:
         url = 'http://' + self.web + self.lang_url
         data = get_json(url)
         print('Questions obtained:')
+        base_url = 'http://' + self.web
         for q in data['question'].keys():
             # input file
-            url = 'http://' + self.web + data['question'][q]['inp']
+            url = base_url + data['question'][q]['inp']
             data['question'][q]['inp'] = get_file_from_url(url, 'inputs')
             # output file
-            url = 'http://' + self.web + data['question'][q]['out']
+            url = base_url + data['question'][q]['out']
             data['question'][q]['out'] = get_file_from_url(url, 'outputs')
             print(q)
         print('Languages obtained')
         for l in data['language'].keys():
-            url = 'http://' + self.web + data['language'][l]['wrap']
+            url = base_url + data['language'][l]['wrap']
             data['language'][l]['wrap'] = get_file_from_url(url, 'wrappers')
             print(l)
         return data
 
     def __process_request(self, data):
         # TODO: check if question exists in case someone is malicious
+        # TODO:implement timeout mechanism
         # setup
         global check_data_folder
         print('Prepping for check')
@@ -153,36 +188,19 @@ class Slave:
 
         outfile = check_data_folder + '/temp/OUT_' + get_random_string()
 
-        permissions_modifier = 'chmod u+x ' + wrap + ' && \n'
+        permissions_modifier = 'chmod u+x ' + wrap + ';\n'
         print('Generating command:')
         command = ' '.join((permissions_modifier, wrap, inp, source, outfile))
         print(command)
         # ---------------------------------------
         print('Executing')
-        return_val = os.system(command)
-        if return_val != 0:
-            print('ERROR: Return value non zero: ', return_val)
-        # TODO:implement timeout mechanism
-        """
-        else:
-            start = time.time()
-            while is_alive(pid):
-                if time.time() - start > self.timeout_limit:
-                    os.kill(pid, 1)
-                    return 'Timeout'
-                else:
-                    time.sleep(1)
-        """
-        if return_val == 0:
-            if check_execution(out, outfile):
-                result = 'Correct'
-            else:
-                result = 'Incorrect'
-        else:
-            result = 'Incorrect'
+        return_val, stderr = run_command(command, self.timeout_limit)
+        result = get_result(return_val, out, outfile)
         print(result)
-        print('-' * 50)
-        return result
+        remarks = stderr
+        print(remarks)
+        print('-'*50)
+        return result, remarks
 
     def run(self):
         while True:
