@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from question import models
 from django.http import JsonResponse
+from question import functions
 
 
 def leaderboard(request):
@@ -36,13 +37,12 @@ def question(request, qno):
         if data['answer_form'].is_valid():
             form = data['answer_form']
             form = form.save(commit=False)
-            print(form.source.name)
             form.player = request.user.profile
             form.question = data['question']
-            form.marks = data['question'].get_marks()
+            form.marks = functions.get_marks(data['question'])
             form.save()
-            form.is_correct()  # force a check request
-            print(form.source.name)
+            if functions.is_correct(form):  # force a check request
+                functions.update_marks(request.user.profile, form)
             return redirect('question:question', qno=qno)
     return render(request, template, data)
 
