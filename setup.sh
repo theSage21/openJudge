@@ -9,7 +9,6 @@ else
     source env/bin/activate
 fi
 
-cd openJudge
 setup_folder=$PWD
 
 #CHECKSERVER SETUP
@@ -73,7 +72,7 @@ at.name='Exact'
 at.save()
 
 print('Adding wrappers')
-path = os.path.join( os.path.split(os.getcwd())[0], 'check_data', 'wrappers')
+path = os.path.join(os.path.split(os.getcwd())[0], 'check_data', 'wrappers')
 wrappers = os.listdir(path)
 for wr in wrappers:
     if 'input.py' == wr:
@@ -108,8 +107,8 @@ p.save()
 print('\033[0;31m Username: dummy \033[0m')
 print('\033[0;31m Password: asd \033[0m')
 " > data_creator.py
-echo 'Completed setup. Wrapping up'
 python3 data_creator.py
+echo 'Completed setup. Wrapping up'
 echo -e "$RED ==================================================== $NC"
 rm data_creator.py
 rm -rf calibration
@@ -129,7 +128,7 @@ server {
  
     keepalive_timeout 5;
     # path for static files
-    root $setup_folder/webserver/static_files/;" > $setup_folder/openJudge
+    root $setup_folder/webserver/static_files/;" > $setup_folder
 echo '    location / {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header Host $http_host;
@@ -139,8 +138,8 @@ echo '    location / {
             break;
         }
     }
-}' >> $setup_folder/openJudge
-sudo mv $setup_folder/openJudge /etc/nginx/sites-available/openJudge
+}' >> $setup_folder
+sudo mv $setup_folder /etc/nginx/sites-available/openJudge
 
 cd /etc/nginx/sites-enabled/
 sudo ln /etc/nginx/sites-available/openJudge
@@ -150,4 +149,4 @@ echo -e "$PWD Completed Nginx setup $NC"
 
 cd $setup_folder
 sed -i "s/LOCATION/$setup_folder/" runserver.sh
-pip install -r ../requirements.txt
+pip install -r requirements.txt
