@@ -1,5 +1,3 @@
 #! /bin/bash
 source env/bin/activate
-
-cd openJudge
-python checkserver.py
+python -c 'from openjudge.slave import Slave;s=Slave();s.run()'
