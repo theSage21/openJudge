@@ -128,7 +128,7 @@ server {
  
     keepalive_timeout 5;
     # path for static files
-    root $setup_folder/webserver/static_files/;" > $setup_folder
+    root $setup_folder/webserver/static_files/;" > $setup_folder/judge.conf
 echo '    location / {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header Host $http_host;
@@ -138,8 +138,8 @@ echo '    location / {
             break;
         }
     }
-}' >> $setup_folder
-sudo mv $setup_folder /etc/nginx/sites-available/openJudge
+}' >> $setup_folder/judge.conf
+sudo mv $setup_folder/judge.conf /etc/nginx/sites-available/openJudge
 
 cd /etc/nginx/sites-enabled/
 sudo ln /etc/nginx/sites-available/openJudge
@@ -148,5 +148,5 @@ sudo service nginx reload
 echo -e "$PWD Completed Nginx setup $NC"
 
 cd $setup_folder
-sed -i "s/LOCATION/$setup_folder/" runserver.sh
+sed -i "s,LOCATION,$setup_folder," runserver.sh
 pip install -r requirements.txt
