@@ -205,7 +205,7 @@ class Slave:
             data = {}
         return data
 
-    def __shutdown(self):
+    def shutdown(self):
         """
         Cleanly shutdown the slave.
         - Close sockets
@@ -264,6 +264,14 @@ class Slave:
         - Return results
 
         Print out information during the process
+
+        requires the data to be :
+        data = {
+                'pk'        :primary key of attempt,
+                'qno'       :question number pk,
+                'source'    :source code url,
+                'language'  :language pk,
+                }
         """
 
         # TODO: check if question exists in case someone is malicious
@@ -292,30 +300,46 @@ class Slave:
         print('-'*50)
         return result, remarks
 
-    def run(self):
+    def run(self):  # pragma: no cover
         """
         Run the slave in an infinite loop of accepting and executing
         requests from the webserver.
         """
+        # since this is an infinite loop, we do not test it
         while True:
             try:
-                com, ard = self.sock.accept()
-                data = com.recv(4096)
-                data = loads(data.decode())
-                if data['pk'] not in self.job_list.keys():  # First time for processing
-                    result = self.__process_request(data)
-                    self.job_list[data['pk']] = result  # add to joblist
-                    result = dumps(result)
-                else:  # not first time
-                    result = dumps(self.job_list[data['pk']])
+                data, com = self.__get_data_from_socket()
+                result = self.__assign_to_job_list(data)
                 com.sendall(result.encode('utf-8'))
                 com.close()
             except KeyboardInterrupt:
                 print('The slave is retiring')
-                self.__shutdown()
+                self.shutdown()
                 print('The slave is dead.')
             except OSError:
                 break  # the accept call which will raise a traceback
+
+    def get_data_from_socket(self):
+        """
+        Accepts data sent to it and returns
+        the communication point and data
+        """
+        com, _ = self.sock.accept()
+        data = com.recv(4096)
+        data = loads(data.decode())
+        return data, com
+
+    def assign_to_job_list(self, data):
+        """
+        Assign to job list or return an already executed result
+        """
+        if data['pk'] not in self.job_list.keys():  # First time for processing
+            result = self.__process_request(data)
+            self.job_list[data['pk']] = result  # add to joblist
+            result = dumps(result)
+        else:  # not first time
+            result = dumps(self.job_list[data['pk']])
+        return result
 
 if __name__ == '__main__':
     sl = Slave()

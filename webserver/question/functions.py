@@ -14,7 +14,7 @@ def ask_check_server(data,
     data is of type
         data = {
             'pk'        :primary key of attempt,
-            'qno'       :question number,
+            'qno'       :question number pk,
             'source'    :source code url,
             'language'  :language pk
             }
