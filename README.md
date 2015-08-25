@@ -2,13 +2,17 @@ OpenJudge
 =========
 [![Build Status](https://travis-ci.org/theSage21/openJudge.svg)](https://travis-ci.org/theSage21/openJudge)
 
-A judge I made to judge the simple programming competitions in college.
-A django based web server to provide the interface and a python3 based
-checking server.
+A judge I made to judge the programming competitions in college.
+It is a checking server and requires a web interface to function.
 
+Currently the languages supported are:
 
-Supports python3,python2,java,c++,c. for the attempt languages.
-Checks the code via simple shell script wrappers and pipes and output comparison.
+- Python2
+- Python3
+- Gcc
+- G++
+
+Others may be added by adding a shell script in the `wrappers` folder.
 
 Setup
 -----
@@ -35,7 +39,7 @@ Usage during the competition
    the file can be found in `./openJudge/webserver/`
 2. Run the webserver. Run the check server. Use above instructions
 3. Tell everyone to navigate to the webserver. It will be something like `192.168.1.45`
-4. Enjoy the fruits of wwatching a hundred people program.
+4. Enjoy the fruits of watching a hundred people program.
 
 I recommend a virtualenv with all the requirements satisfied.
 ```
@@ -43,3 +47,5 @@ virtualenv -p python3 env
 source env/bin/activate
 pip install -r requirements-dev.txt
 ```
+
+This is not needed if you are running `./setup.sh`. 
