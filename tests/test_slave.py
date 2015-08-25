@@ -1,7 +1,9 @@
 from openjudge.slave import (get_random_string,
                              run_command,
                              get_result,
+                             get_file_from_url,
                              check_execution,
+                             get_json,
                              bcolors)
 
 
@@ -73,6 +75,13 @@ def test_get_result_timeout():
     assert re == 'Timeout'
 
 
+def test_get_result_catchall():
+    expected = 'random1'
+    got = 'random2'
+    re = get_result(tuple(), expected, got)
+    assert isinstance(re, str)
+
+
 def test_check_execution_correct_exact(tmpdir):
     p = tmpdir.join('expected')
     p.write('1\n4\n9')
@@ -103,3 +112,16 @@ def test_check_execution_incorrect_error_range(tmpdir):
     got = '1\n3.1\n8.1'
     result = check_execution(str(p), got, 0.1)
     assert not result
+
+
+def test_get_json(httpserver):
+    httpserver.serve_content('{"a":1}')
+    assert get_json(httpserver.url) == {'a': 1}
+
+
+def test_get_file_from_url_no_overwrite(httpserver, tmpdir):
+    httpserver.serve_content('nothing')
+    url = httpserver.url
+    path = get_file_from_url(url, str(tmpdir), False)
+    name = url.split('/')[-1]
+    assert path == str(tmpdir) + '/' + name

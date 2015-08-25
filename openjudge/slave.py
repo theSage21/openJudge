@@ -32,20 +32,22 @@ def get_result(return_val, out, out_recieved):
             [Timeout, Correct, Incorrect, Error, <catchall>]
     along with a remark pertaining to the case.
     """
+    result = 'Contact a volunteer'
     if return_val is None:
         result = 'Timeout'
         print(bcolors.OKBLUE + result + bcolors.ENDC)
-    elif return_val != 0:
-        print('ERROR: Return value non zero: ', return_val)
-        result = 'Error'
-        print(bcolors.WARNING + result + bcolors.ENDC)
-    elif return_val == 0:
-        if check_execution(out, out_recieved):
-            result = 'Correct'
-            print(bcolors.OKGREEN + result + bcolors.ENDC)
-        else:
-            result = 'Incorrect'
-            print(bcolors.FAIL + result + bcolors.ENDC)
+    elif isinstance(return_val, int):
+        if return_val != 0:
+            print('ERROR: Return value non zero: ', return_val)
+            result = 'Error'
+            print(bcolors.WARNING + result + bcolors.ENDC)
+        elif return_val == 0:
+            if check_execution(out, out_recieved):
+                result = 'Correct'
+                print(bcolors.OKGREEN + result + bcolors.ENDC)
+            else:
+                result = 'Incorrect'
+                print(bcolors.FAIL + result + bcolors.ENDC)
     return result
 
 
@@ -58,11 +60,14 @@ def get_file_from_url(url, folder, overwrite=False):
     "Get file from url. Overwrite if overwrite=True"
     # create storage path
     path = os.path.join(config.check_data_folder, folder)
-    if not os.path.exists(path):
+    if not os.path.exists(path):  # pragma: no cover
+        # this does not work with the tmpdir funcarg
         os.makedirs(path)
     # get file name
     filename = url.split('/')[-1]
-    if not overwrite and os.path.exists(filename):
+    if not overwrite and os.path.exists(filename):  # pragma: no cover
+        # os does not work with tmpdir funcarg in testing
+        # TODO: find a way to test this
         salt = get_random_string()
         filename = salt + filename
     # get resources
