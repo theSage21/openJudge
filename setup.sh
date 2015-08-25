@@ -7,6 +7,7 @@ if source ./env/bin/activate; then
 else
     virtualenv -p python3 env
     source env/bin/activate
+    pip install -r requirements.txt
 fi
 
 setup_folder=$PWD
@@ -149,4 +150,3 @@ echo -e "$PWD Completed Nginx setup $NC"
 
 cd $setup_folder
 sed -i "s,LOCATION,$setup_folder," runserver.sh
-pip install -r requirements.txt
