@@ -5,11 +5,14 @@ from random import sample
 from json import loads, dumps
 from socket import socket, SO_REUSEADDR, SOL_SOCKET
 from urllib.request import urlopen, urlretrieve
-
-check_data_folder = 'check_data'
+from . import config
 
 
 class bcolors:  # for printing in terminal with colours
+    """
+    Simple coloured output in the terminal to help distinguish between
+    things
+    """
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
     OKGREEN = '\033[92m'
@@ -21,6 +24,14 @@ class bcolors:  # for printing in terminal with colours
 
 
 def get_result(return_val, out, outfile):
+    """
+    Based on return value provided,
+             output recieved,
+             output expected
+    return a result which is in
+            [Timeout, Correct, Incorrect, Error, <catchall>]
+    along with a remark pertaining to the case.
+    """
     if return_val is None:
         result = 'Timeout'
         print(bcolors.OKBLUE + result + bcolors.ENDC)
@@ -36,7 +47,7 @@ def get_result(return_val, out, outfile):
             result = 'Incorrect'
             print(bcolors.FAIL + result + bcolors.ENDC)
     else:
-        result = 'Contact host. Something wierd is happening to your code.'
+        result = 'Contact a volunteer.\n Something wierd is happening to your code.'
     return result
 
 
@@ -46,10 +57,9 @@ def get_random_string(l=10):
 
 
 def get_file_from_url(url, folder, overwrite=False):
-    "Get file from url. Overwrite if overwrite-True"
-    global check_data_folder
+    "Get file from url. Overwrite if overwrite=True"
     # create storage path
-    path = os.path.join(check_data_folder, folder)
+    path = os.path.join(config.check_data_folder, folder)
     if not os.path.exists(path):
         os.makedirs(path)
     # get file name
@@ -72,12 +82,20 @@ def get_json(url):
 
 
 def check_execution(out_expected, outfile, check_error=None):
-    "Check if output is correct."
+    """Check if output is correct.
+    Output is checked against expected output.
+    There are two methods of checking.
+        - Exact      : String comparison is made
+        - Error range: Difference must be within error range
+    """
     # get output files
     with open(out_expected, 'r') as f:
         lines_expected = f.readlines()
     with open(outfile, 'r') as f:
         lines_got = f.readlines()
+    # make sure check_error is of correct type
+    if not isinstance(check_error, (int, float)):
+        check_error = eval(check_error)
     # check line by line
     for got, exp in zip(lines_got, lines_expected):
         if check_error is None:  # exact checking
@@ -89,8 +107,11 @@ def check_execution(out_expected, outfile, check_error=None):
     return True
 
 
-def run_command(cmd, timeout=30):
-    "Run the command and wait for timeout time before killing"
+def run_command(cmd, timeout=config.timeout_limit):
+    """
+    Run the command in a subprocess and wait for timeout
+    time before killing it.
+    Errors are recorded and output is recorded"""
     class Timeout(Exception):  # class for timeout exception
         pass
 
@@ -105,7 +126,7 @@ def run_command(cmd, timeout=30):
                             )
 
     signal.signal(signal.SIGALRM, alarm_handler)
-    signal.alarm(timeout)  # 5 minutes
+    signal.alarm(timeout)
     try:
         stdoutdata, stderrdata = proc.communicate()
         signal.alarm(0)  # reset the alarm
@@ -119,13 +140,43 @@ def run_command(cmd, timeout=30):
 
 
 class Slave:
+    """
+    The slave class is the main class in the check slave.
+
+    It does the following:
+        - Setup itself with information about the contest
+        - Recieve jobs on a listening address
+        - Perform check for jobs
+        - Return the result of the checks
+        - Remember checked jobs.
+    """
     def __init__(self,
-                 webserver='127.0.0.1:8000',  # where is the webserver
-                 language_url='/question/detail_list/',  # what us the language data url
-                 listen_addr=('127.0.0.1', 9000),  # where should this slave listen
-                 timeout_limit=10  # how long to wait for timeout?
-                 ):
-        self.name = 'joblist_' + str(listen_addr[1])  # name of slave listening at assigned port
+                 webserver=None,
+                 language_url=None,
+                 listen_addr=None,
+                 timeout_limit=None):
+        """
+        Arguments:
+            webserver       :   address of the webserver
+            language_url    :   the url where language and question details are found
+            listen_addr     :   where does this slave listen
+            timeout_limit   :   how long to wait before declaring a timout (seconds)
+
+        After creating a slave call:
+            slave.run()
+            slave = Slave()
+        """
+        # set defaults in case missing
+        if webserver is None:
+            webserver = config.webserver
+        if language_url is None:
+            language_url = config.language_url
+        if listen_addr is None:
+            listen_addr = config.listen_addr
+        if timeout_limit is None:
+            timeout_limit = config.timeout_limit
+        # defaults set
+        self.name = config.job_list_prefix + str(listen_addr[1])  # name of slave listening at assigned port
         print('Waking up the slave')
         self.addr = listen_addr
         self.web = webserver
@@ -143,7 +194,10 @@ class Slave:
         self.job_list = self.__load_jobs()
 
     def __load_jobs(self):
-        "Load jobs according to self name"
+        """
+        Load jobs according to self.name
+        If none exist return an empty job dictionary
+        """
         try:
             with open(self.name, 'r') as fl:
                 data = loads(fl.read())
@@ -152,6 +206,12 @@ class Slave:
         return data
 
     def __shutdown(self):
+        """
+        Cleanly shutdown the slave.
+        - Close sockets
+        - Kill existing jobs
+        - Save joblist
+        """
         # kill existing jobs
         print('Abandoning all running checks')
         for i in self.processes:
@@ -165,11 +225,20 @@ class Slave:
             fl.write(data)
 
     def __setup(self):
-        "Obtain language data and question data"
-        url = 'http://' + self.web + self.lang_url
+        """
+        Obtain language data and question data
+        form the webserver at the language_url
+
+        Save in check_data_folder
+        return a dict of relevant data
+        """
+        print(config.protocol_of_webserver)
+        print(self.web)
+        print(self.lang_url)
+        url = config.protocol_of_webserver + self.web + self.lang_url
         data = get_json(url)
         print('Questions obtained:')
-        base_url = 'http://' + self.web
+        base_url = config.protocol_of_webserver + self.web
         for q in data['question'].keys():
             # input file
             url = base_url + data['question'][q]['inp']
@@ -186,10 +255,20 @@ class Slave:
         return data
 
     def __process_request(self, data):
+        """
+        Process the request.
+
+        - Check if data is valid
+        - Execute the program
+        - Collect information
+        - Return results
+
+        Print out information during the process
+        """
+
         # TODO: check if question exists in case someone is malicious
-        # TODO:implement timeout mechanism
+        # TODO: use subprocess output pipe instead of temp file
         # setup
-        global check_data_folder
         print('Prepping for check')
         lang, qno = str(data['language']), str(data['qno'])
 
@@ -198,10 +277,10 @@ class Slave:
         out = self.check_data['question'][qno]['out']
 
         overwrite = self.check_data['language'][lang]['overwrite']
-        url = 'http://' + self.web + data['source']
+        url = config.protocol_of_webserver + self.web + data['source']
         source = get_file_from_url(url, 'source', overwrite)
 
-        outfile = check_data_folder + '/temp/OUT_' + get_random_string()
+        outfile = config.check_data_folder + config.temp_folder_prefix + get_random_string()
 
         permissions_modifier = 'chmod u+x ' + wrap + ';\n'
         print('Generating command:')
@@ -217,6 +296,10 @@ class Slave:
         return result, remarks
 
     def run(self):
+        """
+        Run the slave in an infinite loop of accepting and executing
+        requests from the webserver.
+        """
         while True:
             try:
                 com, ard = self.sock.accept()
@@ -234,6 +317,8 @@ class Slave:
                 print('The slave is retiring')
                 self.__shutdown()
                 print('The slave is dead.')
+            except OSError:
+                break  # the accept call which will raise a traceback
 
 if __name__ == '__main__':
     sl = Slave()
