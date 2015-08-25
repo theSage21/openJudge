@@ -23,7 +23,7 @@ class bcolors:  # for printing in terminal with colours
     UNDERLINE = '\033[4m'
 
 
-def get_result(return_val, out, outfile):
+def get_result(return_val, out, out_recieved):
     """
     Based on return value provided,
              output recieved,
@@ -40,7 +40,7 @@ def get_result(return_val, out, outfile):
         result = 'Error'
         print(bcolors.WARNING + result + bcolors.ENDC)
     elif return_val == 0:
-        if check_execution(out, outfile):
+        if check_execution(out, out_recieved):
             result = 'Correct'
             print(bcolors.OKGREEN + result + bcolors.ENDC)
         else:
@@ -81,7 +81,7 @@ def get_json(url):
     return data
 
 
-def check_execution(out_expected, outfile, check_error=None):
+def check_execution(out_expected, out_recieved, check_error=None):
     """Check if output is correct.
     Output is checked against expected output.
     There are two methods of checking.
@@ -91,10 +91,10 @@ def check_execution(out_expected, outfile, check_error=None):
     # get output files
     with open(out_expected, 'r') as f:
         lines_expected = f.readlines()
-    with open(outfile, 'r') as f:
-        lines_got = f.readlines()
+    lines_got = out_recieved.split('\n')
     # make sure check_error is of correct type
-    if not isinstance(check_error, (int, float)):
+    if check_error is not None and (not isinstance(check_error, (int, float))):
+        print(type(check_error))
         check_error = eval(check_error)
     # check line by line
     for got, exp in zip(lines_got, lines_expected):
@@ -134,9 +134,10 @@ def run_command(cmd, timeout=config.timeout_limit):
         proc.terminate()
         ret_val = None
         stderrdata = b''
+        stdoutdata = b''
     else:
         ret_val = proc.returncode
-    return ret_val, stderrdata.decode()
+    return ret_val, stdoutdata.decode(), stderrdata.decode()
 
 
 class Slave:
@@ -280,16 +281,14 @@ class Slave:
         url = config.protocol_of_webserver + self.web + data['source']
         source = get_file_from_url(url, 'source', overwrite)
 
-        outfile = config.check_data_folder + config.temp_folder_prefix + get_random_string()
-
         permissions_modifier = 'chmod u+x ' + wrap + ';\n'
         print('Generating command:')
-        command = ' '.join((permissions_modifier, wrap, inp, source, outfile))
+        command = ' '.join((permissions_modifier, wrap, inp, source))
         print(command)
         # ---------------------------------------
         print('Executing')
-        return_val, stderr = run_command(command, self.timeout_limit)
-        result = get_result(return_val, out, outfile)
+        return_val, out_recieved, stderr = run_command(command, self.timeout_limit)
+        result = get_result(return_val, out, out_recieved)
         remarks = stderr
         print(bcolors.BOLD + remarks + bcolors.ENDC)
         print('-'*50)
