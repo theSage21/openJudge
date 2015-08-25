@@ -11,4 +11,4 @@ script:
   - py.test --cov openjudge --cov-report html
 
 after_success:
-    coveralls --rcfile=.coveragerc
+  - coveralls
