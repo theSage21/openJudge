@@ -1,6 +1,7 @@
 import os
 from openjudge.slave import (get_random_string,
                              run_command,
+                             get_result,
                              check_execution,
                              bcolors)
 
@@ -41,3 +42,11 @@ def test_color_sequences_for_printing():
     assert bcolors.ENDC
     assert bcolors.BOLD
     assert bcolors.UNDERLINE
+
+
+def test_get_result_correct(tmpdir):
+    p = tmpdir.join('expected')
+    p.write('1\n4')
+    got = '1\n4'
+    re = get_result(0, str(p), got)
+    assert re == 'Correct'
