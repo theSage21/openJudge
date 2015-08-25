@@ -8,6 +8,7 @@ install:
 # command to run tests
 script:
   - flake8
+  - py.test --cov openjudge --cov-report html
 
 after_success:
     coveralls --rcfile=.coveragerc
