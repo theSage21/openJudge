@@ -267,7 +267,6 @@ class Slave:
         """
 
         # TODO: check if question exists in case someone is malicious
-        # TODO: use subprocess output pipe instead of temp file
         # setup
         print('Prepping for check')
         lang, qno = str(data['language']), str(data['qno'])

@@ -1,10 +1,29 @@
+import pytest
+import random
+from openjudge import config
 from openjudge.slave import (get_random_string,
                              run_command,
                              get_result,
                              get_file_from_url,
                              check_execution,
                              get_json,
+                             Slave,
                              bcolors)
+
+
+@pytest.fixture
+def slave(httpserver):
+    httpserver.serve_content('{"question": {}, "language": {}}')
+    url = httpserver.url[7:]  # cut out the already existing http://
+    config.webserver = '127.0.0.1:8000'
+    config.language_url = '/question/detail_list/'
+    config.listen_addr = ('127.0.0.1', 9000)
+    config.timeout_limit = 10
+    s = Slave(webserver=url,
+              language_url='/',
+              listen_addr=('127.0.0.1', random.choice(range(9000, 10000))),
+              timeout_limit=20)
+    return s
 
 
 def test_get_random_string():
@@ -125,3 +144,45 @@ def test_get_file_from_url_no_overwrite(httpserver, tmpdir):
     path = get_file_from_url(url, str(tmpdir), False)
     name = url.split('/')[-1]
     assert path == str(tmpdir) + '/' + name
+
+
+def test_slave_creation_with_all_parameters(httpserver):
+    httpserver.serve_content('{"question": {}, "language": {}}')
+    url = httpserver.url[7:]  # cut out the already existing http://
+    assert Slave(webserver=url,
+                 language_url='/',
+                 listen_addr=('127.0.0.1', 9000),
+                 timeout_limit=20)
+
+
+def test_slave_creation_with_no_parameters(httpserver):
+    httpserver.serve_content('{"question": {}, "language": {}}')
+    url = httpserver.url[7:]  # cut out the already existing http://
+    config.webserver = url
+    config.language_url = '/'
+    assert Slave()
+
+
+def test_slave_job_list_read_existing_file(tmpdir, httpserver):
+    # custom joblist file name
+    p = tmpdir.join('job')
+    config.job_list_prefix = str(p)
+    p = tmpdir.join('job9000')
+    p.write('{"1": "2"}')
+    # create a slave
+    httpserver.serve_content('{"question": {}, "language": {}}')
+    url = httpserver.url[7:]  # cut out the already existing http://
+    s = Slave(webserver=url,
+              language_url='/',
+              listen_addr=('127.0.0.1', 9000),
+              timeout_limit=20)
+    assert s
+    assert s.job_list == {"1": "2"}
+
+
+def test_slave_job_list_without_existing_file(slave):
+    # custom joblist file name
+    # create a slave
+    s = slave
+    assert s
+    assert s.job_list == {}
