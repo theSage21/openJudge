@@ -139,10 +139,10 @@ echo '    location / {
         }
     }
 }' >> $setup_folder/judge.conf
-sudo mv $setup_folder/judge.conf /etc/nginx/sites-available/openJudge
+sudo mv $setup_folder/judge.conf /etc/nginx/sites-available/openjudge
 
 cd /etc/nginx/sites-enabled/
-sudo ln /etc/nginx/sites-available/openJudge
+sudo ln /etc/nginx/sites-available/openjudge
 sudo service nginx reload
 
 echo -e "$PWD Completed Nginx setup $NC"
