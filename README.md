@@ -1,6 +1,7 @@
 OpenJudge
 =========
 [![Build Status](https://travis-ci.org/theSage21/openJudge.svg)](https://travis-ci.org/theSage21/openJudge)
+[![Coverage Status](https://coveralls.io/repos/theSage21/openJudge/badge.svg?branch=master&service=github)](https://coveralls.io/github/theSage21/openJudge?branch=master)
 
 A judge I made to judge the programming competitions in college.
 It is a checking server and requires a web interface to function.
