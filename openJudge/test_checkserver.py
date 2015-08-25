@@ -1,5 +1,8 @@
+import os
 from checkserver import (get_random_string,
-                         run_command)
+                         run_command,
+                         check_execution,
+                         bcolors)
 
 
 def test_get_random_string():
@@ -26,3 +29,15 @@ def test_run_command_error():
     r, err = run_command(cmd)
     assert r == 1
     assert err == 'cat: non_existant_file: No such file or directory\n'
+
+
+def test_color_sequences_for_printing():
+    assert bcolors
+    assert bcolors.HEADER
+    assert bcolors.OKBLUE
+    assert bcolors.OKGREEN
+    assert bcolors.WARNING
+    assert bcolors.FAIL
+    assert bcolors.ENDC
+    assert bcolors.BOLD
+    assert bcolors.UNDERLINE
