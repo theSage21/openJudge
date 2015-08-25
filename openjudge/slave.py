@@ -46,8 +46,6 @@ def get_result(return_val, out, out_recieved):
         else:
             result = 'Incorrect'
             print(bcolors.FAIL + result + bcolors.ENDC)
-    else:
-        result = 'Contact a volunteer.\n Something wierd is happening to your code.'
     return result
 
 
@@ -92,17 +90,13 @@ def check_execution(out_expected, out_recieved, check_error=None):
     with open(out_expected, 'r') as f:
         lines_expected = f.readlines()
     lines_got = out_recieved.split('\n')
-    # make sure check_error is of correct type
-    if check_error is not None and (not isinstance(check_error, (int, float))):
-        print(type(check_error))
-        check_error = eval(check_error)
     # check line by line
     for got, exp in zip(lines_got, lines_expected):
         if check_error is None:  # exact checking
             if exp.strip() != got.strip():
                 return False
         else:  # error range checking
-            if abs(eval(exp.strip()) - eval(got.strip())) > eval(check_error):
+            if abs(eval(exp.strip()) - eval(got.strip())) > check_error:
                 return False
     return True
 
