@@ -1,7 +1,7 @@
 import pytest
 import random
 from socket import create_connection
-from openjudge import config
+from openjudge import config, errors
 from openjudge.slave import (get_random_string,
                              run_command,
                              get_result,
@@ -87,6 +87,12 @@ def test_color_sequences_for_printing():
     assert bcolors.UNDERLINE
 
 
+def test_get_result_catchall():
+    re = get_result(tuple(), 'a', 'b')
+    assert re == 'Contact a volunteer'
+    assert isinstance(re, str)
+
+
 def test_get_result_correct(tmpdir):
     p = tmpdir.join('expected')
     p.write('1\n4')
@@ -113,13 +119,6 @@ def test_get_result_timeout():
     expected = 'this_does_not_matter',
     re = get_result(None, expected, 'so_does_this')
     assert re == 'Timeout'
-
-
-def test_get_result_catchall():
-    expected = 'random1'
-    got = 'random2'
-    re = get_result(tuple(), expected, got)
-    assert isinstance(re, str)
 
 
 def test_check_execution_correct_exact(tmpdir):
@@ -159,12 +158,46 @@ def test_get_json(httpserver):
     assert get_json(httpserver.url) == {'a': 1}
 
 
-def test_get_file_from_url_no_overwrite(httpserver, tmpdir):
+def test_get_file_from_url_unable_to_retrieve_url():
+    url = 'http://example.com/some/exist.html'
+    with pytest.raises(errors.InterfaceNotRunning):
+        get_file_from_url(url, 'filename')
+
+
+def test_get_file_from_url_folder_does_not_exist(httpserver, tmpdir):
+    httpserver.serve_content('nothing')
+    url = httpserver.url
+    folder = str(tmpdir) + '/random/'
+    fl = get_file_from_url(url, folder)
+    assert fl == str(tmpdir) + '/random/' + url.split('/')[-1]
+
+
+def test_get_file_from_url_no_overwrite_file_exists(httpserver, tmpdir):
+    httpserver.serve_content('nothing')
+    url = httpserver.url
+    name = url.split('/')[-1]
+    # create the file
+    p = tmpdir.join(name)
+    p.write('something')
+    assert p.read() == 'something'
+    # get the file
+    fl = get_file_from_url(url, str(tmpdir))
+    # assert a new file was created
+    assert p.read() == 'something'
+    with open(fl, 'r') as recieved_data:
+        assert recieved_data.read() == 'nothing'
+
+
+def test_get_file_from_url_no_overwrite_file_does_not_exist(httpserver, tmpdir):
     httpserver.serve_content('nothing')
     url = httpserver.url
     path = get_file_from_url(url, str(tmpdir), False)
     name = url.split('/')[-1]
     assert path == str(tmpdir) + '/' + name
+
+
+def test_slave_creation_failure():
+    assert Slave()
 
 
 def test_slave_creation_with_all_parameters(httpserver):

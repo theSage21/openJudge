@@ -32,7 +32,7 @@ def get_result(return_val, out, out_recieved):
             print('ERROR: Return value non zero: ', return_val)
             result = 'Error'
             print(bcolors.WARNING + result + bcolors.ENDC)
-        elif return_val == 0:
+        else:
             if check_execution(out, out_recieved):
                 result = 'Correct'
                 print(bcolors.OKGREEN + result + bcolors.ENDC)
@@ -51,14 +51,12 @@ def get_file_from_url(url, folder, overwrite=False):
     "Get file from url. Overwrite if overwrite=True"
     # create storage path
     path = os.path.join(config.check_data_folder, folder)
-    if not os.path.exists(path):  # pragma: no cover
-        # this does not work with the tmpdir funcarg
+    if not os.path.exists(path):
         os.makedirs(path)
     # get file name
     filename = url.split('/')[-1]
-    if not overwrite and os.path.exists(filename):  # pragma: no cover
-        # os does not work with tmpdir funcarg in testing
-        # TODO: find a way to test this
+    filepath = os.path.join(path, filename)
+    if not overwrite and os.path.exists(filepath):
         salt = get_random_string()
         filename = salt + filename
     # get resources
@@ -67,8 +65,6 @@ def get_file_from_url(url, folder, overwrite=False):
         fl_name, _ = urlretrieve(url, complete_path)
     except URLError:
         raise errors.InterfaceNotRunning('URL unavailable: {}'.format(url))
-    except Exception:
-        raise errors.OpenjudgeError
     return os.path.join(os.getcwd(), fl_name)
 
 
@@ -78,8 +74,6 @@ def get_json(url):
         page = urlopen(url)
     except URLError:
         raise errors.InterfaceNotRunning('URL unavailable: {}'.format(url))
-    except Exception:
-        raise errors.OpenjudgeError
     text = page.read().decode()
     data = loads(text)
     return data
@@ -180,7 +174,6 @@ class Slave:
         self.web = webserver
         self.lang_url = language_url
         self.timeout_limit = timeout_limit
-        self.processes = []
         self.sock = socket()
         self.job_list = self.__load_jobs()
         # ----------------------
@@ -217,9 +210,6 @@ class Slave:
         print(bcolors.WARNING + 'Shutting down due to: ')
         print(bcolors.BOLD + reason + bcolors.ENDC)
         # kill existing jobs
-        print('Abandoning all running checks')
-        for i in self.processes:
-            os.kill(i, 1)
         print('Cutting all communications')
         # close comms
         self.sock.close()
@@ -250,18 +240,10 @@ class Slave:
         for q in data['question'].keys():
             # input file
             url = base_url + data['question'][q]['inp']
-            try:
-                data['question'][q]['inp'] = get_file_from_url(url, 'inputs')
-            except errors.InterfaceNotRunning as e:
-                self.shutdown('Interface not running' + str(e))
-                return None
+            data['question'][q]['inp'] = get_file_from_url(url, 'inputs')
             # output file
             url = base_url + data['question'][q]['out']
-            try:
-                data['question'][q]['out'] = get_file_from_url(url, 'outputs')
-            except errors.InterfaceNotRunning as e:
-                self.shutdown('Interface not running' + str(e))
-                return None
+            data['question'][q]['out'] = get_file_from_url(url, 'outputs')
             print(q)
         print('Languages obtained')
         for l in data['language'].keys():
