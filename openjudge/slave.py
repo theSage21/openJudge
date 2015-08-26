@@ -242,8 +242,8 @@ class Slave:
         url = config.protocol_of_webserver + self.web + self.lang_url
         try:
             data = get_json(url)
-        except errors.InterfaceNotRunning:
-            self.shutdown('Interface not running')
+        except errors.InterfaceNotRunning as e:
+            self.shutdown('Interface not running: ' + str(e))
             return None
         print('Questions obtained:')
         base_url = config.protocol_of_webserver + self.web
@@ -252,15 +252,15 @@ class Slave:
             url = base_url + data['question'][q]['inp']
             try:
                 data['question'][q]['inp'] = get_file_from_url(url, 'inputs')
-            except errors.InterfaceNotRunning:
-                self.shutdown('Interface not running')
+            except errors.InterfaceNotRunning as e:
+                self.shutdown('Interface not running' + str(e))
                 return None
             # output file
             url = base_url + data['question'][q]['out']
             try:
                 data['question'][q]['out'] = get_file_from_url(url, 'outputs')
-            except errors.InterfaceNotRunning:
-                self.shutdown('Interface not running')
+            except errors.InterfaceNotRunning as e:
+                self.shutdown('Interface not running' + str(e))
                 return None
             print(q)
         print('Languages obtained')
