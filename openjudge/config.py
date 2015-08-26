@@ -1,5 +1,5 @@
 timeout_limit = 10
-check_data_folder = '../check_data'
+check_data_folder = '~/check_data'
 webserver = '127.0.0.1:8000'
 language_url = '/question/detail_list/'
 listen_addr = ('127.0.0.1', 9000)
