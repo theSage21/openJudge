@@ -1,6 +1,7 @@
 import os
 import signal
 import subprocess
+import logging
 from random import sample
 from json import loads, dumps
 from socket import socket, SO_REUSEADDR, SOL_SOCKET
@@ -12,6 +13,9 @@ from . import utils
 
 
 bcolors = utils.bcolors
+logging.basicConfig(filename=config.logfile,
+                    level=logging.DEBUG)
+judge_log = logging.getLogger('judge')
 
 
 def get_result(return_val, out, out_recieved):
@@ -26,19 +30,19 @@ def get_result(return_val, out, out_recieved):
     result = 'Contact a volunteer'
     if return_val is None:
         result = 'Timeout'
-        print(bcolors.OKBLUE + result + bcolors.ENDC)
+        judge_log.info(result)
     elif isinstance(return_val, int):
         if return_val != 0:
-            print('ERROR: Return value non zero: ', return_val)
+            judge_log.info('ERROR: Return value non zero: ', return_val)
             result = 'Error'
-            print(bcolors.WARNING + result + bcolors.ENDC)
+            judge_log.info(result)
         else:
             if check_execution(out, out_recieved):
                 result = 'Correct'
-                print(bcolors.OKGREEN + result + bcolors.ENDC)
+                judge_log.info(result)
             else:
                 result = 'Incorrect'
-                print(bcolors.FAIL + result + bcolors.ENDC)
+                judge_log.info(result)
     return result
 
 
@@ -64,6 +68,7 @@ def get_file_from_url(url, folder, overwrite=False):
     try:
         fl_name, _ = urlretrieve(url, complete_path)
     except URLError:
+        judge_log.exception('URL unavailable: {}'.format(url))
         raise errors.InterfaceNotRunning('URL unavailable: {}'.format(url))
     return os.path.join(os.getcwd(), fl_name)
 
@@ -73,6 +78,7 @@ def get_json(url):
     try:
         page = urlopen(url)
     except URLError:
+        judge_log.exception('URL unavailable: {}'.format(url))
         raise errors.InterfaceNotRunning('URL unavailable: {}'.format(url))
     text = page.read().decode()
     data = loads(text)
@@ -169,7 +175,8 @@ class Slave:
             timeout_limit = config.timeout_limit
         # defaults set
         self.name = config.job_list_prefix + str(listen_addr[1])  # name of slave listening at assigned port
-        print('Waking up the slave')
+        self.log = logging.getLogger('slave_' + str(listen_addr[1]))
+        self.log.info('Waking up the slave')
         self.addr = listen_addr
         self.web = webserver
         self.lang_url = language_url
@@ -180,13 +187,13 @@ class Slave:
         self.sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         self.sock.bind(self.addr)
         self.sock.listen(5)
-        print('The slave is learning about the contest.')
+        self.log.info('The slave is learning about the contest.')
         data = self.__setup()
         if data is None:
-            print(bcolors.FAIL + 'Setup failed' + bcolors.ENDC)
+            self.log.error('Setup failed')
             return
         self.check_data = data
-        print('Slave awaiting orders at: ', self.sock.getsockname())
+        self.log.info('Slave awaiting orders at: ', self.sock.getsockname())
 
     def __load_jobs(self):
         """
@@ -197,6 +204,7 @@ class Slave:
             with open(self.name, 'r') as fl:
                 data = loads(fl.read())
         except:
+            self.log.info('Jobfile not found, starting afresh')
             data = {}
         return data
 
@@ -207,16 +215,17 @@ class Slave:
         - Kill existing jobs
         - Save joblist
         """
-        print(bcolors.WARNING + 'Shutting down due to: ')
-        print(bcolors.BOLD + reason + bcolors.ENDC)
+        self.log.info('Shutting down due to: ' + reason)
         # kill existing jobs
-        print('Cutting all communications')
+        self.log.info('Cutting all communications')
         # close comms
         self.sock.close()
         # save job list
+        self.log.info('Saving joblist')
         with open(self.name, 'w') as fl:
             data = dumps(self.job_list)
             fl.write(data)
+        self.log.info('Job list saved')
 
     def __setup(self):
         """
@@ -226,16 +235,13 @@ class Slave:
         Save in check_data_folder
         return a dict of relevant data
         """
-        print(config.protocol_of_webserver)
-        print(self.web)
-        print(self.lang_url)
         url = config.protocol_of_webserver + self.web + self.lang_url
         try:
             data = get_json(url)
         except errors.InterfaceNotRunning as e:
             self.shutdown('Interface not running: ' + str(e))
             return None
-        print('Questions obtained:')
+        self.log.info('Questions obtained:')
         base_url = config.protocol_of_webserver + self.web
         for q in data['question'].keys():
             # input file
@@ -244,12 +250,12 @@ class Slave:
             # output file
             url = base_url + data['question'][q]['out']
             data['question'][q]['out'] = get_file_from_url(url, 'outputs')
-            print(q)
-        print('Languages obtained')
+            self.log.info(q)
+        self.log.info('Languages obtained')
         for l in data['language'].keys():
             url = base_url + data['language'][l]['wrap']
             data['language'][l]['wrap'] = get_file_from_url(url, 'wrappers')
-            print(l)
+            self.log.info(l)
         return data
 
     def __process_request(self, data):
@@ -274,7 +280,7 @@ class Slave:
 
         # TODO: check if question exists in case someone is malicious
         # setup
-        print('Prepping for check')
+        self.log.info('Prepping for check pk:', str(data['pk']))
         lang, qno = str(data['language']), str(data['qno'])
 
         wrap = self.check_data['language'][lang]['wrap']
@@ -286,16 +292,15 @@ class Slave:
         source = get_file_from_url(url, 'source', overwrite)
 
         permissions_modifier = 'chmod u+x ' + wrap + ';\n'
-        print('Generating command:')
+        self.log.info('Generating command:')
         command = ' '.join((permissions_modifier, wrap, inp, source))
-        print(command)
+        self.log.info(command)
         # ---------------------------------------
-        print('Executing')
+        self.log.info('Executing')
         return_val, out_recieved, stderr = run_command(command, self.timeout_limit)
         result = get_result(return_val, out, out_recieved)
         remarks = stderr
-        print(bcolors.BOLD + remarks + bcolors.ENDC)
-        print('-'*50)
+        self.log.info(remarks)
         return result, remarks
 
     def run(self):  # pragma: no cover
@@ -311,9 +316,9 @@ class Slave:
                 com.sendall(result.encode('utf-8'))
                 com.close()
             except KeyboardInterrupt:
-                print('The slave is retiring')
+                self.log.info('The slave is retiring')
                 self.shutdown('Keyboard interrupt')
-                print('The slave is dead.')
+                self.log.info('The slave is dead.')
             except OSError:
                 break  # the accept call which will raise a traceback
 
@@ -332,10 +337,12 @@ class Slave:
         Assign to job list or return an already executed result
         """
         if data['pk'] not in self.job_list.keys():  # First time for processing
+            self.log.info('Job recieved for first time: ' + str(data['pk']))
             result = self.__process_request(data)
             self.job_list[data['pk']] = result  # add to joblist
             result = dumps(result)
         else:  # not first time
+            self.log.info('Job recieved: ' + str(data['pk']))
             result = dumps(self.job_list[data['pk']])
         return result
 

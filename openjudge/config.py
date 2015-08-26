@@ -5,3 +5,4 @@ language_url = '/question/detail_list/'
 listen_addr = ('127.0.0.1', 9000)
 job_list_prefix = 'joblist_'
 protocol_of_webserver = 'http://'
+logfile = 'judge.log'
