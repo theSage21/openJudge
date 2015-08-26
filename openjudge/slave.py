@@ -2,6 +2,7 @@ import os
 import signal
 import subprocess
 import logging
+from datetime import datetime
 from random import sample
 from json import loads, dumps
 from socket import socket, SO_REUSEADDR, SOL_SOCKET
@@ -33,7 +34,7 @@ def get_result(return_val, out, out_recieved):
         judge_log.info(result)
     elif isinstance(return_val, int):
         if return_val != 0:
-            judge_log.info('ERROR: Return value non zero: ', return_val)
+            judge_log.info('ERROR: Return value non zero: ' + return_val)
             result = 'Error'
             judge_log.info(result)
         else:
@@ -68,7 +69,6 @@ def get_file_from_url(url, folder, overwrite=False):
     try:
         fl_name, _ = urlretrieve(url, complete_path)
     except URLError:
-        judge_log.exception('URL unavailable: {}'.format(url))
         raise errors.InterfaceNotRunning('URL unavailable: {}'.format(url))
     return os.path.join(os.getcwd(), fl_name)
 
@@ -78,7 +78,6 @@ def get_json(url):
     try:
         page = urlopen(url)
     except URLError:
-        judge_log.exception('URL unavailable: {}'.format(url))
         raise errors.InterfaceNotRunning('URL unavailable: {}'.format(url))
     text = page.read().decode()
     data = loads(text)
@@ -176,7 +175,7 @@ class Slave:
         # defaults set
         self.name = config.job_list_prefix + str(listen_addr[1])  # name of slave listening at assigned port
         self.log = logging.getLogger('slave_' + str(listen_addr[1]))
-        self.log.info('Waking up the slave')
+        self.log.info('Waking up the slave at: ' + str(datetime.now()))
         self.addr = listen_addr
         self.web = webserver
         self.lang_url = language_url
@@ -193,7 +192,7 @@ class Slave:
             self.log.error('Setup failed')
             return
         self.check_data = data
-        self.log.info('Slave awaiting orders at: ', self.sock.getsockname())
+        self.log.info('Slave awaiting orders at: ' + str(self.sock.getsockname()))
 
     def __load_jobs(self):
         """
@@ -226,6 +225,7 @@ class Slave:
             data = dumps(self.job_list)
             fl.write(data)
         self.log.info('Job list saved')
+        self.log.info('Shutdown completed at: ' + str(datetime.now()))
 
     def __setup(self):
         """
@@ -280,7 +280,7 @@ class Slave:
 
         # TODO: check if question exists in case someone is malicious
         # setup
-        self.log.info('Prepping for check pk:', str(data['pk']))
+        self.log.info('Prepping for check pk:' + str(data['pk']))
         lang, qno = str(data['language']), str(data['qno'])
 
         wrap = self.check_data['language'][lang]['wrap']
