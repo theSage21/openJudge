@@ -6,14 +6,14 @@ OpenJudge
 A judge I made to judge the programming competitions in college.
 It requires a web interface to function.
 
-Currently the languages supported are:
+Language support is unlimited, as long as you can write a shell script for it.
+The interface I use is [judge-interface](https://github.com/theSage21/judge-interface).
+The interface ships with
 
-- Python2
-- Python3
-- Gcc
-- G++
-
-Others may be added by adding a shell script in the `wrappers` folder.
+- python3
+- python2
+- gcc
+- g++
 
 Why?
 ----
@@ -32,8 +32,6 @@ virtualenv -p python3 env
 source env/bin/activate
 pip install openjudge
 ```
-
-The interface I use is [judge-interface](https://github.com/theSage21/judge-interface).
 
 In order to setup the interface one can do the following.
 
