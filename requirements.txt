@@ -1,4 +1,0 @@
-Django==1.8
-django-bootstrap==0.2.4
-django-bootstrap-form==3.2
-gunicorn==19.3.0
