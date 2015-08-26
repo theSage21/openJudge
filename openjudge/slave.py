@@ -207,7 +207,7 @@ class Slave:
             data = {}
         return data
 
-    def shutdown(self, reason):
+    def shutdown(self, reason='Direct call'):
         """
         Cleanly shutdown the slave.
         - Close sockets
