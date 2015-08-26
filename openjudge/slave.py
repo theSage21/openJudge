@@ -5,22 +5,13 @@ from random import sample
 from json import loads, dumps
 from socket import socket, SO_REUSEADDR, SOL_SOCKET
 from urllib.request import urlopen, urlretrieve
+from urllib.error import URLError
 from . import config
+from . import errors
+from . import utils
 
 
-class bcolors:  # for printing in terminal with colours
-    """
-    Simple coloured output in the terminal to help distinguish between
-    things
-    """
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
+bcolors = utils.bcolors
 
 
 def get_result(return_val, out, out_recieved):
@@ -72,13 +63,23 @@ def get_file_from_url(url, folder, overwrite=False):
         filename = salt + filename
     # get resources
     complete_path = os.path.join(path, filename)
-    fl_name, _ = urlretrieve(url, complete_path)
+    try:
+        fl_name, _ = urlretrieve(url, complete_path)
+    except URLError:
+        raise errors.InterfaceNotRunning('URL unavailable: {}'.format(url))
+    except Exception:
+        raise errors.OpenjudgeError
     return os.path.join(os.getcwd(), fl_name)
 
 
 def get_json(url):
     "Get json from url and return dict"
-    page = urlopen(url)
+    try:
+        page = urlopen(url)
+    except URLError:
+        raise errors.InterfaceNotRunning('URL unavailable: {}'.format(url))
+    except Exception:
+        raise errors.OpenjudgeError
     text = page.read().decode()
     data = loads(text)
     return data
@@ -111,12 +112,9 @@ def run_command(cmd, timeout=config.timeout_limit):
     Run the command in a subprocess and wait for timeout
     time before killing it.
     Errors are recorded and output is recorded"""
-    class Timeout(Exception):  # class for timeout exception
-        pass
-
     def alarm_handler(signum, frame):
         "Raise the alarm of timeout"
-        raise Timeout
+        raise errors.Timeout
 
     proc = subprocess.Popen(cmd,
                             stderr=subprocess.PIPE,
@@ -129,7 +127,7 @@ def run_command(cmd, timeout=config.timeout_limit):
     try:
         stdoutdata, stderrdata = proc.communicate()
         signal.alarm(0)  # reset the alarm
-    except Timeout:
+    except errors.Timeout:
         proc.terminate()
         ret_val = None
         stderrdata = b''
@@ -184,14 +182,18 @@ class Slave:
         self.timeout_limit = timeout_limit
         self.processes = []
         self.sock = socket()
+        self.job_list = self.__load_jobs()
         # ----------------------
         self.sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         self.sock.bind(self.addr)
         self.sock.listen(5)
         print('The slave is learning about the contest.')
-        self.check_data = self.__setup()
+        data = self.__setup()
+        if data is None:
+            print(bcolors.FAIL + 'Setup failed' + bcolors.ENDC)
+            return
+        self.check_data = data
         print('Slave awaiting orders at: ', self.sock.getsockname())
-        self.job_list = self.__load_jobs()
 
     def __load_jobs(self):
         """
@@ -205,13 +207,15 @@ class Slave:
             data = {}
         return data
 
-    def shutdown(self):
+    def shutdown(self, reason):
         """
         Cleanly shutdown the slave.
         - Close sockets
         - Kill existing jobs
         - Save joblist
         """
+        print(bcolors.WARNING + 'Shutting down due to: ')
+        print(bcolors.BOLD + reason + bcolors.ENDC)
         # kill existing jobs
         print('Abandoning all running checks')
         for i in self.processes:
@@ -236,16 +240,28 @@ class Slave:
         print(self.web)
         print(self.lang_url)
         url = config.protocol_of_webserver + self.web + self.lang_url
-        data = get_json(url)
+        try:
+            data = get_json(url)
+        except errors.InterfaceNotRunning:
+            self.shutdown('Interface not running')
+            return None
         print('Questions obtained:')
         base_url = config.protocol_of_webserver + self.web
         for q in data['question'].keys():
             # input file
             url = base_url + data['question'][q]['inp']
-            data['question'][q]['inp'] = get_file_from_url(url, 'inputs')
+            try:
+                data['question'][q]['inp'] = get_file_from_url(url, 'inputs')
+            except errors.InterfaceNotRunning:
+                self.shutdown('Interface not running')
+                return None
             # output file
             url = base_url + data['question'][q]['out']
-            data['question'][q]['out'] = get_file_from_url(url, 'outputs')
+            try:
+                data['question'][q]['out'] = get_file_from_url(url, 'outputs')
+            except errors.InterfaceNotRunning:
+                self.shutdown('Interface not running')
+                return None
             print(q)
         print('Languages obtained')
         for l in data['language'].keys():
@@ -308,13 +324,13 @@ class Slave:
         # since this is an infinite loop, we do not test it
         while True:
             try:
-                data, com = self.__get_data_from_socket()
-                result = self.__assign_to_job_list(data)
+                data, com = self.get_data_from_socket()
+                result = self.assign_to_job_list(data)
                 com.sendall(result.encode('utf-8'))
                 com.close()
             except KeyboardInterrupt:
                 print('The slave is retiring')
-                self.shutdown()
+                self.shutdown('Keyboard interrupt')
                 print('The slave is dead.')
             except OSError:
                 break  # the accept call which will raise a traceback
