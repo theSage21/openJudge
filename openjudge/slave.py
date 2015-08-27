@@ -1,3 +1,4 @@
+import sys
 import logging
 from datetime import datetime
 from json import loads, dumps
@@ -8,6 +9,22 @@ from . import utils
 
 
 bcolors = utils.bcolors
+
+
+def create_log(name):
+    """
+    Taken from:
+    stackoverflow.com/questions/14058453/making-python-loggers-output-all-messages-to-stdout-in-addition-to-log#answer-14058475
+    """
+    root = logging.getLogger(name)
+    root.setLevel(logging.DEBUG)
+
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
+    root.addHandler(ch)
+    return root
 
 
 class Slave:
@@ -48,7 +65,7 @@ class Slave:
             timeout_limit = config.timeout_limit
         # defaults set
         self.name = config.job_list_prefix + str(listen_addr[1])  # name of slave listening at assigned port
-        self.log = logging.getLogger('slave_' + str(listen_addr[1]))
+        self.log = create_log('slave_' + str(listen_addr[1]))
         self.log.info('Waking up the slave at: ' + str(datetime.now()))
         self.addr = listen_addr
         self.web = webserver
