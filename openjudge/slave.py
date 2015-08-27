@@ -1,139 +1,13 @@
-import os
-import signal
-import subprocess
 import logging
 from datetime import datetime
-from random import sample
 from json import loads, dumps
 from socket import socket, SO_REUSEADDR, SOL_SOCKET
-from urllib.request import urlopen, urlretrieve
-from urllib.error import URLError
 from . import config
 from . import errors
 from . import utils
 
 
 bcolors = utils.bcolors
-logging.basicConfig(filename=config.logfile,
-                    level=logging.DEBUG)
-judge_log = logging.getLogger('judge')
-
-
-def get_result(return_val, out, out_recieved):
-    """
-    Based on return value provided,
-             output recieved,
-             output expected
-    return a result which is in
-            [Timeout, Correct, Incorrect, Error, <catchall>]
-    along with a remark pertaining to the case.
-    """
-    result = 'Contact a volunteer'
-    if return_val is None:
-        result = 'Timeout'
-        judge_log.info(result)
-    elif isinstance(return_val, int):
-        if return_val != 0:
-            judge_log.info('ERROR: Return value non zero: ' + return_val)
-            result = 'Error'
-            judge_log.info(result)
-        else:
-            if check_execution(out, out_recieved):
-                result = 'Correct'
-                judge_log.info(result)
-            else:
-                result = 'Incorrect'
-                judge_log.info(result)
-    return result
-
-
-def get_random_string(l=10):
-    "Returns a string of random alphabets of 'l' length"
-    return ''.join(sample('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', l))
-
-
-def get_file_from_url(url, folder, overwrite=False):
-    "Get file from url. Overwrite if overwrite=True"
-    # create storage path
-    path = os.path.join(config.check_data_folder, folder)
-    if not os.path.exists(path):
-        os.makedirs(path)
-    # get file name
-    filename = url.split('/')[-1]
-    filepath = os.path.join(path, filename)
-    if not overwrite and os.path.exists(filepath):
-        salt = get_random_string()
-        filename = salt + filename
-    # get resources
-    complete_path = os.path.join(path, filename)
-    try:
-        fl_name, _ = urlretrieve(url, complete_path)
-    except URLError:
-        raise errors.InterfaceNotRunning('URL unavailable: {}'.format(url))
-    return os.path.join(os.getcwd(), fl_name)
-
-
-def get_json(url):
-    "Get json from url and return dict"
-    try:
-        page = urlopen(url)
-    except URLError:
-        raise errors.InterfaceNotRunning('URL unavailable: {}'.format(url))
-    text = page.read().decode()
-    data = loads(text)
-    return data
-
-
-def check_execution(out_expected, out_recieved, check_error=None):
-    """Check if output is correct.
-    Output is checked against expected output.
-    There are two methods of checking.
-        - Exact      : String comparison is made
-        - Error range: Difference must be within error range
-    """
-    # get output files
-    with open(out_expected, 'r') as f:
-        lines_expected = f.readlines()
-    lines_got = out_recieved.split('\n')
-    # check line by line
-    for got, exp in zip(lines_got, lines_expected):
-        if check_error is None:  # exact checking
-            if exp.strip() != got.strip():
-                return False
-        else:  # error range checking
-            if abs(eval(exp.strip()) - eval(got.strip())) > check_error:
-                return False
-    return True
-
-
-def run_command(cmd, timeout=config.timeout_limit):
-    """
-    Run the command in a subprocess and wait for timeout
-    time before killing it.
-    Errors are recorded and output is recorded"""
-    def alarm_handler(signum, frame):
-        "Raise the alarm of timeout"
-        raise errors.Timeout
-
-    proc = subprocess.Popen(cmd,
-                            stderr=subprocess.PIPE,
-                            stdout=subprocess.PIPE,
-                            shell=True
-                            )
-
-    signal.signal(signal.SIGALRM, alarm_handler)
-    signal.alarm(timeout)
-    try:
-        stdoutdata, stderrdata = proc.communicate()
-        signal.alarm(0)  # reset the alarm
-    except errors.Timeout:
-        proc.terminate()
-        ret_val = None
-        stderrdata = b''
-        stdoutdata = b''
-    else:
-        ret_val = proc.returncode
-    return ret_val, stdoutdata.decode(), stderrdata.decode()
 
 
 class Slave:
@@ -237,7 +111,7 @@ class Slave:
         """
         url = config.protocol_of_webserver + self.web + self.lang_url
         try:
-            data = get_json(url)
+            data = utils.get_json(url)
         except errors.InterfaceNotRunning as e:
             self.shutdown('Interface not running: ' + str(e))
             return None
@@ -246,15 +120,15 @@ class Slave:
         for q in data['question'].keys():
             # input file
             url = base_url + data['question'][q]['inp']
-            data['question'][q]['inp'] = get_file_from_url(url, 'inputs')
+            data['question'][q]['inp'] = utils.get_file_from_url(url, 'inputs')
             # output file
             url = base_url + data['question'][q]['out']
-            data['question'][q]['out'] = get_file_from_url(url, 'outputs')
+            data['question'][q]['out'] = utils.get_file_from_url(url, 'outputs')
             self.log.info(q)
         self.log.info('Languages obtained')
         for l in data['language'].keys():
             url = base_url + data['language'][l]['wrap']
-            data['language'][l]['wrap'] = get_file_from_url(url, 'wrappers')
+            data['language'][l]['wrap'] = utils.get_file_from_url(url, 'wrappers')
             self.log.info(l)
         return data
 
@@ -289,7 +163,7 @@ class Slave:
 
         overwrite = self.check_data['language'][lang]['overwrite']
         url = config.protocol_of_webserver + self.web + data['source']
-        source = get_file_from_url(url, 'source', overwrite)
+        source = utils.get_file_from_url(url, 'source', overwrite)
 
         permissions_modifier = 'chmod u+x ' + wrap + ';\n'
         self.log.info('Generating command:')
@@ -297,8 +171,8 @@ class Slave:
         self.log.info(command)
         # ---------------------------------------
         self.log.info('Executing')
-        return_val, out_recieved, stderr = run_command(command, self.timeout_limit)
-        result = get_result(return_val, out, out_recieved)
+        return_val, out_recieved, stderr = utils.run_command(command, self.timeout_limit)
+        result = utils.get_result(return_val, out, out_recieved)
         remarks = stderr
         self.log.info(remarks)
         return result, remarks
