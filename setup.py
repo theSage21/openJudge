@@ -1,9 +1,12 @@
 from setuptools import setup
 import openjudge
+import markdown2
 
 version = '.'.join(map(str, openjudge.__version__))
 with open('README.md', 'r') as f:
     long_desc = f.read()
+    long_desc = markdown2.markdown(long_desc)
+
 setup(name='openjudge',
       version=version,
       description='LAN programming judge',
