@@ -2,10 +2,8 @@ from setuptools import setup
 import openjudge
 
 version = '.'.join(map(str, openjudge.__version__))
-long_desc = '''A Programming Judge for LAN based competitions.
-Can also function as a Judge for internet based competitions.
-Requires a pluggable interface to work.'''
-
+with open('README.md', 'r') as f:
+    long_desc = f.read()
 setup(name='openjudge',
       version=version,
       description='LAN programming judge',
