@@ -71,4 +71,3 @@ Gotchas
 Some features are not available. If you want you can implement them yourself.
 
 - No sandboxing.
-- No logging. (Proposed for future versions)
