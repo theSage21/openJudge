@@ -40,14 +40,14 @@ class Slave:
     """
     def __init__(self,
                  webserver=None,
-                 language_url=None,
+                 detail_url=None,
                  listen_addr=None,
                  timeout_limit=None,
                  loglevel=None):
         """
         Arguments:
             webserver       :   address of the webserver
-            language_url    :   the url where language and question details are found
+            detail_url    :   the url where language and question details are found
             listen_addr     :   where does this slave listen
             timeout_limit   :   how long to wait before declaring a timout (seconds)
             loglevel        :   Logging level. default is in config=logging.INFO
@@ -59,8 +59,8 @@ class Slave:
         # set defaults in case missing
         if webserver is None:
             webserver = config.webserver
-        if language_url is None:
-            language_url = config.language_url
+        if detail_url is None:
+            detail_url = config.detail_url
         if listen_addr is None:
             listen_addr = config.listen_addr
         if timeout_limit is None:
@@ -74,7 +74,7 @@ class Slave:
         self.log.debug('Assigning variables')
         self.addr = listen_addr
         self.web = webserver
-        self.lang_url = language_url
+        self.detail_url = detail_url
         self.timeout_limit = timeout_limit
         self.log.debug('Creating socket')
         self.sock = socket()
@@ -137,7 +137,7 @@ class Slave:
         Save in check_data_folder
         return a dict of relevant data
         """
-        url = config.protocol_of_webserver + self.web + self.lang_url
+        url = config.protocol_of_webserver + self.web + self.detail_url
         self.log.debug('Getting url for setup')
         try:
             data = utils.get_json(url)
