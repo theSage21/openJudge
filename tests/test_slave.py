@@ -28,11 +28,11 @@ def slave(httpserver):
     httpserver.serve_content(content)
     url = httpserver.url[7:]  # cut out the already existing http://
     config.webserver = '127.0.0.1:8000'
-    config.language_url = '/question/detail_list/',  # the process only needs to get the data
+    config.detail_url = '/question/detail_list/',  # the process only needs to get the data
     config.listen_addr = ('127.0.0.1', 9000)
     config.timeout_limit = 10
     s = Slave(webserver=url,
-              language_url='/',
+              detail_url='/',
               listen_addr=('127.0.0.1', random.choice(range(9000, 10000))),
               timeout_limit=20,
               loglevel=logging.DEBUG)
@@ -43,7 +43,7 @@ def slave(httpserver):
 
 def test_slave_creation_failure():
     s = Slave(webserver='127.0.0.1:8000',
-              language_url='/somethnig/')
+              detail_url='/somethnig/')
     assert not hasattr(s, 'check_data')
 
 
@@ -51,7 +51,7 @@ def test_slave_creation_with_all_parameters(httpserver):
     httpserver.serve_content('{"question": {}, "language": {}}')
     url = httpserver.url[7:]  # cut out the already existing http://
     assert Slave(webserver=url,
-                 language_url='/',
+                 detail_url='/',
                  listen_addr=('127.0.0.1', 9000),
                  timeout_limit=20)
 
@@ -60,7 +60,7 @@ def test_slave_creation_with_no_parameters(httpserver):
     httpserver.serve_content('{"question": {}, "language": {}}')
     url = httpserver.url[7:]  # cut out the already existing http://
     config.webserver = url
-    config.language_url = '/'
+    config.detail_url = '/'
     assert Slave()
 
 
@@ -74,7 +74,7 @@ def test_slave_job_list_read_existing_file(tmpdir, httpserver):
     httpserver.serve_content('{"question": {}, "language": {}}')
     url = httpserver.url[7:]  # cut out the already existing http://
     s = Slave(webserver=url,
-              language_url='/',
+              detail_url='/',
               listen_addr=('127.0.0.1', 9000),
               timeout_limit=20)
     assert s

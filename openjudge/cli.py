@@ -57,7 +57,7 @@ def add_arguments(parser):
     return parser
 
 
-def process_args_and_get_slave(args):
+def process_args_and_get_slave(args):  # pragma: no cover
     "Process the args"
     return slave.Slave(webserver=args.web_server,
                  detail_url=args.detail_url,
@@ -65,7 +65,7 @@ def process_args_and_get_slave(args):
                  timeout_limit=args.timeout,
                  loglevel=args.log_level)
 
-def main():
+def main():  # pragma: no cover
     parser = get_parser()
     parser = add_arguments(parser)
     args = parser.parse_args()
