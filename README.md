@@ -61,10 +61,30 @@ Usage during the competition
     - Register users with `python add_user.py` using a python shell at the registration desk.
       the file can be found in `judge-interface/webserver/`
     - This can also be done via the Django Admin
-3. Run the judge with `python -c 'from openjudge.slave import Slave;Slave().run()'`
+3. Run the judge with `openjudge`
 3. Tell everyone to navigate to the webserver. It will be something like `192.168.1.45`
 4. Enjoy the fruits of watching a hundred people program.
 
+Command line options
+--------------------
+
+All options are available via command line.
+
+| Option                                                 | Description
+|--------------------------------------------------------|---------------------------------------------------
+| `-h`, `--help`                                         | Show this help message and exit
+| `-ll`, `--log-level`                                   | Logging level. Integer value accepted
+| `-t`, `--timeout`                                      | The time in seconds to wait before declaring code to be timed out.
+|`-d`, `--check-data-folder`                             | Path to the folder which must be used for data storage
+| `-w`, `--web-server`                                   | Address of webserver. example 192.168.1.15:80
+| `-u`, `--detail-url`                                   | URL where details of question and languages may be found
+| `-b`, `--bind`                                         | Address where the slave must listen. example ('127.0.0.1', 9000)
+| `-j`, `--job-list-prefix`                              | The prefix string used to store job list files
+| `-p`, `--protocol`                                     | The protocol used by the webserver. example https://
+| `-l`, `--log-file`                                     | The name of the log file to use for logging purposes
+
+
+Invoke via `openjudge --help`
 
 Gotchas
 -------
