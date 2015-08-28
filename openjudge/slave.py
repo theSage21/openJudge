@@ -8,9 +8,6 @@ from . import errors
 from . import utils
 
 
-bcolors = utils.bcolors
-
-
 def create_log(name, loglevel):
     """
     Taken from:
@@ -57,6 +54,8 @@ class Slave:
             slave = Slave()
         """
         # set defaults in case missing
+        # we avoid setting them in the
+        # default args as they are evaluated only once
         if webserver is None:
             webserver = config.webserver
         if detail_url is None:
@@ -72,29 +71,32 @@ class Slave:
         self.log = create_log('slave_' + str(listen_addr[1]), loglevel)
         self.log.info('Waking up the slave at: ' + str(datetime.now()))
         self.log.debug('Assigning variables')
+
         self.addr = listen_addr
         self.web = webserver
         self.detail_url = detail_url
         self.timeout_limit = timeout_limit
         self.log.debug('Creating socket')
+
         self.sock = socket()
         self.log.debug('Socket created.')
-        self.job_list = self.__load_jobs()
-        # ----------------------
+        self.job_list = self.load_jobs()
         self.log.debug('Setting socket options')
+
         self.sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         self.sock.bind(self.addr)
         self.sock.listen(5)
+
         self.log.debug('Socket ready to recieve data')
         self.log.info('The slave is learning about the contest.')
-        data = self.__setup()
+        data = self.setup()
         if data is None:
             self.log.error('Setup failed')
             return
         self.check_data = data
         self.log.info('Slave awaiting orders at: ' + str(self.sock.getsockname()))
 
-    def __load_jobs(self):
+    def load_jobs(self):
         """
         Load jobs according to self.name
         If none exist return an empty job dictionary
@@ -117,11 +119,8 @@ class Slave:
         - Save joblist
         """
         self.log.info('Shutting down due to: ' + reason)
-        # kill existing jobs
         self.log.debug('Closing socket')
-        # close comms
         self.sock.close()
-        # save job list
         self.log.debug('Saving joblist')
         with open(self.name, 'w') as fl:
             data = dumps(self.job_list)
@@ -129,7 +128,7 @@ class Slave:
         self.log.debug('Job list saved')
         self.log.info('Shutdown completed at: ' + str(datetime.now()))
 
-    def __setup(self):
+    def setup(self):
         """
         Obtain language data and question data
         form the webserver at the language_url
@@ -144,25 +143,40 @@ class Slave:
         except errors.InterfaceNotRunning as e:
             self.shutdown('Interface not running: ' + str(e))
             return None
+
         self.log.debug('JSON for check_data obtained')
         base_url = config.protocol_of_webserver + self.web
         self.log.debug('Getting question details')
+        ques, lang = data['question'], data['language']
+        get = utils.get_file_from_url
+
         for q in data['question'].keys():
-            # input file
             url = base_url + data['question'][q]['inp']
-            data['question'][q]['inp'] = utils.get_file_from_url(url, 'inputs')
-            # output file
+            ques[q]['inp'] = get(url, 'inputs')
+
             url = base_url + data['question'][q]['out']
-            data['question'][q]['out'] = utils.get_file_from_url(url, 'outputs')
-            self.log.debug(q)
+            ques[q]['out'] = get(url, 'outputs')
+            self.log.debug(str(ques[q]))
+
+        self.log.debug('Getting language details')
         for l in data['language'].keys():
             url = base_url + data['language'][l]['wrap']
-            data['language'][l]['wrap'] = utils.get_file_from_url(url, 'wrappers')
-            self.log.debug(l)
+            lang[l]['wrap'] = get(url, 'wrappers')
+            self.log.debug(str(lang[l]))
         self.log.debug('Setup completed')
         return data
 
-    def __process_request(self, data):
+    def is_valid_request(self, data):
+        """Check if question can be checked"""
+        q_pk = str(data['qno'])
+        lang = str(data['language'])
+        if q_pk in self.check_data['question'].keys() and lang in self.check_data['language'].keys():
+            return True
+        else:
+            self.log.debug('Invalid request recieved' + str(data))
+            return False
+
+    def process_request(self, data):
         """
         Process the request.
 
@@ -182,33 +196,34 @@ class Slave:
                 }
         """
 
-        # TODO: check if question exists in case someone is malicious
-        # setup
-        self.log.info('Prepping for check pk:' + str(data['pk']))
-        lang, qno = str(data['language']), str(data['qno'])
+        if self.is_valid_request(data):
+            self.log.info('Prepping for check pk:' + str(data['pk']))
+            lang, qno = str(data['language']), str(data['qno'])
 
-        wrap = self.check_data['language'][lang]['wrap']
-        inp = self.check_data['question'][qno]['inp']
-        out = self.check_data['question'][qno]['out']
+            wrap = self.check_data['language'][lang]['wrap']
+            inp = self.check_data['question'][qno]['inp']
+            out = self.check_data['question'][qno]['out']
 
-        overwrite = self.check_data['language'][lang]['overwrite']
-        url = config.protocol_of_webserver + self.web + data['source']
-        self.log.debug('Getting source file from webserver')
-        source = utils.get_file_from_url(url, 'source', overwrite)
-        self.log.debug('File recieved from webserver')
+            overwrite = self.check_data['language'][lang]['overwrite']
+            url = config.protocol_of_webserver + self.web + data['source']
+            self.log.debug('Getting source file from webserver')
+            source = utils.get_file_from_url(url, 'source', overwrite)
+            self.log.debug('File recieved from webserver')
 
-        permissions_modifier = 'chmod u+x ' + wrap + ';\n'
-        self.log.debug('Generating command:')
-        command = ' '.join((permissions_modifier, wrap, inp, source))
-        self.log.debug(command)
-        # ---------------------------------------
-        self.log.info('Executing obtained source code')
-        return_val, out_recieved, stderr = utils.run_command(command, self.timeout_limit)
-        self.log.info('Execution Complete')
-        result = utils.get_result(return_val, out, out_recieved)
-        remarks = stderr
-        self.log.info(remarks)
-        self.log.info('-----------------------------------------')
+            permissions_modifier = 'chmod u+x ' + wrap + ';\n'
+            self.log.debug('Generating command:')
+            command = ' '.join((permissions_modifier, wrap, inp, source))
+            self.log.debug(command)
+            # ---------------------------------------
+            self.log.info('Executing obtained source code')
+            return_val, out_recieved, stderr = utils.run_command(command, self.timeout_limit)
+            self.log.info('Execution Complete')
+            result = utils.get_result(return_val, out, out_recieved)
+            remarks = stderr
+            self.log.debug(remarks)
+            self.log.info('-----------------------------------------')
+        else:
+            result, remarks = 'Invalid request', 'Question and/or language details not correct'
         return result, remarks
 
     def run(self):  # pragma: no cover
@@ -216,7 +231,6 @@ class Slave:
         Run the slave in an infinite loop of accepting and executing
         requests from the webserver.
         """
-        # since this is an infinite loop, we do not test it
         while True:
             try:
                 self.log.debug('Getting new data')
@@ -226,7 +240,9 @@ class Slave:
                 result = self.assign_to_job_list(data)
                 self.log.debug('New data assigned to job list')
                 com.sendall(result.encode('utf-8'))
+                self.log.debug('Data sent completely')
                 com.close()
+                self.log.debug('Connection closed')
             except KeyboardInterrupt:
                 self.log.info('The slave is retiring')
                 self.shutdown('Keyboard interrupt')
@@ -251,7 +267,7 @@ class Slave:
         if data['pk'] not in self.job_list.keys():  # First time for processing
             self.log.info('Job recieved for first time: ' + str(data['pk']))
             self.log.debug('Job executing')
-            result = self.__process_request(data)
+            result = self.process_request(data)
             self.log.debug('Job execution complete')
             self.job_list[data['pk']] = result  # add to joblist
             result = dumps(result)

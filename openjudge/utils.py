@@ -9,23 +9,9 @@ from urllib.error import URLError
 from json import loads
 
 
-class bcolors:  # for printing in terminal with colours
-    """
-    Simple coloured output in the terminal to help distinguish between
-    things
-    """
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-
 logging.basicConfig(filename=config.logfile,
                     level=config.default_loglevel)
-judge_log = logging.getLogger('utils')
+log = logging.getLogger('utils')
 
 
 def get_result(return_val, out, out_recieved):
@@ -40,40 +26,41 @@ def get_result(return_val, out, out_recieved):
     result = 'Contact a volunteer'
     if return_val is None:
         result = 'Timeout'
-        judge_log.info(result)
     elif isinstance(return_val, int):
         if return_val != 0:
-            judge_log.info('ERROR: Return value non zero: ' + str(return_val))
             result = 'Error'
-            judge_log.info(result)
         else:
             if check_execution(out, out_recieved):
                 result = 'Correct'
-                judge_log.info(result)
             else:
                 result = 'Incorrect'
-                judge_log.info(result)
+    log.info(result)
     return result
 
 
 def get_random_string(l=10):
     "Returns a string of random alphabets of 'l' length"
-    alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+    alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    alpha += alpha.lower()
     if l > 26*2:
         alpha = alpha * (int(l/(26*2)) + 1)
     return ''.join(sample(alpha, l))
 
 
 def get_file_from_url(url, folder, overwrite=False):
-    "Get file from url. Overwrite if overwrite=True"
+    """Get file from url.
+    Store in provided folder.
+    Overwrite if overwrite=True"""
     # create storage path
     path = os.path.join(config.check_data_folder, folder)
     if not os.path.exists(path):
+        log.debug('Path did nto exist. Was created. ' + path)
         os.makedirs(path)
     # get file name
     filename = url.split('/')[-1]
     filepath = os.path.join(path, filename)
     if not overwrite and os.path.exists(filepath):
+        log.debug('Salting the file')
         salt = get_random_string()
         filename = salt + filename
     # get resources
@@ -81,7 +68,7 @@ def get_file_from_url(url, folder, overwrite=False):
     try:
         fl_name, _ = urlretrieve(url, complete_path)
     except URLError:
-        judge_log.debug('Unable to retrieve url(file_from_url): {}'.format(url))
+        log.debug('Unable to retrieve url(file_from_url): {}'.format(url))
         raise errors.InterfaceNotRunning('URL unavailable: {}'.format(url))
     return os.path.join(os.getcwd(), fl_name)
 
@@ -91,7 +78,7 @@ def get_json(url):
     try:
         page = urlopen(url)
     except URLError:
-        judge_log.debug('Unable to retrieve url(getjson): {}'.format(url))
+        log.debug('Unable to retrieve url(getjson): {}'.format(url))
         raise errors.InterfaceNotRunning('URL unavailable: {}'.format(url))
     text = page.read().decode()
     data = loads(text)
@@ -106,26 +93,26 @@ def check_execution(out_expected, out_recieved, check_error=None):
         - Error range: Difference must be within error range
     """
     # get output files
-    judge_log.debug('Opening output_expected file')
+    log.debug('Opening output_expected file')
     with open(out_expected, 'r') as f:
         lines_expected = f.readlines()
-    judge_log.debug('Expected output recieved')
+    log.debug('Expected output recieved')
     lines_got = out_recieved.split('\n')
     # check line by line
-    judge_log.debug('Starting coparison')
+    log.debug('Starting coparison')
     result = True
     for got, exp in zip(lines_got, lines_expected):
         if check_error is None:  # exact checking
             if exp.strip() != got.strip():
-                judge_log.debug('Inequality found:' + exp.strip() + ' != ' + got.strip())
+                log.debug('Inequality found:' + exp.strip() + ' != ' + got.strip())
                 result = False
                 break
         else:  # error range checking
             if abs(eval(exp.strip()) - eval(got.strip())) > check_error:
-                judge_log.debug('Inequality found:' + exp.strip() + ' != ' + got.strip())
+                log.debug('Inequality found:' + exp.strip() + ' != ' + got.strip())
                 result = False
                 break
-    judge_log.debug('Check completed: ' + str(result))
+    log.debug('Check completed: ' + str(result))
     return result
 
 
@@ -137,7 +124,7 @@ def run_command(cmd, timeout=config.timeout_limit):
     def alarm_handler(signum, frame):
         "Raise the alarm of timeout"
         raise errors.Timeout
-    judge_log.debug('Starting subprocess')
+    log.debug('Starting subprocess')
 
     proc = subprocess.Popen(cmd,
                             stderr=subprocess.PIPE,
@@ -149,13 +136,15 @@ def run_command(cmd, timeout=config.timeout_limit):
     signal.alarm(timeout)
     try:
         stdoutdata, stderrdata = proc.communicate()
+        log.debug('Subprocess ended')
         signal.alarm(0)  # reset the alarm
     except errors.Timeout:
+        log.debug('Timeout experienced')
         proc.terminate()
         ret_val = None
         stderrdata = b''
         stdoutdata = b''
     else:
         ret_val = proc.returncode
-    judge_log.debug('Subprocess completed with result: ' + str(ret_val))
+    log.debug('Subprocess completed with result: ' + str(ret_val))
     return ret_val, stdoutdata.decode(), stderrdata.decode()

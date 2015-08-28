@@ -5,8 +5,7 @@ from openjudge.utils import (get_random_string,
                              get_result,
                              get_file_from_url,
                              check_execution,
-                             get_json,
-                             bcolors)
+                             get_json,)
 
 
 def test_get_random_string():
@@ -44,18 +43,6 @@ def test_run_command_error():
     assert r == 1
     assert err == 'cat: non_existant_file: No such file or directory\n'
     assert out == ''
-
-
-def test_color_sequences_for_printing():
-    assert bcolors
-    assert bcolors.HEADER
-    assert bcolors.OKBLUE
-    assert bcolors.OKGREEN
-    assert bcolors.WARNING
-    assert bcolors.FAIL
-    assert bcolors.ENDC
-    assert bcolors.BOLD
-    assert bcolors.UNDERLINE
 
 
 def test_get_result_catchall():
