@@ -126,6 +126,7 @@ def run_command(cmd, timeout=config.timeout_limit):
     def alarm_handler(signum, frame):
         "Raise the alarm of timeout"
         raise errors.Timeout
+    judge_log.debug('Starting subprocess')
 
     proc = subprocess.Popen(cmd,
                             stderr=subprocess.PIPE,
@@ -145,4 +146,5 @@ def run_command(cmd, timeout=config.timeout_limit):
         stdoutdata = b''
     else:
         ret_val = proc.returncode
+    judge_log.debug('Subprocess completed with result: ' + str(ret_val))
     return ret_val, stdoutdata.decode(), stderrdata.decode()

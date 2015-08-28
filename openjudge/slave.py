@@ -180,15 +180,18 @@ class Slave:
 
         overwrite = self.check_data['language'][lang]['overwrite']
         url = config.protocol_of_webserver + self.web + data['source']
+        self.log.debug('Getting source file from webserver')
         source = utils.get_file_from_url(url, 'source', overwrite)
+        self.log.debug('File recieved from webserver')
 
         permissions_modifier = 'chmod u+x ' + wrap + ';\n'
-        self.log.info('Generating command:')
+        self.log.debug('Generating command:')
         command = ' '.join((permissions_modifier, wrap, inp, source))
-        self.log.info(command)
+        self.log.debug(command)
         # ---------------------------------------
         self.log.info('Executing')
         return_val, out_recieved, stderr = utils.run_command(command, self.timeout_limit)
+        self.log.info('Execution Complete')
         result = utils.get_result(return_val, out, out_recieved)
         remarks = stderr
         self.log.info(remarks)
@@ -202,8 +205,12 @@ class Slave:
         # since this is an infinite loop, we do not test it
         while True:
             try:
+                self.log.debug('Getting new data')
                 data, com = self.get_data_from_socket()
+                self.log.debug('New data recieved')
+                self.log.debug('Assigning new data to joblist')
                 result = self.assign_to_job_list(data)
+                self.log.debug('New data assigned to job list')
                 com.sendall(result.encode('utf-8'))
                 com.close()
             except KeyboardInterrupt:
@@ -229,7 +236,9 @@ class Slave:
         """
         if data['pk'] not in self.job_list.keys():  # First time for processing
             self.log.info('Job recieved for first time: ' + str(data['pk']))
+            self.log.debug('Job executing')
             result = self.__process_request(data)
+            self.log.debug('Job execution complete')
             self.job_list[data['pk']] = result  # add to joblist
             result = dumps(result)
         else:  # not first time
