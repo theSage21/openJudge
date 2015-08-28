@@ -24,7 +24,7 @@ class bcolors:  # for printing in terminal with colours
     UNDERLINE = '\033[4m'
 
 logging.basicConfig(filename=config.logfile,
-                    level=logging.DEBUG)
+                    level=config.default_loglevel)
 judge_log = logging.getLogger('utils')
 
 
@@ -81,6 +81,7 @@ def get_file_from_url(url, folder, overwrite=False):
     try:
         fl_name, _ = urlretrieve(url, complete_path)
     except URLError:
+        judge_log.debug('Unable to retrieve url(file_from_url): {}'.format(url))
         raise errors.InterfaceNotRunning('URL unavailable: {}'.format(url))
     return os.path.join(os.getcwd(), fl_name)
 
@@ -90,6 +91,7 @@ def get_json(url):
     try:
         page = urlopen(url)
     except URLError:
+        judge_log.debug('Unable to retrieve url(getjson): {}'.format(url))
         raise errors.InterfaceNotRunning('URL unavailable: {}'.format(url))
     text = page.read().decode()
     data = loads(text)
@@ -104,18 +106,27 @@ def check_execution(out_expected, out_recieved, check_error=None):
         - Error range: Difference must be within error range
     """
     # get output files
+    judge_log.debug('Opening output_expected file')
     with open(out_expected, 'r') as f:
         lines_expected = f.readlines()
+    judge_log.debug('Expected output recieved')
     lines_got = out_recieved.split('\n')
     # check line by line
+    judge_log.debug('Starting coparison')
+    result = True
     for got, exp in zip(lines_got, lines_expected):
         if check_error is None:  # exact checking
             if exp.strip() != got.strip():
-                return False
+                judge_log.debug('Inequality found:' + exp.strip() + ' != ' + got.strip())
+                result = False
+                break
         else:  # error range checking
             if abs(eval(exp.strip()) - eval(got.strip())) > check_error:
-                return False
-    return True
+                judge_log.debug('Inequality found:' + exp.strip() + ' != ' + got.strip())
+                result = False
+                break
+    judge_log.debug('Check completed: ' + str(result))
+    return result
 
 
 def run_command(cmd, timeout=config.timeout_limit):

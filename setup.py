@@ -36,5 +36,6 @@ setup(name='openjudge',
                    'License :: OSI Approved :: MIT License',
                    'Programming Language :: Python :: 3.4',
                    ],
-      keywords='judge programming check proof openjudge'.split(' ')
+      keywords='judge programming check proof openjudge'.split(' '),
+      entry_points={'console_scripts': ['openjudge=openjudge.cli:main']},
       )
