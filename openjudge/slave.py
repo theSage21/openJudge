@@ -11,13 +11,13 @@ from . import utils
 bcolors = utils.bcolors
 
 
-def create_log(name):
+def create_log(name, loglevel):
     """
     Taken from:
     stackoverflow.com/questions/14058453/making-python-loggers-output-all-messages-to-stdout-in-addition-to-log#answer-14058475
     """
     root = logging.getLogger(name)
-    root.setLevel(logging.DEBUG)
+    root.setLevel(loglevel)
 
     ch = logging.StreamHandler(sys.stdout)
     ch.setLevel(logging.DEBUG)
@@ -42,13 +42,15 @@ class Slave:
                  webserver=None,
                  language_url=None,
                  listen_addr=None,
-                 timeout_limit=None):
+                 timeout_limit=None,
+                 loglevel=None):
         """
         Arguments:
             webserver       :   address of the webserver
             language_url    :   the url where language and question details are found
             listen_addr     :   where does this slave listen
             timeout_limit   :   how long to wait before declaring a timout (seconds)
+            loglevel        :   Logging level. default is in config=logging.INFO
 
         After creating a slave call:
             slave.run()
@@ -63,20 +65,27 @@ class Slave:
             listen_addr = config.listen_addr
         if timeout_limit is None:
             timeout_limit = config.timeout_limit
+        if loglevel is None:
+            loglevel = config.default_loglevel
         # defaults set
         self.name = config.job_list_prefix + str(listen_addr[1])  # name of slave listening at assigned port
-        self.log = create_log('slave_' + str(listen_addr[1]))
+        self.log = create_log('slave_' + str(listen_addr[1]), loglevel)
         self.log.info('Waking up the slave at: ' + str(datetime.now()))
+        self.log.debug('Assigning variables')
         self.addr = listen_addr
         self.web = webserver
         self.lang_url = language_url
         self.timeout_limit = timeout_limit
+        self.log.debug('Creating socket')
         self.sock = socket()
+        self.log.debug('Socket created.')
         self.job_list = self.__load_jobs()
         # ----------------------
+        self.log.debug('Setting socket options')
         self.sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         self.sock.bind(self.addr)
         self.sock.listen(5)
+        self.log.debug('Socket ready to recieve data')
         self.log.info('The slave is learning about the contest.')
         data = self.__setup()
         if data is None:
@@ -90,12 +99,14 @@ class Slave:
         Load jobs according to self.name
         If none exist return an empty job dictionary
         """
+        self.log.debug('Loading job info from file')
         try:
             with open(self.name, 'r') as fl:
                 data = loads(fl.read())
         except:
-            self.log.info('Jobfile not found, starting afresh')
+            self.log.debug('Jobfile not found, starting afresh')
             data = {}
+        self.log.debug('Job data loading complete')
         return data
 
     def shutdown(self, reason='Direct call'):
@@ -107,15 +118,15 @@ class Slave:
         """
         self.log.info('Shutting down due to: ' + reason)
         # kill existing jobs
-        self.log.info('Cutting all communications')
+        self.log.debug('Closing socket')
         # close comms
         self.sock.close()
         # save job list
-        self.log.info('Saving joblist')
+        self.log.debug('Saving joblist')
         with open(self.name, 'w') as fl:
             data = dumps(self.job_list)
             fl.write(data)
-        self.log.info('Job list saved')
+        self.log.debug('Job list saved')
         self.log.info('Shutdown completed at: ' + str(datetime.now()))
 
     def __setup(self):
@@ -127,13 +138,15 @@ class Slave:
         return a dict of relevant data
         """
         url = config.protocol_of_webserver + self.web + self.lang_url
+        self.log.debug('Getting url for setup')
         try:
             data = utils.get_json(url)
         except errors.InterfaceNotRunning as e:
             self.shutdown('Interface not running: ' + str(e))
             return None
-        self.log.info('Questions obtained:')
+        self.log.debug('JSON for check_data obtained')
         base_url = config.protocol_of_webserver + self.web
+        self.log.debug('Getting question details')
         for q in data['question'].keys():
             # input file
             url = base_url + data['question'][q]['inp']
@@ -141,12 +154,12 @@ class Slave:
             # output file
             url = base_url + data['question'][q]['out']
             data['question'][q]['out'] = utils.get_file_from_url(url, 'outputs')
-            self.log.info(q)
-        self.log.info('Languages obtained')
+            self.log.debug(q)
         for l in data['language'].keys():
             url = base_url + data['language'][l]['wrap']
             data['language'][l]['wrap'] = utils.get_file_from_url(url, 'wrappers')
-            self.log.info(l)
+            self.log.debug(l)
+        self.log.debug('Setup completed')
         return data
 
     def __process_request(self, data):
@@ -180,18 +193,22 @@ class Slave:
 
         overwrite = self.check_data['language'][lang]['overwrite']
         url = config.protocol_of_webserver + self.web + data['source']
+        self.log.debug('Getting source code from webserver')
         source = utils.get_file_from_url(url, 'source', overwrite)
+        self.log.debug('Obtained')
 
         permissions_modifier = 'chmod u+x ' + wrap + ';\n'
         self.log.info('Generating command:')
         command = ' '.join((permissions_modifier, wrap, inp, source))
-        self.log.info(command)
+        self.log.debug(command)
         # ---------------------------------------
-        self.log.info('Executing')
+        self.log.info('Executing obtained source code')
         return_val, out_recieved, stderr = utils.run_command(command, self.timeout_limit)
+        self.log.info('Completed')
         result = utils.get_result(return_val, out, out_recieved)
         remarks = stderr
         self.log.info(remarks)
+        self.log.info('-----------------------------------------')
         return result, remarks
 
     def run(self):  # pragma: no cover

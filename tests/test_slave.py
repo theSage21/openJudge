@@ -1,5 +1,6 @@
 import pytest
 import random
+import logging
 from socket import create_connection
 from openjudge import config
 from openjudge.slave import Slave
@@ -33,14 +34,17 @@ def slave(httpserver):
     s = Slave(webserver=url,
               language_url='/',
               listen_addr=('127.0.0.1', random.choice(range(9000, 10000))),
-              timeout_limit=20)
+              timeout_limit=20,
+              loglevel=logging.DEBUG)
     assert s.check_data['question'] != {}
     assert s.check_data['language'] != {}
     return s
 
 
 def test_slave_creation_failure():
-    assert Slave()
+    s = Slave(webserver='127.0.0.1:8000',
+              language_url='/somethnig/')
+    assert not hasattr(s, 'check_data')
 
 
 def test_slave_creation_with_all_parameters(httpserver):
