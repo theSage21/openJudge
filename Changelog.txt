@@ -1,0 +1,14 @@
+v 0.3.0
+-------
+
+- Logging is added
+- Interface is decoupled
+- Command line interface is added
+- 100% testing
+
+v 0.2.0
+-------
+
+- Timeouts are available
+- Custom scoring is possible
+- Tracebacks are available
