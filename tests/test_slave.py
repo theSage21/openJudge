@@ -94,6 +94,7 @@ def test_slave_method_get_data_from_socket(slave):
     data = {'pk': 1,
             'qno': 1,
             'source': '/',  # the process only needs to get the data
+            'name': 'some.py',
             'language': '1',
             }
     data_string = dumps(data)
@@ -107,6 +108,7 @@ def test_slave_method_get_data_from_socket(slave):
 def test_slave_assign_to_job_list(slave):
     data = {'pk': 1, 'qno': 1,
             'source': '/media/test_cases/inp',  # it does not matter
+            'name': 'some.py',
             'language': '1', }
     result = loads(slave.assign_to_job_list(data))
     assert result[0] == 'Error'
@@ -115,6 +117,7 @@ def test_slave_assign_to_job_list(slave):
 def test_slave_assign_to_job_two_times(slave):
     data = {'pk': 1, 'qno': '1',
             'source': '/media/test_cases/inp',  # it does not matter
+            'name': 'some.py',
             'language': '1', }
     result = loads(slave.assign_to_job_list(data))
     assert result[0] == 'Error'
@@ -129,6 +132,7 @@ def test_slave_shutdown_procedure(slave):
 def test_slave_request_validation(slave):
     data = {'pk': 1, 'qno': '1',
             'source': '/media/test_cases/inp',  # it does not matter
+            'name': 'some.py',
             'language': '1', }
     valid = slave.is_valid_request(data)
     assert valid
@@ -137,6 +141,7 @@ def test_slave_request_validation(slave):
 def test_slave_request_invalidity(slave):
     data = {'pk': 1, 'qno': 'not_a_valid_pk',
             'source': '/media/test_cases/inp',  # it does not matter
+            'name': 'some.py',
             'language': '1', }
     valid = slave.is_valid_request(data)
     assert not valid
@@ -149,6 +154,7 @@ def test_slave_request_invalidity(slave):
 def test_process_request_invalid_request(slave):
     data = {'pk': 1, 'qno': 'not_a_valid_pk',
             'source': '/media/test_cases/inp',  # it does not matter
+            'name': 'some.py',
             'language': '1', }
     result, remark = slave.process_request(data)
     assert result == 'Invalid request'

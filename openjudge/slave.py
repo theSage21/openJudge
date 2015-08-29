@@ -1,3 +1,4 @@
+import os
 import sys
 import logging
 from datetime import datetime
@@ -77,6 +78,7 @@ class Slave:
         self.detail_url = detail_url
         self.timeout_limit = timeout_limit
         self.log.debug('Creating socket')
+        self.check_data_folder = config.check_data_folder
 
         self.sock = socket()
         self.log.debug('Socket created.')
@@ -207,7 +209,8 @@ class Slave:
 
             overwrite = self.check_data['language'][lang]['overwrite']
             self.log.debug('Writing source to file')
-            source = utils.save_text_to_file(data['source'], data['name'], overwrite)
+            filename = os.path.join(self.check_data_folder, data['name'])
+            source = utils.save_text_to_file(data['source'], filename, overwrite)
             self.log.debug('File writing complete')
 
             permissions_modifier = 'chmod u+x ' + wrap + ';\n'
