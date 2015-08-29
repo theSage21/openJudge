@@ -1,3 +1,4 @@
+import os
 import sys
 import logging
 from datetime import datetime
@@ -77,6 +78,7 @@ class Slave:
         self.detail_url = detail_url
         self.timeout_limit = timeout_limit
         self.log.debug('Creating socket')
+        self.check_data_folder = config.check_data_folder
 
         self.sock = socket()
         self.log.debug('Socket created.')
@@ -191,7 +193,8 @@ class Slave:
         data = {
                 'pk'        :primary key of attempt,
                 'qno'       :question number pk,
-                'source'    :source code url,
+                'source'    :source code,
+                'name'      :name of source file,
                 'language'  :language pk,
                 }
         """
@@ -205,10 +208,10 @@ class Slave:
             out = self.check_data['question'][qno]['out']
 
             overwrite = self.check_data['language'][lang]['overwrite']
-            url = config.protocol_of_webserver + self.web + data['source']
-            self.log.debug('Getting source file from webserver')
-            source = utils.get_file_from_url(url, 'source', overwrite)
-            self.log.debug('File recieved from webserver')
+            self.log.debug('Writing source to file')
+            filename = os.path.join(self.check_data_folder, data['name'])
+            source = utils.save_text_to_file(data['source'], filename, overwrite)
+            self.log.debug('File writing complete')
 
             permissions_modifier = 'chmod u+x ' + wrap + ';\n'
             self.log.debug('Generating command:')

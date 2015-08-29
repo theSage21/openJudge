@@ -4,6 +4,7 @@ from openjudge.utils import (get_random_string,
                              run_command,
                              get_result,
                              get_file_from_url,
+                             save_text_to_file,
                              check_execution,
                              get_json,)
 
@@ -172,3 +173,35 @@ def test_get_file_from_url_overwrite_file_exists(httpserver, tmpdir):
     # check
     assert p.read() == 'nothing'
     assert str(p) == path
+
+
+def test_save_text_to_file(tmpdir):
+    text = 'something'
+    fl = tmpdir.join('some.py')
+    path = str(fl)
+    p = save_text_to_file(text, path)
+    assert p == path
+
+
+def test_save_text_to_file_overwrite(tmpdir):
+    text = 'something'
+    fl = tmpdir.join('some.py')
+    fl.write('nothing')
+    assert fl.read() == 'nothing'
+    path = str(fl)
+    p = save_text_to_file(text, path, True)
+    assert p == path
+    assert fl.read() == 'something'
+
+
+def test_save_text_to_file_no_overwrite(tmpdir):
+    text = 'something'
+    fl = tmpdir.join('some.py')
+    fl.write('nothing')
+    assert fl.read() == 'nothing'
+    path = str(fl)
+    p = save_text_to_file(text, path, False)
+    assert p != path
+    assert fl.read() == 'nothing'
+    with open(p, 'r') as f:
+        assert f.read() == 'something'
