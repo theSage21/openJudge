@@ -73,6 +73,19 @@ def get_file_from_url(url, folder, overwrite=False):
     return os.path.join(os.getcwd(), fl_name)
 
 
+def save_text_to_file(text, file_path, overwrite=False):
+    path, name = os.path.split(file_path)
+    if not overwrite and os.path.exists(file_path):
+        log.debug('Salting the file name')
+        salt = get_random_string()
+        name = salt + name
+        file_path = os.path.join(path, name)
+        log.debug('Done')
+    with open(file_path, 'w') as fl:
+        fl.write(text)
+    return file_path
+
+
 def get_json(url):
     "Get json from url and return dict"
     try:
