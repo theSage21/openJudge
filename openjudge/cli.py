@@ -16,6 +16,10 @@ def add_arguments(parser):
     """
     Add relevant arguments
     """
+    parser.add_argument('-v',
+                        '--version',
+                        action='store_true',
+                        help='Display version info')
     parser.add_argument('-ll',
                         '--log-level',
                         help='Logging level',
@@ -59,6 +63,11 @@ def add_arguments(parser):
 
 def process_args_and_get_slave(args):  # pragma: no cover
     "Process the args"
+    if args.version:
+        from openjudge import __version__
+        version = 'v ' + '.'.join(map(str, __version__))
+        print(version)
+        return None
     return slave.Slave(webserver=args.web_server,
                        detail_url=args.detail_url,
                        listen_addr=args.bind,
@@ -71,4 +80,5 @@ def main():  # pragma: no cover
     parser = add_arguments(parser)
     args = parser.parse_args()
     s = process_args_and_get_slave(args)
-    s.run()
+    if s is not None:
+        s.run()

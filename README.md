@@ -3,8 +3,8 @@ OpenJudge
 [![Build Status](https://travis-ci.org/theSage21/openJudge.svg)](https://travis-ci.org/theSage21/openJudge)
 [![Coverage Status](https://coveralls.io/repos/theSage21/openJudge/badge.svg?branch=master&service=github)](https://coveralls.io/github/theSage21/openJudge?branch=master)
 
-A judge I made to judge the programming competitions in college.
-It requires a web interface to function.
+A judge made to judge the programming competitions held over LAN.
+It requires a web based interface to function.
 
 Language support is unlimited, as long as you can write a shell script for it.
 The interface I use is [judge-interface](https://github.com/theSage21/judge-interface).
@@ -14,12 +14,13 @@ The interface ships with
 - python2
 - gcc
 - g++
+- java
 
 Why?
 ----
 
 - Judging programs by hand quickly becomes an experience best forgotten
-- Roll my own
+- Roll-my-own
 
 Setup
 -----
@@ -72,6 +73,7 @@ All options are available via command line.
 
 | Option                                                 | Description
 |--------------------------------------------------------|---------------------------------------------------
+| `-v`, `--version`                                      | Show version info and exit
 | `-h`, `--help`                                         | Show this help message and exit
 | `-ll`, `--log-level`                                   | Logging level. Integer value accepted
 | `-t`, `--timeout`                                      | The time in seconds to wait before declaring code to be timed out.
