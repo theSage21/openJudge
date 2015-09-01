@@ -68,10 +68,6 @@ class Slave:
         if loglevel is None:
             loglevel = config.default_loglevel
         # defaults set
-        self.name = config.job_list_prefix + str(listen_addr[1])  # name of slave listening at assigned port
-        self.log = create_log('slave_' + str(listen_addr[1]), loglevel)
-        self.log.info('Waking up the slave at: ' + str(datetime.now()))
-        self.log.debug('Assigning variables')
 
         self.addr = listen_addr
         self.web = webserver
@@ -81,6 +77,11 @@ class Slave:
 
         self.sock = self.create_socket()
         self.job_list = self.load_jobs()
+
+        self.name = config.job_list_prefix + str(listen_addr[1])  # name of slave listening at assigned port
+        self.log = create_log('slave_' + str(listen_addr[1]), loglevel)
+        self.log.info('Waking up the slave at: ' + str(datetime.now()))
+        self.log.debug('Assigning variables')
 
         self.log.debug('Socket ready to recieve data')
         self.log.info('The slave is learning about the contest.')
@@ -92,7 +93,6 @@ class Slave:
         self.log.info('Slave awaiting orders at: ' + str(self.sock.getsockname()))
 
     def create_socket(self):
-        self.log.debug('Creating socket')
         while True:
             try:
                 sock = socket()
@@ -103,7 +103,6 @@ class Slave:
             else:
                 sock.listen(5)
                 break
-        self.log.debug('Socket created.')
         return sock
 
     def load_jobs(self):
@@ -111,14 +110,11 @@ class Slave:
         Load jobs according to self.name
         If none exist return an empty job dictionary
         """
-        self.log.debug('Loading job info from file')
         try:
             with open(self.name, 'r') as fl:
                 data = loads(fl.read())
         except:
-            self.log.debug('Jobfile not found, starting afresh')
             data = {}
-        self.log.debug('Job data loading complete')
         return data
 
     def shutdown(self, reason='Direct call'):
