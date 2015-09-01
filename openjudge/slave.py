@@ -77,17 +77,10 @@ class Slave:
         self.web = webserver
         self.detail_url = detail_url
         self.timeout_limit = timeout_limit
-        self.log.debug('Creating socket')
         self.check_data_folder = config.check_data_folder
 
-        self.sock = socket()
-        self.log.debug('Socket created.')
+        self.sock = self.create_socket()
         self.job_list = self.load_jobs()
-        self.log.debug('Setting socket options')
-
-        self.sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
-        self.sock.bind(self.addr)
-        self.sock.listen(5)
 
         self.log.debug('Socket ready to recieve data')
         self.log.info('The slave is learning about the contest.')
@@ -97,6 +90,21 @@ class Slave:
             return
         self.check_data = data
         self.log.info('Slave awaiting orders at: ' + str(self.sock.getsockname()))
+
+    def create_socket(self):
+        self.log.debug('Creating socket')
+        while True:
+            try:
+                sock = socket()
+                sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+                sock.bind(self.addr)
+            except:
+                self.addr = (self.addr[0], self.addr[1] + 1)
+            else:
+                sock.listen(5)
+                break
+        self.log.debug('Socket created.')
+        return sock
 
     def load_jobs(self):
         """
@@ -239,6 +247,13 @@ class Slave:
                 self.log.debug('Getting new data')
                 data, com = self.get_data_from_socket()
                 self.log.debug('New data recieved')
+
+                if data == 'Alive':
+                    self.log.debug('Alive check reply')
+                    com.sendall('True'.encode('utf-8'))
+                    com.close()
+                    continue
+
                 self.log.debug('Assigning new data to joblist')
                 result = self.assign_to_job_list(data)
                 self.log.debug('New data assigned to job list')
@@ -260,7 +275,9 @@ class Slave:
         """
         com, _ = self.sock.accept()
         data = com.recv(4096)
-        data = loads(data.decode())
+        data = data.decode()
+        if data != 'Alive':  # alive check
+            data = loads(data)
         return data, com
 
     def assign_to_job_list(self, data):

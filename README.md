@@ -62,7 +62,7 @@ Usage during the competition
     - Register users with `python add_user.py` using a python shell at the registration desk.
       the file can be found in `judge-interface/webserver/`
     - This can also be done via the Django Admin
-3. Run the judge with `openjudge`
+3. Run the judge with `openjudge`. As many instances as needed can be initiated. I usually work with 5
 3. Tell everyone to navigate to the webserver. It will be something like `192.168.1.45`
 4. Enjoy the fruits of watching a hundred people program.
 
