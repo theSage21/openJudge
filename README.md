@@ -2,8 +2,7 @@ OpenJudge
 =========
 [![Build Status](https://travis-ci.org/theSage21/openJudge.svg)](https://travis-ci.org/theSage21/openJudge)
 [![Coverage Status](https://coveralls.io/repos/theSage21/openJudge/badge.svg?branch=master&service=github)](https://coveralls.io/github/theSage21/openJudge?branch=master)
-[![PyPi version](https://pypip.in/v/openjudge/badge.png)](https://crate.io/packages/openjudge/)
-[![PyPi downloads](https://pypip.in/d/openjudge/badge.png)](https://crate.io/packages/openjudge/)
+[![PyPI version](https://badge.fury.io/py/openjudge.svg)](http://badge.fury.io/py/openjudge)
 
 A judge made to judge the programming competitions held over LAN.
 It requires a web based interface to function.
