@@ -1,3 +1,5 @@
 #! /bin/bash
 source env/bin/activate
-python -c 'from openjudge.slave import Slave;s=Slave();s.run()'
+python -c 'from openjudge import slave, __version__, config;
+print(__version__);
+s=slave.Slave();s.run()'
