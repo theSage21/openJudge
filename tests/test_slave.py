@@ -1,5 +1,6 @@
+import os
 import pytest
-import random
+import socket
 import logging
 from socket import create_connection
 from openjudge import config
@@ -27,18 +28,28 @@ def slave(httpserver):
                   "wrap": "/media/wrappers/java.sh"}}}'''
     httpserver.serve_content(content)
     url = httpserver.url[7:]  # cut out the already existing http://
-    config.webserver = '127.0.0.1:8000'
-    config.detail_url = '/question/detail_list/',  # the process only needs to get the data
-    config.listen_addr = ('127.0.0.1', 9000)
     config.timeout_limit = 10
-    s = Slave(webserver=url,
-              detail_url='/',
-              listen_addr=('127.0.0.1', random.choice(range(9000, 10000))),
-              timeout_limit=20,
-              loglevel=logging.DEBUG)
-    assert s.check_data['question'] != {}
-    assert s.check_data['language'] != {}
-    return s
+    config.check_data_folder = '/tmp/check_data'
+    config.webserver = '127.0.0.1:8000'
+    config.detail_url = '/question/detail_list/'
+    config.listen_addr = ('127.0.0.1', 9000)
+    config.job_list_prefix = 'joblist_'
+    config.protocol_of_webserver = 'http://'
+    config.logfile = 'judge.log'
+    config.default_loglevel = 30
+
+    class SlaveFactory:
+        def get(self):
+            s = Slave(webserver=url,
+                      detail_url='/',
+                      listen_addr=('127.0.0.1', 9000),
+                      # listen_addr=('127.0.0.1', random.choice(range(9000, 10000))),
+                      timeout_limit=20,
+                      loglevel=logging.DEBUG)
+            assert s.check_data['question'] != {}
+            assert s.check_data['language'] != {}
+            return s
+    return SlaveFactory()
 
 
 def test_slave_creation_failure():
@@ -56,20 +67,15 @@ def test_slave_creation_with_all_parameters(httpserver):
                  timeout_limit=20)
 
 
-def test_slave_creation_with_no_parameters(httpserver):
-    httpserver.serve_content('{"question": {}, "language": {}}')
-    url = httpserver.url[7:]  # cut out the already existing http://
-    config.webserver = url
-    config.detail_url = '/'
-    assert Slave()
+def test_slave_creation_with_no_parameters(httpserver, slave):
+    slave = slave.get()
+    assert slave
 
 
-def test_slave_job_list_read_existing_file(tmpdir, httpserver):
+def test_slave_job_list_read_existing_file(httpserver):
     # custom joblist file name
-    p = tmpdir.join('job')
-    config.job_list_prefix = str(p)
-    p = tmpdir.join('job9000')
-    p.write('{"1": "2"}')
+    with open('joblist_9000', 'w') as p:
+        p.write('{"1": "2"}')
     # create a slave
     httpserver.serve_content('{"question": {}, "language": {}}')
     url = httpserver.url[7:]  # cut out the already existing http://
@@ -77,19 +83,22 @@ def test_slave_job_list_read_existing_file(tmpdir, httpserver):
               detail_url='/',
               listen_addr=('127.0.0.1', 9000),
               timeout_limit=20)
+    assert s.name == 'joblist_9000'
     assert s
     assert s.job_list == {"1": "2"}
+    os.remove('joblist_9000')
 
 
 def test_slave_job_list_without_existing_file(slave):
     # custom joblist file name
     # create a slave
-    s = slave
+    s = slave.get()
     assert s
     assert s.job_list == {}
 
 
 def test_slave_method_get_data_from_socket(slave):
+    slave = slave.get()
     slave_addr = slave.sock.getsockname()
     data = {'pk': 1,
             'qno': 1,
@@ -110,6 +119,7 @@ def test_slave_assign_to_job_list(slave):
             'source': '/media/test_cases/inp',  # it does not matter
             'name': 'some.py',
             'language': '1', }
+    slave = slave.get()
     result = loads(slave.assign_to_job_list(data))
     assert result[0] == 'Error'
 
@@ -119,6 +129,7 @@ def test_slave_assign_to_job_two_times(slave):
             'source': '/media/test_cases/inp',  # it does not matter
             'name': 'some.py',
             'language': '1', }
+    slave = slave.get()
     result = loads(slave.assign_to_job_list(data))
     assert result[0] == 'Error'
     result = loads(slave.assign_to_job_list(data))
@@ -126,7 +137,7 @@ def test_slave_assign_to_job_two_times(slave):
 
 
 def test_slave_shutdown_procedure(slave):
-    assert slave.shutdown() is None
+    assert slave.get().shutdown() is None
 
 
 def test_slave_request_validation(slave):
@@ -134,7 +145,7 @@ def test_slave_request_validation(slave):
             'source': '/media/test_cases/inp',  # it does not matter
             'name': 'some.py',
             'language': '1', }
-    valid = slave.is_valid_request(data)
+    valid = slave.get().is_valid_request(data)
     assert valid
 
 
@@ -143,6 +154,7 @@ def test_slave_request_invalidity(slave):
             'source': '/media/test_cases/inp',  # it does not matter
             'name': 'some.py',
             'language': '1', }
+    slave = slave.get()
     valid = slave.is_valid_request(data)
     assert not valid
     data['language'] = 'again not valid'
@@ -156,5 +168,20 @@ def test_process_request_invalid_request(slave):
             'source': '/media/test_cases/inp',  # it does not matter
             'name': 'some.py',
             'language': '1', }
+    slave = slave.get()
     result, remark = slave.process_request(data)
     assert result == 'Invalid request'
+
+
+def test_socket_creation():
+    s = Slave()
+    assert s.sock
+
+
+def test_socket_creation_on_already_bound_socket(slave):
+    s = socket.socket()
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    s.bind(('0.0.0.0', 9000))
+    a = slave.get()
+    assert a.sock.getsockname() != s.getsockname()
+    s.close()

@@ -76,15 +76,14 @@ class Slave:
         self.check_data_folder = config.check_data_folder
 
         self.sock = self.create_socket()
+        self.name = config.job_list_prefix + str(listen_addr[1])  # name of slave listening at assigned port
         self.job_list = self.load_jobs()
 
-        self.name = config.job_list_prefix + str(listen_addr[1])  # name of slave listening at assigned port
         self.log = create_log('slave_' + str(listen_addr[1]), loglevel)
         self.log.info('Waking up the slave at: ' + str(datetime.now()))
-        self.log.debug('Assigning variables')
 
-        self.log.debug('Socket ready to recieve data')
         self.log.info('The slave is learning about the contest.')
+
         data = self.setup()
         if data is None:
             self.log.error('Setup failed')
@@ -126,6 +125,7 @@ class Slave:
         """
         self.log.info('Shutting down due to: ' + reason)
         self.log.debug('Closing socket')
+        self.sock.shutdown(1)
         self.sock.close()
         self.log.debug('Saving joblist')
         with open(self.name, 'w') as fl:
