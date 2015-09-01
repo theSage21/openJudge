@@ -246,7 +246,6 @@ class Slave:
 
                 if data == 'Alive':
                     self.log.debug('Alive check reply')
-                    com.sendall('True'.encode('utf-8'))
                     com.close()
                     continue
 
