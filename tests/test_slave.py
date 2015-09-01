@@ -1,6 +1,5 @@
 import os
 import pytest
-import socket
 import logging
 from socket import create_connection
 from openjudge import config
@@ -179,9 +178,7 @@ def test_socket_creation():
 
 
 def test_socket_creation_on_already_bound_socket(slave):
-    s = socket.socket()
-    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    s.bind(('0.0.0.0', 9000))
+    first = slave.get()
+    s1 = first.sock.getsockname()
     a = slave.get()
-    assert a.sock.getsockname() != s.getsockname()
-    s.close()
+    assert a.sock.getsockname() != s1
