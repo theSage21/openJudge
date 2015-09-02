@@ -79,7 +79,7 @@ class Slave:
         self.name = config.job_list_prefix + str(listen_addr[1])  # name of slave listening at assigned port
         self.job_list = self.load_jobs()
 
-        self.log = create_log('slave_' + str(listen_addr[1]), loglevel)
+        self.log = create_log('slave_' + str(self.addr[1]), loglevel)
         self.log.info('Waking up the slave at: ' + str(datetime.now()))
 
         self.log.info('The slave is learning about the contest.')
