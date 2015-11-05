@@ -98,7 +98,7 @@ def get_json(url):
     return data
 
 
-def check_execution(out_expected, out_recieved, check_error=None):
+def check_execution(out_expected, out_recieved, check_error=0.0001):
     """Check if output is correct.
     Output is checked against expected output.
     There are two methods of checking.
