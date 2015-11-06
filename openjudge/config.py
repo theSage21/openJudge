@@ -9,3 +9,4 @@ job_list_prefix = 'joblist_'
 protocol_of_webserver = 'http://'
 logfile = 'judge.log'
 default_loglevel = INFO
+check_error = 0.001

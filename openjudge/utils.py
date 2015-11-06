@@ -98,7 +98,7 @@ def get_json(url):
     return data
 
 
-def check_execution(out_expected, out_recieved, check_error=0.0001):
+def check_execution(out_expected, out_recieved, check_error=None):
     """Check if output is correct.
     Output is checked against expected output.
     There are two methods of checking.
@@ -121,7 +121,7 @@ def check_execution(out_expected, out_recieved, check_error=0.0001):
                 result = False
                 break
         else:  # error range checking
-            if abs(eval(exp.strip()) - eval(got.strip())) > check_error:
+            if abs(eval(exp.strip()) - eval(got.strip())) > config.check_error:
                 log.debug('Inequality found:' + exp.strip() + ' != ' + got.strip())
                 result = False
                 break
