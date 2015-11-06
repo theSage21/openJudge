@@ -100,7 +100,7 @@ class Slave:
             except:
                 self.addr = (self.addr[0], self.addr[1] + 1)
             else:
-                sock.listen(5)
+                sock.listen(1)
                 break
         return sock
 
