@@ -14,9 +14,9 @@
         {% block posthead %}{% endblock %}
   </head>
   <body>
-    {% block prebody %}{% endblock %}
     <div class='nav'>
     <ul>
+        <li class='banner'>OpenJudge |</li>
         <li><a href="{%url 'home' %}">Home</a></li>
         {% if user.is_authenticated %}
             <li>{{user}}</li>
@@ -24,14 +24,20 @@
         {% else %}
             <li><a href="{% url 'login' %}">Login</a></li>
         {% endif %}
+        {% if contest %}
+        <li><a href="{{contest.get_leaderboard}}">Leaderboard</a></li>
+        {% endif %}
+        <li class='banner'>| </li>
+        {% block nav %}
+        {% endblock %}
     </ul> 
     </div><!-- navigation -->
+
     <div class='container'>
         {% block body %}
         BASE
         {% endblock %}
     </div>
-    {% block postbody%}{% endblock %}
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
   </body>
 </html>

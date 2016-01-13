@@ -11,6 +11,9 @@ class Contest(models.Model):
     published = models.BooleanField(default=True)
     def get_absolute_url(self):
         return reverse('contest', args=[self.pk])
+    def get_leaderboard(self):
+        return reverse('leaderboard', args=[self.pk])
+
 
 
 class Profile(models.Model):
