@@ -10,7 +10,11 @@
     {% if form.errors %}
         <p> There are errors in the form</p>
     {% endif %}
-        <b>Register for contest</b>
+    <p class='center'>
+    <i>Register <b>{{user}}</b> for contest</i><br>
+    Login as another user to register them for a contest.
+    </p>
+    <hr>
         <form role='form' method="post" action="{% url 'register' %}">
             {% csrf_token %}
             {{ form.as_p }}

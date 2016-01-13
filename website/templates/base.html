@@ -30,8 +30,8 @@
         {% if contest %}
         <li><a href="{{contest.get_leaderboard}}">Leaderboard</a></li>
         {% endif %}
-        <li><a href="{% url 'register' %}">Register</a></li>
         <li><a href="{% url 'signup' %}">SignUp</a></li>
+        <li><a href="{% url 'register' %}">Register</a></li>
         <li class='banner'>| </li>
         {% block nav %}
         {% endblock %}
@@ -40,7 +40,6 @@
 
     <div class='container'>
         {% block body %}
-        BASE
         {% endblock %}
     </div>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
