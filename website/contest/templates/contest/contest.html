@@ -1,7 +1,7 @@
 {% extends 'contest/home.html' %}
 {% block body %}
 <div class='center'>
-    <p>{{contest}} Question List</p>
+    <p>{{contest}} {% block contest_display %}Question List {% endblock %}</p>
 </div>
 <hr>
 {% block content %}
