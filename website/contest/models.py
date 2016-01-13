@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 
 
@@ -8,6 +9,8 @@ class Contest(models.Model):
     name = models.CharField(max_length=50)
     live = models.BooleanField(default=True)
     published = models.BooleanField(default=True)
+    def get_absolute_url(self):
+        return reverse('contest', args=[self.pk])
 
 
 class Profile(models.Model):

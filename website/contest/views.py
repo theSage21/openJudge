@@ -12,6 +12,7 @@ def contest(request, cpk):
     context = {}
     template = 'contest/contest.html'
     contest = get_object_or_404(models.Contest, pk=cpk)
+    context['contest'] = contest
     context['questions'] = models.Question.objects.filter(contest=contest)
     return render(request, template, context)
 

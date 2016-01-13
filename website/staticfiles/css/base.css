@@ -23,3 +23,18 @@
 .nav li a:hover {
     background-color: white;
 }
+a{
+    text-decoration: none;
+    display: block;
+    color: black;
+}
+a:hover{
+    color:grey;
+    text-decoration: underline;
+}
+hr{
+    width:85%;
+}
+.center{
+    text-align:center;
+}

@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block body %}
+<div class='center'>
+    <p>{{contest}} Question List</p>
+</div>
+<hr>
+<ul>
+    {% for question in questions %}
+    <li><a href="{{question.get_absolute_url}}">{{question}}</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}

@@ -1,4 +1,11 @@
 {% extends 'base.html' %}
 {% block body %}
-HOME
+<div class='container'>
+    <h3>Contest list</h3>
+    <ul>
+        {% for contest in contests %}
+        <li><a href={{contest.get_absolute_url}}>{{contest}}</a></li>
+        {% endfor %}
+    </ul>
+</div>
 {% endblock %}
