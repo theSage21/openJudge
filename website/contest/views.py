@@ -50,7 +50,9 @@ def leaderboard(request, cpk):
     context = {}
     template = 'contest/leaderboard.html'
     con = get_object_or_404(models.Contest, pk=cpk)
-    players = models.Profile.objects.filter(contest=con)
+    players = [i for i in  models.Profile.objects.filter(contest=con)]
+    players.sort(key=lambda x:x.score)
     # This seems neater to me
-    context['players'] = players.order_by('score')
+    context['players'] = players
+    context['contest'] = get_object_or_404(models.Contest, pk=cpk)
     return render(request, template, context)

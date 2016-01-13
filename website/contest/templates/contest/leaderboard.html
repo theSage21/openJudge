@@ -1,0 +1,32 @@
+{% extends 'contest/contest.html' %}
+{% block content %}
+<style>
+.disq{
+    background-color:pink;
+}
+table{
+    width:100%;
+}
+tr:nth-child(even) {background: #CCC}
+tr:nth-child(odd) {background: #FFF}
+</style>
+<table>
+    <thead>
+        <tr>
+            <th>Rank</th>
+            <th>Nickname</th>
+            <th>Score</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for player in players %}
+        <tr {%if not player.allowed %}class='disq'{%endif%}>
+            <td>{{forloop.counter}}</td>
+            <td>{{player.nick}}</td>
+            <td>{{player.score}}</td>
+        </tr>
+        {% endfor %}
+        <t
+    </tbody>
+</table>
+{% endblock %}
