@@ -51,3 +51,8 @@ hr{
     list-style-type: none;
     display: inline;
 }
+pre {
+    background-color:#CCC;
+    padding:1em;
+    overflow:scroll;
+}

@@ -28,6 +28,8 @@ def question(request, cpk, qpk):
     context = {}
     template = 'contest/question.html'
     q = get_object_or_404(models.Question, pk=qpk)
+    context['contest'] = get_object_or_404(models.Contest, pk=cpk)
+    context['question'] = q
     if request.method == 'GET':
         form = None
         # TODO  show form

@@ -36,6 +36,8 @@ class Question(models.Model):
     title = models.CharField(max_length=100)
     contest = models.ForeignKey(Contest, related_name='contest_question')
     text = models.TextField()
+    def get_absolute_url(self):
+        return reverse('question', args=[self.contest.pk, self.pk])
 
 
 class TestCase(models.Model):
