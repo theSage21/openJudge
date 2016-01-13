@@ -1,5 +1,4 @@
 from django.db import models
-from django.forms import ModelForm
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 
@@ -79,8 +78,3 @@ class Attempt(models.Model):
         total = before_this.exclude(correct=None).count()
         result = 1 if total == 0 else float(correct) / total
     marks = property(_get_marks)
-
-class AttemptForm(ModelForm):
-    class Meta:
-        model = Attempt
-        exclude = ['profile', 'question', 'stamp']

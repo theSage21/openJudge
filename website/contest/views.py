@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from contest import models
+from contest.forms import AttemptForm, RegistrationForm, ProfileForm
 
 def home(request):
     context = {}
@@ -37,9 +38,9 @@ def question(request, cpk, qpk):
 
     if request.method == 'GET':
         
-        context['answer_form'] = models.AttemptForm()
+        context['answer_form'] = AttemptForm()
     elif request.method == 'POST':
-        form = models.AttemptForm(request.POST, request.FILES)
+        form = AttemptForm(request.POST, request.FILES)
         if form.is_valid():
             attempt = form.save(commit=False)
             attempt.profile = profile
@@ -49,11 +50,38 @@ def question(request, cpk, qpk):
             data['answer_form'] = form
     return render(request, template, context)
 
+def signup(request):
+    context = {}
+    template = 'contest/signup.html'
+    context['form'] = RegistrationForm()
+    if request.method == 'POST':
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+            uname = form['username'].value()
+            pwd = form['password'].value()
+            p = models.User()
+            p.username = uname
+            p.set_password(pwd)
+            p.save()
+            context['successful_registration'] = uname
+        else:
+            context['form'] = form
+    return render(request, template, context)
 
+@login_required
 def register(request):
     context = {}
     template = 'contest/register.html'
-    # TODO
+    context['form'] = ProfileForm()
+    if request.method == 'POST':
+        form = ProfileForm(request.POST)
+        if form.is_valid():
+            profile = form.save(commit=False)
+            profile.user = request.user
+            profile.save()
+            context['successful_registration'] = profile.user
+        else:
+            context['form'] = form
     return render(request, template, context)
 
 

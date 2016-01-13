@@ -21,8 +21,7 @@ from django.contrib.auth.views import login, logout
 urlpatterns = [url(r'^', include(contest_urls)),
                url(r'^admin/', include(admin.site.urls)),
                url(r'^login/$', login,
-                   name='login', kwargs={'template_name': 'login.html',
-                                         }
+                   name='login', kwargs={'template_name': 'login.html', }
                    ),
                url(r'^logout/$', logout,
                    name='logout', kwargs={'next_page': '/'}
