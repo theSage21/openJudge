@@ -30,19 +30,6 @@
 .nav ul li ul{
     display: block;
     opacity: 0;}
-
-
-
-
-
-
-
-
-
-
-
-
-
 a{
     text-decoration: none;
     color: black;
@@ -56,4 +43,11 @@ hr{
 }
 .center{
     text-align:center;
+}
+
+
+.errorlist{
+    background-color: red;
+    list-style-type: none;
+    display: inline;
 }

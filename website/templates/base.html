@@ -16,10 +16,13 @@
   <body>
     <div class='nav'>
     <ul>
-        <li class='banner'>OpenJudge |</li>
+
+        
+        <li class='banner'>{% if user.is_authenticated %}OJ-{{user}}
+            {%else%}OpenJudge
+        {% endif %}|</li>
         <li><a href="{%url 'home' %}">Home</a></li>
         {% if user.is_authenticated %}
-            <li>{{user}}</li>
             <li><a href="{%url 'logout' %}">Logout</a></li>
         {% else %}
             <li><a href="{% url 'login' %}">Login</a></li>
