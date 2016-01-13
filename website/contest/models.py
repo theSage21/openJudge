@@ -1,4 +1,5 @@
 from django.db import models
+from django.forms import ModelForm
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 
@@ -25,7 +26,7 @@ class Profile(models.Model):
     allowed = models.BooleanField(default=True)
 
     def _get_score(self):
-        all_att = Attempts.objects.filter(profile=self, correct=True)
+        all_att = (i for i in Attempt.objects.filter(profile=self) if i.correct)
         total = sum((i.marks for i in all_att))
         return total
     score = property(_get_score)
@@ -64,7 +65,7 @@ class Attempt(models.Model):
     question = models.ForeignKey(Question, related_name='question_attempt')
     profile = models.ForeignKey(Profile, related_name='profile_attempt')
     language = models.ForeignKey(Language, related_name='language_attempt')
-    filename = models.CharField(max_length=50)
+    filename = models.CharField(max_length=50, help_text='Setting this sets formatting in editor + filename for Java')
     source = models.TextField()
     stamp = models.DateTimeField(auto_now_add=True)
     def _get_correct(self):
@@ -78,3 +79,8 @@ class Attempt(models.Model):
         total = before_this.exclude(correct=None).count()
         result = 1 if total == 0 else float(correct) / total
     marks = property(_get_marks)
+
+class AttemptForm(ModelForm):
+    class Meta:
+        model = Attempt
+        exclude = ['profile', 'question', 'stamp']

@@ -21,6 +21,9 @@
     padding: 0.2em 0.5em;
     font-weight:bold;
 }
+.nav .banner:hover{
+    background-color: #08D177;
+}
 .nav ul a{
     text-align: center;
     padding: 0.2em 0.5em;

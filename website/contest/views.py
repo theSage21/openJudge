@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from contest import models
 
 def home(request):
@@ -24,18 +25,28 @@ def details(request, cpk):
 
 
 
+@login_required
 def question(request, cpk, qpk):
     context = {}
     template = 'contest/question.html'
-    q = get_object_or_404(models.Question, pk=qpk)
+
     context['contest'] = get_object_or_404(models.Contest, pk=cpk)
-    context['question'] = q
+    context['question'] = get_object_or_404(models.Question, pk=qpk)
+    profile_user = models.Profile.objects.filter(user=request.user)
+    profile = profile_user.filter(contest=context['contest'])[0]
+
     if request.method == 'GET':
-        form = None
-        # TODO  show form
+        
+        context['answer_form'] = models.AttemptForm()
     elif request.method == 'POST':
-        form = None
-        # TODO  accept form
+        form = models.AttemptForm(request.POST, request.FILES)
+        if form.is_valid():
+            attempt = form.save(commit=False)
+            attempt.profile = profile
+            attempt.question = context['question']
+            attempt.save()
+        else:
+            data['answer_form'] = form
     return render(request, template, context)
 
 

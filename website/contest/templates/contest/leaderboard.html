@@ -10,7 +10,7 @@ table{
 tr:nth-child(even) {background: #CCC}
 tr:nth-child(odd) {background: #FFF}
 </style>
-<table>
+<table class='center'>
     <thead>
         <tr>
             <th>Rank</th>
@@ -22,7 +22,7 @@ tr:nth-child(odd) {background: #FFF}
         {% for player in players %}
         <tr {%if not player.allowed %}class='disq'{%endif%}>
             <td>{{forloop.counter}}</td>
-            <td>{{player.nick}}</td>
+            <td>{{player}}</td>
             <td>{{player.score}}</td>
         </tr>
         {% endfor %}
