@@ -36,12 +36,12 @@ class TestCase(models.Model):
     def __str__(self):
         return self.question.__str__()
     question = models.ForeignKey(Question, related_name='question_testcase')
-    inp = models.FileField(uppload_to='testcase')
-    out = models.FileField(uppload_to='testcase')
+    inp = models.FileField(upload_to='testcase')
+    out = models.FileField(upload_to='testcase')
     exact_check = models.BooleanField(default=True)
 
 
-class Langauge(models.Model):
+class Language(models.Model):
     def __str__(self):
         return self.name
     name = models.CharField(max_length=50)

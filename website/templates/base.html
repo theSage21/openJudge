@@ -1,5 +1,37 @@
-{% if user.is_authenticated %}
-<p>Welcome, {{ user.username }}  <a href="{% url 'accounts:logout' %}">[logout]</a></p>
-{% else %}
-<p>Welcome, Guest <a href="{% url 'accounts:login' %}">[login]</a></p>
-{% endif %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {% load staticfiles %}
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="{% static 'css/base.css' %}" rel="stylesheet" type="text/css" />
+        {% block prehead %}{% endblock %}
+        <title>OpenJudge|{% block title %}Home{% endblock %}</title>
+        {% block head %}{% endblock %}
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+        {% block posthead %}{% endblock %}
+  </head>
+  <body>
+    {% block prebody %}{% endblock %}
+    <div class='nav'>
+    <ul>
+        <li><a href="{%url 'home' %}">Home</a></li>
+        {% if user.is_authenticated %}
+            <li>{{user}}</li>
+            <li><a href="{%url 'logout' %}">Logout</a></li>
+        {% else %}
+            <li><a href="{% url 'login' %}">Login</a></li>
+        {% endif %}
+    </ul> 
+    </div><!-- navigation -->
+    <div class='container'>
+        {% block body %}
+        BASE
+        {% endblock %}
+    </div>
+    {% block postbody%}{% endblock %}
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+  </body>
+</html>
