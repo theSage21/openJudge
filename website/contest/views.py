@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from contest import models
 from contest.forms import AttemptForm, RegistrationForm, ProfileForm
 
@@ -19,10 +20,23 @@ def contest(request, cpk):
     return render(request, template, context)
 
 
-def details(request, cpk):
-    context = {}
-    template = 'contest/contest.html'
-    return render(request, template, context)
+def details(request):
+    data = {}
+    questions = models.Question.objects.all()
+    data['question'] = {}
+    for q in questions:
+        tcase_list = models.TextCase.objects.filter(question=q)
+        data['question'][str(q.pk)] = [(i.inp.url,
+                                        i.out.url,
+                                        i.exact_check) for i in tcase_list]
+    data['language'] = {}
+    languages = models.Language.objects.all()
+    for l in languages:
+        data['language'][str(l.pk)] = {'wrap': l.wrapper.url,
+                                       'misc': l.name,
+                                       'overwrite': l.strict_filename}
+    return JsonResponse(data)
+
 
 
 
