@@ -1,6 +1,8 @@
 from django.db import models
+from socket import create_connection
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
+from contest.comms import is_correct
 
 
 class Contest(models.Model):
@@ -67,8 +69,16 @@ class Attempt(models.Model):
     filename = models.CharField(max_length=50, help_text='Setting this sets formatting in editor + filename for Java')
     source = models.TextField()
     stamp = models.DateTimeField(auto_now_add=True)
+    _correct = models.NullBooleanField(default=None)
     def _get_correct(self):
-        pass
+        if self._correct is not None:
+            val = self._correct
+        else:
+            val = is_correct(self)
+            if val is not None:  # avoid DB hit if None
+                self._correct = val
+                self.save()
+        return val
     correct = property(_get_correct)
 
     def _get_marks(self):
@@ -78,3 +88,34 @@ class Attempt(models.Model):
         total = before_this.exclude(correct=None).count()
         result = 1 if total == 0 else float(correct) / total
     marks = property(_get_marks)
+
+
+class Slave(models.Model):
+    def __str__(self):
+        return self.ip + str(self.port)
+
+    ip = models.GenericIPAddressField()
+    port = models.IntegerField()
+    busy = models.BooleanField(default=False)
+
+    def is_alive(self):
+        addr = (self.ip, self.port)
+        try:
+            con = create_connection(addr)
+        except:
+            return False
+        else:
+            con.sendall('Alive'.encode('utf-8'))
+            con.close()
+            return True
+
+    def get_address(self):
+        return (self.ip, self.port)
+
+    def __enter__(self):
+        self.busy = True
+        self.save()
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.busy = False
+        self.save()
