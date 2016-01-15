@@ -32,6 +32,7 @@
 {% endblock %}
 
 {% block content %}
+<div id='page'>
 <p><b>{{question}} </b>
 {% if last_attempt.correct == True%}
     <i class='correct'>Correct Attempt</i>
@@ -88,4 +89,5 @@
          }
         }
 </script>
+</div>
 {%endblock%}
