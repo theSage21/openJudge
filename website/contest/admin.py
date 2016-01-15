@@ -7,7 +7,7 @@ class TestCaseInlineAdmin(admin.TabularInline):
 
 @admin.register(models.Profile)
 class ProfileAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('user', 'contest', 'allowed')
 
 
 @admin.register(models.Language)
