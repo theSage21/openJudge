@@ -76,7 +76,7 @@ class Attempt(models.Model):
             val = self._correct
         else:
             #val = is_correct(self)
-            val = False
+            val = True
             # TODO
             if val is not None:  # avoid DB hit if None
                 self._correct = val
@@ -87,7 +87,8 @@ class Attempt(models.Model):
     def _get_marks(self):
         on_this_question = Attempt.objects.filter(question=self.question)
         before_this = on_this_question.filter(stamp__lte=self.stamp)
-        correct = before_this.filter(correct=True).count()
-        total = before_this.exclude(correct=None).count()
+        correct = sum((1 for i in before_this if i.correct == True))
+        total = sum((1 for i in before_this if i.correct is not None))
         result = 1 if total == 0 else float(correct) / total
+        return result
     marks = property(_get_marks)
