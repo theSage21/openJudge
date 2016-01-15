@@ -27,7 +27,6 @@ def is_correct(att, joblist={}):
         t.start()
     result, remark = recheck_Q(att)
     joblist[att.pk] = result, remark
-    print(joblist)
     return joblist[att.pk]
 
 
@@ -64,7 +63,6 @@ def execute(att):
             results.append(result)
             remarks.append(remark)
     result, remarks = process_tests(results, remarks, outputs)
-    print(att.pk, result, remarks)
     global Q
     Q.put((att.pk, result, remarks))
 
