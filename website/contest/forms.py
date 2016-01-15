@@ -23,7 +23,7 @@ class RegistrationForm(Form):
 class AttemptForm(ModelForm):
     class Meta:
         model = models.Attempt
-        exclude = ['profile', 'question', 'stamp']
+        exclude = ['profile', 'question', 'stamp', '_correct']
 
 
 class ProfileForm(ModelForm):

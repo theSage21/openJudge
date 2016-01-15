@@ -10,14 +10,9 @@
     height: 500px;
     }
     #submit {
-        width: 100%;
+        width: 15.5em;
         color:black;
-        font-weight:bold;
-        font-size:2em;
-        background-color:grey;
-    }
-    #submit:hover {
-        background-color:white;
+        font-size:1.2em;
     }
 </style>
 <script src="{%static 'jquery.min.js' %}"></script>
@@ -31,11 +26,12 @@
 <form role='form' action={%url "question" contest.pk question.pk %} method='post'>
 {%csrf_token%}
 {{answer_form.as_p}}
+<input id="submit" type='submit' value='Submit'>
+<hr>
 <div class='well'>
 <div id="temp_text_area">
 </div>
 </div>
-<input id="submit" type='submit' class='btn btn-success' value='Submit'>
 </form>
 <hr>
     <script src="{% static 'ace/ace.js' %}" type="text/javascript" charset="utf-8"></script>
