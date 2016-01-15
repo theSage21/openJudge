@@ -86,9 +86,9 @@ class Attempt(models.Model):
 
     def _get_marks(self):
         on_this_question = Attempt.objects.filter(question=self.question)
-        before_this = on_this_question.filter(stamp__lte=self.stamp)
-        correct = sum((1 for i in before_this if i.correct == True))
+        before_this = on_this_question.filter(stamp__lt=self.stamp)
+        wrong = sum((1 for i in before_this if i.correct == False))
         total = sum((1 for i in before_this if i.correct is not None))
-        result = 1 if total == 0 else float(correct) / total
+        result = 1 if total == 0 else float(wrong) / total
         return result
     marks = property(_get_marks)
