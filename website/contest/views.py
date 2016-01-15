@@ -20,6 +20,7 @@ def contest(request, cpk):
     return render(request, template, context)
 
 
+# TODO: This seems deprecated
 def details(request):
     data = {}
     questions = models.Question.objects.all()
@@ -49,10 +50,10 @@ def question(request, cpk, qpk):
     context['question'] = get_object_or_404(models.Question, pk=qpk)
     profile_user = models.Profile.objects.filter(user=request.user)
     profile = profile_user.filter(contest=context['contest'])[0]
+    last_attempt = profile.profile_attempt.order_by('-stamp').first()
 
     if request.method == 'GET':
-        
-        context['answer_form'] = AttemptForm()
+        context['answer_form'] = AttemptForm(instance=last_attempt) if last_attempt else AttemptForm()
     elif request.method == 'POST':
         form = AttemptForm(request.POST, request.FILES)
         if form.is_valid():
@@ -60,8 +61,13 @@ def question(request, cpk, qpk):
             attempt.profile = profile
             attempt.question = context['question']
             attempt.save()
+            if attempt.correct:
+                context['correct'] = True
+            else:
+                context['incorrect'] = True
+            context['answer_form'] = AttemptForm(instance=last_attempt) if last_attempt else AttemptForm()
         else:
-            data['answer_form'] = form
+            context['answer_form'] = form
     return render(request, template, context)
 
 def signup(request):
