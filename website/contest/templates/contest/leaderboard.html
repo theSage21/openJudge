@@ -2,14 +2,14 @@
 {% block contest_display %}Leaderboard{% endblock %}
 {% block content %}
 <style>
-.disq{
-    background-color:pink;
-}
 table{
     width:100%;
 }
 tr:nth-child(even) {background: #CCC}
 tr:nth-child(odd) {background: #FFF}
+.disq{
+    background-color:pink;
+}
 </style>
 <table class='center'>
     <thead>
@@ -21,9 +21,12 @@ tr:nth-child(odd) {background: #FFF}
     </thead>
     <tbody>
         {% for player in players %}
-        <tr {%if not player.allowed %}class='disq'{%endif%}>
+        <tr>
+            <tr> 
             <td>{{forloop.counter}}</td>
-            <td>{{player}}</td>
+            {%if not player.allowed %}<td class='disq'>DQ-
+                {% else %} <td>{%endif %}
+                    {{player}}</td>
             <td>{{player.score}}</td>
         </tr>
         {% endfor %}
