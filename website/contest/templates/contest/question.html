@@ -32,21 +32,13 @@
 {% endblock %}
 
 {% block content %}
-<div id='page'>
 <p><b>{{question}} </b>
-
 {% if last_attempt.correct == True%}
     <i class='correct'>Correct Attempt</i>
 {% elif last_attempt.correct == False%}
     <i class='incorrect'>Incorrect Attempt</i>
 {% elif last_attempt.correct == None %}
-<i class='wait'>...<i>
-<script>
-    $(document).ready(function () { setTimeout("RefreshPage()", 1000); })
-    function RefreshPage() { location.reload(); }
-</script>
-{% endif %}|{{last_attempt.remarks}}
-</p>
+<i class='wait'>...</i> {% endif %}|{{last_attempt.remarks}} </p>
 <pre>{{question.text}}</pre>
 <hr>
 
@@ -86,5 +78,14 @@
         source_name.change(new_mode)
         editor.setFontSize(18);
     </script>
-</div>
+<script>
+    $(document).ready(function () { 
+            setTimeout("RefreshPage()", 1000); })
+    function RefreshPage() {
+        var html= $('body').html().toString();
+        if(html.indexOf('C'+'hecking') > -1){
+            location.reload();
+         }
+        }
+</script>
 {%endblock%}
