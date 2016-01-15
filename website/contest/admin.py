@@ -16,12 +16,13 @@ class LanguageAdmin(admin.ModelAdmin):
 
 @admin.register(models.Contest)
 class ContestAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('name', 'live', 'published')
 
 
 @admin.register(models.Question)
 class QuestionAdmin(admin.ModelAdmin):
     inlines = [TestCaseInlineAdmin]
+    list_display = ('title', 'contest')
 
 
 @admin.register(models.TestCase)
@@ -30,4 +31,5 @@ class TestCaseAdmin(admin.ModelAdmin):
 
 @admin.register(models.Attempt)
 class AttemptAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('question', 'profile', 'language', 'correct')
+    list_order=('question', 'profile', 'language', 'correct')
