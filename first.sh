@@ -12,8 +12,6 @@ pip install -r requirements.txt
 
 setup_folder=$PWD
 echo $setup_folder
-mkdir wrappers
-cp wrappers_origional/* wrappers/
 # add absolute path to the wrappers
 
 echo -e "$RED Webserver Setup started.$NC"
