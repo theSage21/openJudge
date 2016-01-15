@@ -20,13 +20,24 @@
     .incorrect {
         background-color:pink;
     }
+    .timeout {
+        background-color:lightblue;
+    }
 </style>
 <script src="{%static 'jquery.min.js' %}"></script>
 {% endblock %}
 
 {% block content %}
-<p><b>{{question}} </b>{% if correct%}
-<i class='correct'>Correct Attempt</i>{% elif incorrect %}<i class='incorrect'>Incorrect Attempt</i>{% endif %}</p>
+<p><b>{{question}} </b>
+
+{% if last_attempt.correct == True%}
+    <i class='correct'>Correct Attempt</i>
+{% elif last_attempt.correct == False%}
+    <i class='incorrect'>Incorrect Attempt</i>
+{% elif last_attempt.correct == None %}
+<i class='timeout'>{{remark}}</i>
+{% endif %}|{{last_attempt.remarks}}
+</p>
 <pre>{{question.text}}</pre>
 <hr>
 

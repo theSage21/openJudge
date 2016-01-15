@@ -28,8 +28,15 @@ class Profile(models.Model):
     allowed = models.BooleanField(default=True)
 
     def _get_score(self):
-        all_att = (i for i in Attempt.objects.filter(profile=self) if i.correct)
-        total = sum((i.marks for i in all_att))
+        all_att = (i for i in Attempt.objects.filter(profile=self).order_by('-stamp') if i.correct)
+        # only first correct attempt per question
+        questions_done = []
+        first_correct = []
+        for i in all_att:
+            if i.question not in questions_done:
+                questions_done.append(i.question)
+                first_correct.append(i)
+        total = sum((i.marks for i in first_correct))
         return total
     score = property(_get_score)
 
@@ -69,18 +76,17 @@ class Attempt(models.Model):
     language = models.ForeignKey(Language, related_name='language_attempt')
     filename = models.CharField(max_length=50, help_text='Setting this sets formatting in editor + filename for Java')
     source = models.TextField()
+    remarks = models.TextField(default='')
     stamp = models.DateTimeField(auto_now_add=True)
     _correct = models.NullBooleanField(default=None)
     def _get_correct(self):
         if self._correct is not None:
             val = self._correct
         else:
-            #val = is_correct(self)
-            val = True
-            # TODO
-            if val is not None:  # avoid DB hit if None
-                self._correct = val
-                self.save()
+            val, remark = is_correct(self)
+            self._correct = val
+            self.remarks = remark
+            self.save()
         return val
     correct = property(_get_correct)
 

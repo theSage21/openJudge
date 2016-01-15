@@ -21,16 +21,16 @@ tr:nth-child(odd) {background: #FFF}
     </thead>
     <tbody>
         {% for player in players %}
-        <tr>
-            <tr> 
-            <td>{{forloop.counter}}</td>
-            {%if not player.allowed %}<td class='disq'>DQ-
-                {% else %} <td>{%endif %}
-                    {{player}}</td>
-            <td>{{player.score}}</td>
-        </tr>
+            <tr>
+                <td>{{forloop.counter}}</td>
+                {%if not player.allowed %}
+                    <td class='disq'>DQ -
+                {% else %}
+                    <td>
+                {%endif %} {{player}}</td>
+                <td>{{player.score}}</td>
+            </tr>
         {% endfor %}
-        <t
     </tbody>
 </table>
 {% endblock %}

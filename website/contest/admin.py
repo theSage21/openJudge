@@ -31,5 +31,5 @@ class TestCaseAdmin(admin.ModelAdmin):
 
 @admin.register(models.Attempt)
 class AttemptAdmin(admin.ModelAdmin):
-    list_display = ('question', 'profile', 'language', 'correct')
+    list_display = ('question', 'profile', 'language', 'correct', 'remarks')
     list_order=('question', 'profile', 'language', 'correct')

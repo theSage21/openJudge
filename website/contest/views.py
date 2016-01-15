@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from contest import models
@@ -20,27 +20,6 @@ def contest(request, cpk):
     return render(request, template, context)
 
 
-# TODO: This seems deprecated
-def details(request):
-    data = {}
-    questions = models.Question.objects.all()
-    data['question'] = {}
-    for q in questions:
-        tcase_list = models.TextCase.objects.filter(question=q)
-        data['question'][str(q.pk)] = [(i.inp.url,
-                                        i.out.url,
-                                        i.exact_check) for i in tcase_list]
-    data['language'] = {}
-    languages = models.Language.objects.all()
-    for l in languages:
-        data['language'][str(l.pk)] = {'wrap': l.wrapper.url,
-                                       'misc': l.name,
-                                       'overwrite': l.strict_filename}
-    return JsonResponse(data)
-
-
-
-
 @login_required
 def question(request, cpk, qpk):
     context = {}
@@ -51,7 +30,7 @@ def question(request, cpk, qpk):
     profile_user = models.Profile.objects.filter(user=request.user)
     profile = profile_user.filter(contest=context['contest'])[0]
     last_attempt = profile.profile_attempt.order_by('-stamp').first()
-
+    context['last_attempt'] = last_attempt
     if request.method == 'GET':
         context['answer_form'] = AttemptForm(instance=last_attempt) if last_attempt else AttemptForm()
     elif request.method == 'POST':
@@ -61,11 +40,7 @@ def question(request, cpk, qpk):
             attempt.profile = profile
             attempt.question = context['question']
             attempt.save()
-            if attempt.correct:
-                context['correct'] = True
-            else:
-                context['incorrect'] = True
-            context['answer_form'] = AttemptForm(instance=last_attempt) if last_attempt else AttemptForm()
+            return redirect('question', cpk=cpk, qpk=qpk)
         else:
             context['answer_form'] = form
     return render(request, template, context)
@@ -84,6 +59,7 @@ def signup(request):
             p.set_password(pwd)
             p.save()
             context['successful_registration'] = uname
+            return redirect('login')
         else:
             context['form'] = form
     return render(request, template, context)
@@ -100,6 +76,7 @@ def register(request):
             profile.user = request.user
             profile.save()
             context['successful_registration'] = profile.user
+            return redirect('contest', cpk=profile.contest.pk)
         else:
             context['form'] = form
     return render(request, template, context)
