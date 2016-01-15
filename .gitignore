@@ -59,3 +59,4 @@ target/
 check_data/
 static_files/
 joblist*
+media_root/
