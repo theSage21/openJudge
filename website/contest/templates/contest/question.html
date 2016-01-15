@@ -20,7 +20,7 @@
     .incorrect {
         background-color:pink;
     }
-    .timeout {
+    .wait {
         background-color:lightblue;
     }
 </style>
@@ -35,7 +35,11 @@
 {% elif last_attempt.correct == False%}
     <i class='incorrect'>Incorrect Attempt</i>
 {% elif last_attempt.correct == None %}
-<i class='timeout'>{{remark}}</i>
+<i class='wait'>...<i>
+<script>
+    $(document).ready(function () { setTimeout("RefreshPage()", 1000); })
+    function RefreshPage() { location.reload(); }
+</script>
 {% endif %}|{{last_attempt.remarks}}
 </p>
 <pre>{{question.text}}</pre>
