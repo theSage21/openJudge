@@ -14,12 +14,19 @@
         color:black;
         font-size:1.2em;
     }
+    .correct {
+        background-color:lightgreen;
+    }
+    .incorrect {
+        background-color:pink;
+    }
 </style>
 <script src="{%static 'jquery.min.js' %}"></script>
 {% endblock %}
 
 {% block content %}
-<p><b>{{question}}</b></p>
+<p><b>{{question}} </b>{% if correct%}
+<i class='correct'>Correct Attempt</i>{% elif incorrect %}<i class='incorrect'>Incorrect Attempt</i>{% endif %}</p>
 <pre>{{question.text}}</pre>
 <hr>
 
