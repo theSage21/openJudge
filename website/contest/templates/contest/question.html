@@ -23,11 +23,16 @@
     .wait {
         background-color:lightblue;
     }
+    #page{
+        padding-left:7em;
+        padding-right:7em;
+    }
 </style>
 <script src="{%static 'jquery.min.js' %}"></script>
 {% endblock %}
 
 {% block content %}
+<div id='page'>
 <p><b>{{question}} </b>
 
 {% if last_attempt.correct == True%}
@@ -81,4 +86,5 @@
         source_name.change(new_mode)
         editor.setFontSize(18);
     </script>
+</div>
 {%endblock%}
