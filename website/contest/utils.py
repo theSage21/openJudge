@@ -46,6 +46,7 @@ def save_text_to_file(text, file_path):
     path, name = os.path.split(file_path)
     with open(file_path, 'w') as fl:
         fl.write(text)
+    return file_path
 
 
 def execute(att):
@@ -57,13 +58,13 @@ def execute(att):
     remarks, results = [], []
     timeout = att.language.timeout * att.question.contest.timeout
 
-    for tst in test_cases:
+    for tst in testcases:
         inp = tst.inp.path
         out = tst.out.path
-        command = ' '.join((permissions, wrap, inp, source))
+        command = ' '.join((permissions, wrapper, inp, source))
 
         ret_val, out_rec, remark = run_command(command, timeout)
-        result = get_result(ret_val, out, out_rec)
+        result = get_result(ret_val, out, out_rec, True)
 
         results.append(result)
         remarks.append(remark)
@@ -80,26 +81,18 @@ def execute(att):
     result_Q.put((att.pk, res, remark))
 
 def run_command(cmd, timeout):
-    class Timeout(Exception):
-        pass
-
-    def alarm_handler(signum, frame):
-        "Raise the alarm of timeout"
-        raise Timeout()
-
-    proc = subprocess.Popen(cmd, stderr=subprocess.PIPE,
-                            stdout=subprocess.PIPE, shell=True)
-    signal.signal(signal.SIGALARM, alarm_handler)
-    signal.alarm(timeout)
     try:
-        stdout, stderr = proc.communicate()
-        signal.alarm(0)  # reset when command finishes
-    except Timeout:
-        proc.terminate()
+        proc = subprocess.run(cmd,
+                            timeout=timeout,
+                            stderr=subprocess.PIPE,
+                            stdout=subprocess.PIPE,
+                            shell=True)
+    except subprocess.TimeoutExpired:
         ret_val = None
         stdout, stderr = b'', b''
     else:
         ret_val = proc.returncode
+        stdout, stderr = proc.stdout, proc.stderr
     return ret_val, stdout.decode(), stderr.decode()
 
 def get_result(return_val, out, out_rec, strict=True):
@@ -110,7 +103,7 @@ def get_result(return_val, out, out_rec, strict=True):
         if return_val != 0:
             result = 'Error ' + str(return_val)
         else:
-            if compare_outputs(out, out_recieved, strict):
+            if compare_outputs(out, out_rec, strict):
                 result = 'Correct'
             else:
                 result = 'Incorrect'
@@ -120,9 +113,10 @@ def get_result(return_val, out, out_rec, strict=True):
 def compare_outputs(exp, rec, strict):
     global ERR
     with open(exp, 'r') as e:
-        exp = f.read()
+        temp = e.read()
+    exp = temp
     if strict:
-        result = exp.strip() == rec.strip()
+        result = (exp.strip() == rec.strip())
     else:
         lines_e, lines_r = exp.split('\n'), rec.split('\n')
         result = True
