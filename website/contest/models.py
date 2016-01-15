@@ -2,7 +2,7 @@ from django.db import models
 from socket import create_connection
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
-from contest.comms import is_correct
+from contest.utils import is_correct
 
 
 class Contest(models.Model):

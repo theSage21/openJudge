@@ -5,7 +5,6 @@ import subprocess
 from queue import Queue
 from threading import Thread
 from json import loads, dumps
-from contest.models import TestCase
 
 results = {}
 result_Q = Queue()
@@ -51,7 +50,7 @@ def save_text_to_file(text, file_path):
 
 def execute(att):
     global result_Q
-    testcases = TestCase.objects.filter(question=att.question)
+    testcases = att.question.question_testcase.all()
     wrapper = att.language.wrapper.path
     source = save_text_to_file(att.source, att.filename)
     permissions = 'chmod u+x {} ;\n'.format(wrapper)
