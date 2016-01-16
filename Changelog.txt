@@ -1,3 +1,10 @@
+v 0.4.0
+-------
+
+- Monolithic design
+- No external slaves
+- New UI
+
 v 0.3.0
 -------
 
