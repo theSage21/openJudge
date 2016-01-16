@@ -1,6 +1,8 @@
 OpenJudge
 =========
 
+v 0.4.0
+
 A judge made to judge the programming competitions held over LAN.
 
 - python3
