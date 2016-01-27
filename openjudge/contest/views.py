@@ -28,7 +28,10 @@ def question(request, cpk, qpk):
     context['contest'] = get_object_or_404(models.Contest, pk=cpk)
     context['question'] = get_object_or_404(models.Question, pk=qpk)
     profile_user = models.Profile.objects.filter(user=request.user)
-    profile = profile_user.filter(contest=context['contest'])[0]
+    try:
+        profile = profile_user.filter(contest=context['contest'])[0]
+    except IndexError:
+        return redirect('not_registered')
     last_attempt = profile.profile_attempt.order_by('-stamp').first()
     context['last_attempt'] = last_attempt
     if request.method == 'GET':
@@ -91,4 +94,10 @@ def leaderboard(request, cpk):
     # This seems neater to me
     context['players'] = players
     context['contest'] = get_object_or_404(models.Contest, pk=cpk)
+    return render(request, template, context)
+
+
+def not_registered(request):
+    context = {}
+    template = 'contest/not_reg.html'
     return render(request, template, context)
