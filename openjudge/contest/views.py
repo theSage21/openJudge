@@ -27,6 +27,10 @@ def question(request, cpk, qpk):
 
     context['contest'] = get_object_or_404(models.Contest, pk=cpk)
     context['question'] = get_object_or_404(models.Question, pk=qpk)
+
+    if not context['contest'].live:
+        return redirect('contest', cpk=context['contest'].pk)
+
     profile_user = models.Profile.objects.filter(user=request.user)
     try:
         profile = profile_user.filter(contest=context['contest'])[0]
