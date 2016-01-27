@@ -16,7 +16,7 @@ echo $setup_folder
 
 echo -e "$RED Webserver Setup started.$NC"
 # WEBSERVER SETUP
-cd website
+cd openjudge
 rm db.sqlite3 
 rm -rf static_files
 

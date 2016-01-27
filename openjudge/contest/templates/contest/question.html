@@ -27,6 +27,11 @@
         padding-left:7em;
         padding-right:7em;
     }
+    .remarks{
+        display:none;
+        background-color: #6CC;
+        overflow:auto;
+    }
 </style>
 <script src="{%static 'jquery.min.js' %}"></script>
 {% endblock %}
@@ -39,7 +44,7 @@
 {% elif last_attempt.correct == False%}
     <i class='incorrect'>Incorrect Attempt</i>
 {% elif last_attempt.correct == None %}
-<i class='wait'>...</i> {% endif %}|{{last_attempt.remarks}} </p>
+<i class='wait'>...</i> {% endif %}|<pre id='remarks' class='remarks'>{{last_attempt.remarks|safe}}</pre><button id='remark_toggle'>Show/Hide Remarks</button> </p>
 <pre>{{question.text}}</pre>
 <hr>
 
@@ -81,6 +86,9 @@
     </script>
 <script>
     $(document).ready(function () { 
+        $('#remark_toggle').click(function (){
+            $('#remarks').toggle();
+        });
             setTimeout("RefreshPage()", 1000); })
     function RefreshPage() {
         var html= $('body').html().toString();

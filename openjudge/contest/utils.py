@@ -93,5 +93,7 @@ def process_tests(results, remarks, outputs):
         if None in results:
             result = False, 'Timeout'
         elif False in results:
-            result = False, 'ErrorInCode'
+            print(remarks)
+            print(type(remarks))
+            result = False, 'ErrorInCode:\n\n {}'.format(remarks[0])
     return result
