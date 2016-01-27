@@ -1,7 +1,9 @@
 {% extends 'contest/home.html' %}
 {% block body %}
 <div class='center'>
-    <p>{% if not contest.live %}<b style='color:#f55'>[Not Live]</b>{% endif %}{{contest}} {% block contest_display %}Question List {% endblock %}</p>
+    <p>|{% if not contest.live %}<b style='color:#f55'>[Not Live]</b>{% else %}
+    <b style='color:#55f'>{{contest.expires|timeuntil }} Left </b>{% endif %}
+    <b style='color:#999'>{{contest}} </b> | {% block contest_display %}Question List {% endblock %}</p>
 </div>
 <hr>
 {% block content %}

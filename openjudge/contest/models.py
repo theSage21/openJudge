@@ -3,16 +3,21 @@ from socket import create_connection
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from contest.utils import is_correct
+from django.utils import timezone
 
 
 class Contest(models.Model):
     def __str__(self):
+        if timezone.now() >= self.expires:
+            self.live = False
+            self.save()
         return self.name
     name = models.CharField(max_length=50)
     live = models.BooleanField(default=True)
     published = models.BooleanField(default=True)
     timeout = models.FloatField(default=6.0)
 
+    expires = models.DateTimeField(default=timezone.now)
     def get_absolute_url(self):
         return reverse('contest', args=[self.pk])
     def get_leaderboard(self):
