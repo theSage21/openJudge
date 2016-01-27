@@ -18,11 +18,8 @@
     background-color: white;
 }
 .nav .banner{
-    padding: 0.2em 0.5em;
     font-weight:bold;
-}
-.nav .banner:hover{
-    background-color: #08D177;
+    padding: 0.1em 0.2em;
 }
 .nav ul a{
     text-align: center;

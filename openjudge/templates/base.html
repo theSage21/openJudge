@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     {% load staticfiles %}
+    <link rel="icon" type="image/x-icon" href="{%static 'icon.png'%}">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -16,11 +17,7 @@
   <body>
     <div class='nav'>
     <ul>
-
-        
-        <li class='banner'>{% if user.is_authenticated %}OJ-{{user}}
-            {%else%}OpenJudge
-        {% endif %}|</li>
+        <li class='banner'>OJ |</li>
         <li><a href="{%url 'home' %}">Home</a></li>
         {% if user.is_authenticated %}
             <li><a href="{%url 'logout' %}">Logout</a></li>
