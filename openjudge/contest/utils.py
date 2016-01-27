@@ -17,6 +17,7 @@ def Source(text, path):
         fl.write(text)
     yield path
     os.remove(path)
+    os.rmdir(directory)
 
 
 
