@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 {% block nav %}
     {% for contest in contests %}
-    <li><a href={{contest.get_absolute_url}}>{{contest}}</a></li>
+    <li><a href={{contest.get_absolute_url}}
+            {% if not contest.live %}
+            style='color:#555'
+            {% endif %}
+            >{{contest}}</a></li>
     {% endfor %}
 {% endblock %}
 {% block body %}
