@@ -35,7 +35,7 @@ class Profile(models.Model):
     allowed = models.BooleanField(default=True)
 
     def _get_score(self):
-        all_att = (i for i in Attempt.objects.filter(profile=self).order_by('-stamp') if i.correct)
+        all_att = (i for i in Attempt.objects.filter(profile=self).order_by('stamp') if i.correct)
         # only first correct attempt per question
         questions_done = []
         first_correct = []
@@ -43,6 +43,7 @@ class Profile(models.Model):
             if i.question not in questions_done:
                 questions_done.append(i.question)
                 first_correct.append(i)
+                print(i.pk)
         total = sum((i.marks for i in first_correct))
         return total
     score = property(_get_score)
@@ -108,7 +109,7 @@ class Attempt(models.Model):
         on_this_question = Attempt.objects.filter(question=self.question)
         before_this = on_this_question.filter(stamp__lt=self.stamp)
         wrong = sum((1 for i in before_this if i.correct == False))
-        total = sum((1 for i in before_this if i.correct is not None))
+        total = sum((1 for i in before_this if (i.correct is not None)))
         result = 1 if total == 0 else float(wrong) / total
         return result
     marks = property(_get_marks)
