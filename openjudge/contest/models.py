@@ -1,3 +1,4 @@
+from datetime import timedelta
 from django.db import models
 from socket import create_connection
 from django.core.urlresolvers import reverse
@@ -81,6 +82,7 @@ class Attempt(models.Model):
     profile = models.ForeignKey(Profile, related_name='profile_attempt')
     language = models.ForeignKey(Language, related_name='language_attempt')
     filename = models.CharField(max_length=50, help_text='Setting this sets formatting in editor + filename for Java')
+
     source = models.TextField()
     remarks = models.TextField(default='')
     stamp = models.DateTimeField(auto_now_add=True)
@@ -89,7 +91,13 @@ class Attempt(models.Model):
         if self._correct is not None:
             val = self._correct
         else:
-            val, remark = is_correct(self)
+            diff = timezone.now() - self.stamp
+            allowed = self.language.timeout * self.question.contest.timeout
+            allowed = timedelta(0, allowed)
+            if diff > allowed:
+                val, remark = False, 'Time > ' + str(allowed) + ' taken'
+            else:
+                val, remark = is_correct(self)
             self._correct = val
             self.remarks = remark
             self.save()

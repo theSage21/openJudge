@@ -69,6 +69,7 @@ def execute(att):
 
 
 def run(cmd, timeout):
+    print('running with timeout', timeout)
     try:
         p = sp.run(cmd,
                    timeout=timeout,
