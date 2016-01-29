@@ -17,6 +17,8 @@ def Source(text, path):
         fl.write(text)
     yield path
     os.remove(path)
+    for fl in  os.listdir(directory):
+        os.remove(os.path.join(directory, fl))
     os.rmdir(directory)
 
 

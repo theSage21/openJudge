@@ -10,5 +10,5 @@ output_call_name=${output_file%.class}  && \
 
 java $output_call_name < $1  && \
 
-rm $output_call_name  && \
-rm temp_output
+rm $output_call_name.class  && \
+rm temp_output  
