@@ -43,7 +43,6 @@ class Profile(models.Model):
             if i.question not in questions_done:
                 questions_done.append(i.question)
                 first_correct.append(i)
-                print(i.pk)
         total = sum((i.marks for i in first_correct))
         return total
     score = property(_get_score)
