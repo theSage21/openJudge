@@ -1,5 +1,6 @@
 import os
-import subprocess as sp
+# import subprocess as sp
+from contest.compat import run, PIPE, TimeoutExpired
 from queue import Queue
 from threading import Thread
 from contextlib import contextmanager
@@ -59,7 +60,7 @@ def execute(att):
     with Source(att.source, path) as source:
         for tst in tests:
             cmd = ' '.join((pre, wrapper, tst.inp.path, source))
-            result, output, remark = run(cmd, timeout)
+            result, output, remark = coderun(cmd, timeout)
             with open(tst.out.path, 'r') as out:
                 expected = out.read()
             outputs.append((output.strip() ==  expected.strip()))
@@ -70,15 +71,15 @@ def execute(att):
     Q.put((att.pk, result, remarks))
 
 
-def run(cmd, timeout):
+def coderun(cmd, timeout):
     print('running with timeout', timeout)
     try:
-        p = sp.run(cmd,
-                   timeout=timeout,
-                   stderr=sp.PIPE,
-                   stdout=sp.PIPE,
-                   shell=True)
-    except sp.TimeoutExpired:
+        p = run(cmd,
+                timeout=timeout,
+                stderr=PIPE,
+                stdout=PIPE,
+                shell=True)
+    except TimeoutExpired:
         result = None
         stdout, stderr = b'', b''
     else:
