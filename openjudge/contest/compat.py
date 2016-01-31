@@ -8,7 +8,7 @@ if sys.version_info >= (3, 5):
 
 else:
 
-    from contest/sub35 import (PIPE,
+    from contest.sub35 import (PIPE,
                                Popen,
                                TimeoutExpired,
                                CalledProcessError,
