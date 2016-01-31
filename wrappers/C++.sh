@@ -1,5 +1,5 @@
 #! /bin/bash
 name=$RANDOM
-g++ $2 -o /tmp/$name  && \
-/tmp/$name < $1  && \
-rm /tmp/$name
+g++ $2 -o $name  && \
+$name < $1  && \
+rm $name
