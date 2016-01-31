@@ -1,5 +1,4 @@
 import os
-# import subprocess as sp
 from contest.compat import run, PIPE, TimeoutExpired
 from queue import Queue
 from threading import Thread
