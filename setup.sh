@@ -75,7 +75,26 @@ for wr in wrappers:
 print('Adding calibration questions')
 q = models.Question()
 q.title='Square It- Calibration'
-q.text = '''This is a calibration question.\n Read 5 integers from stdin (cin, scanf, input etc).\nFor each input print it's square on a seperate line.'''
+q.text = '''Read 5 integers from stdin (cin, scanf, input etc).\nFor each integer read print it's square on a seperate line.
+Keep in mind that if you print unnecessary things like 'Enter a number: ' and 'answer is: ', your attempt will be
+considered wrong.
+
+Only print what is required.
+
+Example:
+-------
+1
+2
+3
+4
+5
+
+1
+4
+9
+16
+25
+'''
 q.contest = contest
 q.save()
 
