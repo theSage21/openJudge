@@ -36,8 +36,9 @@ def question(request, cpk, qpk):
         profile = profile_user.filter(contest=context['contest'])[0]
     except IndexError:
         return redirect('not_registered')
-    last_attempt = profile.profile_attempt.order_by('-stamp').first()
+    last_attempt = profile.profile_attempt.filter(question=context['question']).order_by('-stamp').first()
     context['last_attempt'] = last_attempt
+
     if request.method == 'GET':
         context['answer_form'] = AttemptForm(instance=last_attempt) if last_attempt else AttemptForm()
     elif request.method == 'POST':
@@ -81,8 +82,9 @@ def register(request):
         if form.is_valid():
             profile = form.save(commit=False)
             profile.user = request.user
-            profile.save()
-            context['successful_registration'] = profile.user
+            if models.Profile.objects.filter(user=profile.user, contest=profile.contest).count() == 0:
+                profile.save()
+                context['successful_registration'] = profile.user
             return redirect('contest', cpk=profile.contest.pk)
         else:
             context['form'] = form
