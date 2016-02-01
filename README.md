@@ -10,6 +10,7 @@ A judge made to judge the programming competitions held over LAN.
 - gcc
 - g++
 - java
+- Perl
  
 Supported out of the box.
 
@@ -25,8 +26,6 @@ Setup
 ```
 cd ~
 git clone --depth 1  https://github.com/theSage21/openjudge
-virtualenv -p python3 env
-source env/bin/activate
 ./setup.sh
 ```
 
@@ -38,9 +37,11 @@ The interface is set up as a standard django server. I prefer using Nginx,Gunico
 combination. Check my [blog](http://arjoonn.blogspot.com/2015/05/django-gunicorn-and-nginx.html) for how to set that up.
 `setup.sh` only sets up the code for you. You still need to deploy on your own.
 
+To run the server you can run `./server.sh` which will set up the local Gunicorn server on port 8000.
+You may then use a reverse proxy to serve it publicly.
+
 Note that the judge will have to run on a linux like machine. I shamelessly used redirection
-and I have no idea how they translate on a windows box if they do at all. Besides that, 
-the interface can run on another machine and the judge on another.
+and I have no idea how they translate on a windows box if they do at all.
 
 Usage during the competition
 ----------------------------
@@ -50,11 +51,12 @@ Usage during the competition
     - Signup
     - Login
     - Register for a contest
-3. Tell everyone to navigate to the webserver. It will be something like `192.168.1.45`
+3. Tell everyone to navigate to the webserver. It will be something like `192.168.xxx.yyy`
 4. Enjoy the fruits of watching a hundred people program.
 
 Gotchas
 -------
-Some features are not available. If you want you can implement them yourself.
+Some features are not available since they are particularly difficult to implement as
+plug and play services. If you want you can implement them yourself.
 
 - No sandboxing.
