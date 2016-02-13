@@ -77,7 +77,9 @@ If you come up with a new interface
 
 1. Name it (myinterface)
 2. Create the directory inside interfaces (interfaces/myinterface)
+3. Create a pull request!
 
+**HackerEarth**
 ![Hackerearth](screenshots/hackerearth.png)
+**Bootstrap**
 ![Bootstrap](screenshots/bootstrap.png)
-3. Craete a pull request!
