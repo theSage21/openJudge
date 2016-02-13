@@ -19,6 +19,7 @@ echo -e "$RED Webserver Setup started.$NC"
 cd openjudge
 rm db.sqlite3 
 rm -rf static_files
+cp -r interfaces/hackerearth templates
 
 python manage.py makemigrations
 python manage.py migrate

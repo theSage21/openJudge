@@ -43,6 +43,23 @@ You may then use a reverse proxy to serve it publicly.
 Note that the judge will have to run on a linux like machine. I shamelessly used redirection
 and I have no idea how they translate on a windows box if they do at all.
 
+Interfaces
+----------
+
+You can use one of several interfaces available in `openjudge/interfaces` by copying one of the folders
+to the directory with openjudge in it. For example:  
+`$ cp -r openjudge/interfaces/bootstrap/ openjudge/templates`
+
+Available interfaces
+
+- bootstrap
+- hackerEarth
+
+If you come up with a new interface  
+
+1. Name it (myinterface)
+2. Create the directory inside interfaces (interfaces/myinterface)
+3. Craete a pull request!
 Usage during the competition
 ----------------------------
 

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block body %}
+{% if form %}
+    {% if successful_registration %}
+        <p class='center'>
+        <b>{{successful_registration}}</b> was registered successfully for the contest.<br>
+        </p>
+    {% endif %}
+
+    {% if form.errors %}
+        <p> There are errors in the form</p>
+    {% endif %}
+    <p class='center'>
+    <i>Register <b>{{user}}</b> for contest</i><br>
+    Login as another user to register them for a contest.
+    </p>
+    <hr>
+        <form role='form' method="post" action="{% url 'register' %}" class='form'>
+            <table class='table'>
+            {% csrf_token %}
+            {{ form}}
+            </table>
+            <input type="submit" value="Register">
+        </form>
+{% else %}
+    <h2 class='text-center bg-warning'> Registrations are closed</h2>
+{% endif %}
+{%endblock%}

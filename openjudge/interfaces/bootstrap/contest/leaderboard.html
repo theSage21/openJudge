@@ -1,0 +1,26 @@
+{% extends 'contest/contest.html' %}
+{% block contest_display %}Leaderboard{% endblock %}
+{% block content %}
+<table class='text-center table table-striped table-compact'>
+    <thead>
+        <tr>
+            <th class='text-center'>Rank</th>
+            <th class='text-center'>Nickname</th>
+            <th class='text-center'>Score</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for player in players %}
+            <tr>
+                <td>{{forloop.counter}}</td>
+                {%if not player.allowed %}
+                    <td class='bg-danger'>DQ -
+                {% else %}
+                    <td>
+                {%endif %} {{player}}</td>
+                <td>{{player.score}}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
