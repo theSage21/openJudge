@@ -1,8 +1,0 @@
--r requirements.txt
-coverage==3.7.1
-flake8==2.4.0
-pytest-django==2.8.0
-pytest-localserver==0.3.4
-python-coveralls==2.5.0
-pytest-cov==2.1.0
-pytest-pythonpath==0.7
