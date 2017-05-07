@@ -7,6 +7,7 @@ class Language(M.Model):
     name = M.CharField(max_length=100)
     bash_wrap = M.TextField()
 
+
 class Contest(M.Model):
     title = M.CharField(max_length=100)
     start = M.DateTimeField()
@@ -20,8 +21,8 @@ class Question(M.Model):
 
 
 class TestCase(M.Model):
-    inp_file = M.FileField()
-    out_file = M.FileField()
+    inp_text = M.TextField()
+    out_text = M.TextField()
     marks_on_pass = M.FloatField(default=1)
     question = M.ForeignKey('Question', related_name='question_testcase')
 
@@ -29,7 +30,7 @@ class TestCase(M.Model):
 class Participant(M.Model):
     user = M.ForeignKey(User, related_name='user_participant')
     contest = M.ForeignKey('Contest', related_name='contest_participant')
-    nick = M.CharField(max_length=50)
+    nick = M.CharField(max_length=50, help_text='Will be displayed on leaderboard')
 
     def get_score(self):
         # Get the attempts this person made
@@ -49,11 +50,25 @@ class Attempt(M.Model):
     participant = M.ForeignKey('Participant', related_name='participant_attempt')
     assessed = M.BooleanField(default=False)
     valid = M.BooleanField(default=False)
-    counted_for_score = M.BooleanField(default=True, help_tex_textt='Multiple good attempts should not increase score')
+    counted_for_score = M.BooleanField(default=True, help_text='Multiple good attempts should not increase score')
     score_obtained = M.FloatField(default=0)
 
     submission_time = M.DateTimeField(auto_now_add=True)
 
     def assess_this_attempt(self):
-        # TODO
-        pass
+        # ASSESS
+        self.is_valid = True  # TODO: Make this a function
+        # IS COUNTED?
+        how_many_correct_attempts_before_this = Attempt.objects.filter(question=self.question,
+                participant=self.participant,
+                assessed=True,
+                counted_for_score=True,
+                submission_time__lt=self.submission_time).count()
+        if how_many_correct_attempts_before_this > 0:
+            self.counted_for_score = False
+        else:
+            if self.is_valid:
+                self.counted_for_score = True
+                test_cases_passed = TestCase.objects.filter(question=self.question)
+                self.score_obtained = test_cases_passed.aggregate(Sum('marks_on_pass'))
+        self.save()
