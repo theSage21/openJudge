@@ -1,6 +1,8 @@
 from django.db import models as M
 from django.db.models import Sum
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
+
 
 
 class Language(M.Model):
@@ -12,12 +14,26 @@ class Contest(M.Model):
     title = M.CharField(max_length=100)
     start = M.DateTimeField()
     end = M.DateTimeField()
+    description = M.TextField()
+    link = M.CharField(max_length=200, null=True)
+
+    def __str__(self):
+        return self.title
+
+    def get_absolute_url(self):
+        return reverse('contest', args=[self.pk])
 
 
 class Question(M.Model):
     title = M.CharField(max_length=100)
     text = M.TextField()
     contest = M.ForeignKey('Contest', related_name='contest_question')
+
+    def get_absolute_url(self):
+        return reverse('question', args=[self.contest.pk, self.pk])
+
+    def __str__(self):
+        return self.title
 
 
 class TestCase(M.Model):
