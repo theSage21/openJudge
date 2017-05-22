@@ -9,6 +9,9 @@ class Language(M.Model):
     name = M.CharField(max_length=100)
     bash_wrap = M.TextField()
 
+    def __str__(self):
+        return self.name
+
 
 class Contest(M.Model):
     title = M.CharField(max_length=100)
