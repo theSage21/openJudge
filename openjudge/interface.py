@@ -1,5 +1,5 @@
 import bottle
-from openjudge import tools, config
+from openjudge import tools, config, judge
 
 contest = tools.read_contest_json()
 app = bottle.Bottle()
@@ -43,6 +43,13 @@ def question_attempt():
     else:
         att_id = None
     return {'attempt': att_id, 'message': message}
+
+
+@app.post('/attempt/status')
+def attempt_status():
+    att_id = bottle.json['attempt']
+    status, message = judge.get_attempt_status(att_id)
+    return {'status': status, 'message': message}
 
 
 @app.get('/static/<path:path>')

@@ -18,4 +18,10 @@ def __run_command__(command, timeout):
 
 def check_results_by_running_code(code, inp_list, out_list, wrap):
     attempt_id = 1
+    # TODO
     return attempt_id
+
+
+def get_attempt_status(attempt_id):
+    # TODO
+    return True, 'All ok'
