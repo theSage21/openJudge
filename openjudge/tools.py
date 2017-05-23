@@ -1,4 +1,5 @@
 import os
+import json
 import bottle
 import pkgutil
 from shutil import copyfile
@@ -35,6 +36,9 @@ def __copy_intro__():
     copyfile(os.path.join(config.variable_root, 'intro.txt'),
              os.path.join(config.static_root, 'intro'))
     log('Copied intro.txt')
+    with open(os.path.join(config.variable_root, 'intro.txt'), 'r') as fl:
+        intro = fl.read()
+    return intro
 
 
 def __copy_templates__():
@@ -97,7 +101,11 @@ def __copy_questions__():
 
 def setup_contest():
     "Set up the contest"
-    __copy_intro__()
+    intro = __copy_intro__()
     __copy_templates__()
     __copy_static__()
-    __copy_questions__()
+    contest_data = __copy_questions__()
+    contest_data['intro'] = intro
+    with open('contest.json', 'w') as fl:
+        fl.write(json.dumps(contest_data, indent=4))
+    log('Contest Data Written to contest.json')
