@@ -59,6 +59,8 @@ target/
 check_data/
 static_files/
 static_root/
+staticroot/
+templatesroot/
 joblist*
 media_root/
 ContestData/
