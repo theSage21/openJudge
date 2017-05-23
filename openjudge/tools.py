@@ -4,7 +4,7 @@ import pkgutil
 from shutil import copyfile
 from openjudge import config
 
-__all__ = ['log', 'section', 'render', 'update_contest_data']
+__all__ = ['log', 'section', 'render', 'setup_contest']
 
 
 def log(*args):
@@ -34,7 +34,7 @@ def __copy_intro__():
         raise Exception(message)
     copyfile(os.path.join(config.variable_root, 'intro.txt'),
              os.path.join(config.static_root, 'intro'))
-    log('Intro copied into static files')
+    log('Copied intro.txt')
 
 
 def __copy_templates__():
@@ -63,7 +63,18 @@ def __copy_static__():
         log('Copied {}'.format(template))
 
 
-def update_contest_data():
+def __copy_questions__():
+    "Copy questions from variable directory to database"
+    if not os.path.exists(config.variable_root):
+        message = "Variable directory not found in {}"
+        message = message.format(config.variable_root)
+        raise Exception(message)
+    pass  # TODO
+
+
+def setup_contest():
+    "Set up the contest"
     __copy_intro__()
     __copy_templates__()
     __copy_static__()
+    __copy_questions__()
