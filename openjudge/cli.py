@@ -1,2 +1,6 @@
+from openjudge import interface, tools
+
+
 def main():
-    print('MAIN')
+    tools.section('Setting Up Openjudge')
+    tools.update_contest_data()

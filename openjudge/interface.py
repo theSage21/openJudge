@@ -1,7 +1,6 @@
 import bottle
 from openjudge import tools, config
 
-tools.update_contest_data()
 app = bottle.Bottle()
 
 

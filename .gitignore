@@ -61,3 +61,4 @@ static_files/
 static_root/
 joblist*
 media_root/
+ContestData/
