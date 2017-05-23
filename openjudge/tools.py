@@ -69,7 +69,30 @@ def __copy_questions__():
         message = "Variable directory not found in {}"
         message = message.format(config.variable_root)
         raise Exception(message)
-    pass  # TODO
+    log('Variable Directory found')
+    qdata = {}
+    vr = config.variable_root
+    for folder in sorted(os.listdir(vr)):  # QUESTION
+        path = os.path.join(vr, folder)
+        if os.path.isdir(path):
+            log('Question number {} detected'.format(folder))
+            with open(os.path.join(path, 'statement'), 'r') as fl:
+                stmt = fl.read()
+            log('statement read for {}'.format(folder))
+            qdata[folder] = {'statement': stmt}
+            io_data = {}
+            for io in sorted(os.listdir(path)):
+                if io[0] in 'io':
+                    if io[1:] not in io_data.keys():
+                        io_data[io[1:]] = {'in': '', 'out': ''}
+                    with open(os.path.join(path, io), 'r') as fl:
+                        if io[0] == 'i':
+                            io_data[io[1:]]['in'] = fl.read()
+                        elif io[0] == 'o':
+                            io_data[io[1:]]['out'] = fl.read()
+            log('{} are test cases found'.format(list(io_data.keys())))
+            qdata[folder]['testcases'] = io_data
+    return qdata
 
 
 def setup_contest():

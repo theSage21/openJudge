@@ -5,8 +5,8 @@ app = bottle.Bottle()
 
 
 @app.get('/')
-def contest_home():
-    return tools.render('contest.html')
+def home():
+    return tools.render('home.html')
 
 
 @app.get('/static/<path:path>')
