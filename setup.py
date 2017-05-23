@@ -12,4 +12,5 @@ setup(name='openjudge',
       include_package_data=True,
       install_requires=['bottle'],
       entry_points={'console_scripts': ['openjudge=openjudge.cli:main']},
+      package_data={'openjudge': ['templates/*', 'static/*']},
       zip_safe=False)
