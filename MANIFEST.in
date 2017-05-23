@@ -1,0 +1,2 @@
+include openjudge/templates/*
+include openjudge/static/*
