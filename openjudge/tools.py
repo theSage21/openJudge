@@ -59,12 +59,12 @@ def __copy_static__():
     if not os.path.exists(config.static_root):
         log('{} does not exist. Creating'.format(config.static_root))
         os.mkdir(config.static_root)
-    for template in ['normalize.css', 'skeleton.css']:
-        with open(os.path.join(config.template_root, template), 'w') as fl:
+    for static in ['normalize.css', 'skeleton.css']:
+        with open(os.path.join(config.static_root, static), 'w') as fl:
             html = pkgutil.get_data('openjudge',
-                                    'static/' + template).decode()
+                                    'static/' + static).decode()
             fl.write(html)
-        log('Copied {}'.format(template))
+        log('Copied {}'.format(static))
 
 
 def __copy_questions__():
@@ -118,9 +118,10 @@ def setup_contest():
     __copy_templates__()
     __copy_static__()
     wrappers = __read_contest_wrappers__()
-    contest_data = __copy_questions__()
-    contest_data['intro'] = intro
-    contest_data['wrappers'] = wrappers
+    qdata = __copy_questions__()
+    contest_data = {'questions': qdata,
+                    'intro': intro,
+                    'wrappers': wrappers}
     with open('contest.json', 'w') as fl:
         fl.write(json.dumps(contest_data, indent=4))
     log('Contest Data Written to contest.json')
