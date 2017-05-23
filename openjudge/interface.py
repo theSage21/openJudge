@@ -1,7 +1,9 @@
 import bottle
 from openjudge import tools, config, judge
+from multiprocessing import Queue
 
 app = bottle.Bottle()
+job_queue = Queue()
 
 
 @app.get('/')
@@ -40,16 +42,17 @@ def question_attempt():
     else:
         message, all_ok = 'This Language is not available', False
     if all_ok:
-        att_id = tools.check_results_by_running_code(code, inp, out, wrap)
+        attid = tools.random_id()
+        tools.check_results_by_running_code(code, inp, out, wrap, job_queue, attid)
     else:
-        att_id = None
-    return {'attempt': att_id, 'message': message}
+        attid = None
+    return {'attempt': attid, 'message': message}
 
 
 @app.post('/attempt/status')
 def attempt_status():
     att_id = bottle.json['attempt']
-    status, message = judge.get_attempt_status(att_id)
+    status, message = judge.get_attempt_status(att_id, job_queue)
     return {'status': status, 'message': message}
 
 

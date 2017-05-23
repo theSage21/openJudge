@@ -1,6 +1,7 @@
 import os
 import json
 import bottle
+import random
 import pkgutil
 from shutil import copyfile
 from openjudge import config
@@ -10,6 +11,12 @@ __all__ = ['log', 'section', 'render', 'setup_contest', 'read_contest_json']
 
 def log(*args):
     print(*args)
+
+
+def random_id(n=30):
+    letters = 'abcdefghijklmnopqrstuvwxyz'
+    name = ''.join(random.choice(letters) for _ in range(n))
+    return name
 
 
 def section(text):
