@@ -129,6 +129,8 @@ def setup_contest():
 
 
 def read_contest_json():
-    with open('contest.json', 'r') as fl:
-        contest = json.load(fl)
+    if os.path.exists('contest.json'):
+        with open('contest.json', 'r') as fl:
+            contest = json.load(fl)
+    contest = {}
     return contest

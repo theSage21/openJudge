@@ -1,7 +1,6 @@
 import bottle
 from openjudge import tools, config, judge
 
-contest = tools.read_contest_json()
 app = bottle.Bottle()
 
 
@@ -12,6 +11,7 @@ def home():
 
 @app.get('/question/<pk>')
 def question_display(pk):
+    contest = tools.read_contest_json()
     pk = str(pk)
     q = {'statement': 'This question does not exist'}
     if pk.isdigit():
@@ -26,6 +26,7 @@ def question_attempt():
     language = bottle.json['language']
     code = bottle.json['code']
     message = 'Something Unexpected happened'
+    contest = tools.read_contest_json()
     all_ok = True
     if question_pk in contest['questions'].keys():
         inp, out = [], []
