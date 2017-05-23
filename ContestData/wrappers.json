@@ -1,0 +1,4 @@
+{
+    "python2" : "python2 '{code}' < '{input}' > '{output}'",
+    "python3" : "python3 '{code}' < '{input}' > '{output}'"
+}

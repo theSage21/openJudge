@@ -99,13 +99,28 @@ def __copy_questions__():
     return qdata
 
 
+def __read_contest_wrappers__():
+    "Copy contest wrappers"
+    if not os.path.exists(config.variable_root):
+        message = "Variable directory not found in {}"
+        message = message.format(config.variable_root)
+        raise Exception(message)
+    vr = config.variable_root
+    with open(os.path.join(vr, 'wrappers.json'), 'r') as fl:
+        wrappers = json.load(fl)
+    log('Read contest wrappers')
+    return wrappers
+
+
 def setup_contest():
     "Set up the contest"
     intro = __copy_intro__()
     __copy_templates__()
     __copy_static__()
+    wrappers = __read_contest_wrappers__()
     contest_data = __copy_questions__()
     contest_data['intro'] = intro
+    contest_data['wrappers'] = wrappers
     with open('contest.json', 'w') as fl:
         fl.write(json.dumps(contest_data, indent=4))
     log('Contest Data Written to contest.json')

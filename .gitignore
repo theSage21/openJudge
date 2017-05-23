@@ -63,5 +63,4 @@ staticroot/
 templatesroot/
 joblist*
 media_root/
-ContestData/
 contest.json
