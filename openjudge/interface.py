@@ -1,6 +1,7 @@
 import bottle
 from openjudge import tools, config
 
+
 app = bottle.Bottle()
 
 

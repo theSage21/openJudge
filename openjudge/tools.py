@@ -5,7 +5,7 @@ import pkgutil
 from shutil import copyfile
 from openjudge import config
 
-__all__ = ['log', 'section', 'render', 'setup_contest']
+__all__ = ['log', 'section', 'render', 'setup_contest', 'read_contest_json']
 
 
 def log(*args):
@@ -13,9 +13,9 @@ def log(*args):
 
 
 def section(text):
-    log('='*70)
+    log('='*100)
     log('.'*25, text)
-    log('='*70)
+    log('='*100)
 
 
 def render(template, data=None):
@@ -109,3 +109,10 @@ def setup_contest():
     with open('contest.json', 'w') as fl:
         fl.write(json.dumps(contest_data, indent=4))
     log('Contest Data Written to contest.json')
+    return contest_data
+
+
+def read_contest_json():
+    with open('contest.json', 'r') as fl:
+        contest = json.load(fl)
+    return contest
