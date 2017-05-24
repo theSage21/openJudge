@@ -87,7 +87,7 @@ def __copy_templates__():
     if not os.path.exists(config.template_root):
         log('{} does not exist. Creating'.format(config.template_root))
         os.mkdir(config.template_root)
-    for template in ['home.html', 'question.html', 'leader.html']:
+    for template in ['home.html']:
         with open(os.path.join(config.template_root, template), 'w') as fl:
             html = pkgutil.get_data('openjudge',
                                     'templates/' + template).decode()
