@@ -160,9 +160,12 @@ def setup_contest():
         contest['questions'] = qdata
         contest['intro'] = intro
         contest['wrappers'] = wrappers
-        contest['attempts'] = {}
-        contest['tokens'] = {}
-        contest['users'] = {}
+        if 'attempts' not in contest:
+            contest['attempts'] = {}
+        if 'tokens' not in contest:
+            contest['tokens'] = {}
+        if 'users' not in contest:
+            contest['users'] = {}
     log('Contest Data Written to contest.json')
 
 
@@ -176,8 +179,10 @@ def setup_contest():
 def login_user(name, pwd):
     status, token = False, None
     with Contest() as contest:
+        log(contest['users'])
+        log(name, pwd)
         if name in contest['users']:
-            if pwd == contest['users']['password']:
+            if pwd == contest['users'][name]['password']:
                 token = random_id(50)
                 contest['tokens'][token] = name
                 status = True
@@ -195,10 +200,12 @@ def logout_user(token):
 
 def register_user(name, pwd):
     status = False
+    log('{} {} received for registration'.format(name, pwd))
     with Contest() as contest:
         if name not in contest['users']:
             contest['users'][name] = {'password': pwd}
             status = True
+    log(status, 'for registring {} {}'.format(name, pwd))
     return status
 
 

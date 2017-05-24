@@ -7,7 +7,7 @@ app = bottle.Bottle()
 
 def jget(*keys):
     "Needs to be used like a, b, c = jget(x, y, z)"
-    return [bottle.json[key] for key in keys]
+    return [bottle.request.json[key] for key in keys]
 
 
 @app.get('/')
