@@ -128,7 +128,9 @@ def setup_contest():
     qdata = __copy_questions__()
     contest_data = {'questions': qdata,
                     'intro': intro,
-                    'wrappers': wrappers}
+                    'wrappers': wrappers,
+                    'attempts': {}
+                    }
     with open('contest.json', 'w') as fl:
         fl.write(json.dumps(contest_data, indent=4))
     log('Contest Data Written to contest.json')
@@ -141,3 +143,13 @@ def read_contest_json():
             contest = json.load(fl)
     contest = {}
     return contest
+
+
+def add_attempt_to_contest(attemptid, attempt_details):
+    if os.path.exists('contest.json'):
+        contest = read_contest_json()
+        if 'attempts' not in contest.keys():
+            contest['attempts'] = {}
+        contest['attempts'][attemptid] = attempt_details
+        with open('contest.json', 'w') as fl:
+            json.dump(contest, fl)

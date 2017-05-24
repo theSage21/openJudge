@@ -1,6 +1,7 @@
 import os
 
 
+timeout = 10  # Seconds
 static_root = os.path.join(os.getcwd(), 'staticroot')
 variable_root = os.path.join(os.getcwd(), 'ContestData')
 template_root = os.path.join(os.getcwd(), 'templatesroot')
@@ -15,3 +16,6 @@ if not os.path.exists(template_root):
     os.mkdir(template_root)
 if not os.path.exists(working_root):
     os.mkdir(working_root)
+
+n_threads_to_check_threads = 4
+code_checking_threads = {}
