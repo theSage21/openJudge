@@ -12,7 +12,10 @@ def jget(*keys):
 
 @app.get('/')
 def home():
-    return tools.render('home.html')
+    with tools.Contest() as contest:
+        d = {'languages': list(contest['wrappers'].keys()),
+             }
+    return tools.render('home.html', d)
 
 
 @app.get('/static/<path:path>')
