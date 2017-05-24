@@ -19,3 +19,13 @@ if not os.path.exists(working_root):
 
 n_threads_to_check_threads = 4
 code_checking_threads = {}
+
+
+default_contest = {'questions': {},
+                   'intro': '',
+                   'wrappers': {},
+                   'attempts': {},
+                   'tokens': {},
+                   'users': {}
+                   }
+contest_json = 'contest.json'

@@ -6,7 +6,29 @@ import pkgutil
 from shutil import copyfile
 from openjudge import config
 
-__all__ = ['log', 'section', 'render', 'setup_contest', 'read_contest_json']
+
+__all__ = ['log', 'section', 'render', 'setup_contest', 'Contest']
+
+
+class Contest(dict):
+    "Use with `with`. In case of an exception, nothing is comitted"
+
+    def __enter__(self):
+        if not os.path.exists(self.path):
+            with open(config.contest_json, 'w') as fl:
+                json.dump(config.default_contest, fl, indent=4)
+        with open(config.contest_json, 'r') as fl:
+            C = json.loads(fl.read())
+        # _set it on self
+        for k, v in C.items():
+            self[k] = v
+        return self
+
+    def __exit__(self, type, value, trace):
+        C = {k: v for k, v in self.items()}
+        with open(config.contest_json, 'w') as fl:
+            json.dump(C, fl, indent=4)
+        return True
 
 
 def log(*args):
@@ -129,27 +151,17 @@ def setup_contest():
     contest_data = {'questions': qdata,
                     'intro': intro,
                     'wrappers': wrappers,
-                    'attempts': {}
+                    'attempts': {},
+                    'tokens': {},
+                    'users': {}
                     }
-    with open('contest.json', 'w') as fl:
-        fl.write(json.dumps(contest_data, indent=4))
+    with Contest() as contest:
+        for k, v in contest_data.items():
+            contest[k] = v
     log('Contest Data Written to contest.json')
     return contest_data
 
 
-def read_contest_json():
-    if os.path.exists('contest.json'):
-        with open('contest.json', 'r') as fl:
-            contest = json.load(fl)
-    contest = {}
-    return contest
-
-
 def add_attempt_to_contest(attemptid, attempt_details):
-    if os.path.exists('contest.json'):
-        contest = read_contest_json()
-        if 'attempts' not in contest.keys():
-            contest['attempts'] = {}
+    with Contest() as contest:
         contest['attempts'][attemptid] = attempt_details
-        with open('contest.json', 'w') as fl:
-            json.dump(contest, fl)

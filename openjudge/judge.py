@@ -82,19 +82,19 @@ def check_results_by_running_code(code, inp_list, out_list, wrap, attempt_id):
 
 
 def get_attempt_status(attempt_id):
-    contest = tools.read_contest_json()
-    if attempt_id not in contest['attempts'].keys():
-        status, remark = None, 'The attempt has been sent to the judge'
-    else:
-        attempt = contest['attempts'][attempt_id]
-        status = attempt['status']
-        if any(i is None for i in status):
-            remark = attempt['err_message']
-            result = None
-        elif all(i for i in status):
-            remark = 'Cleared {} tests'.format(attempt['tests_cleared'])
-            result = True
-        elif any(not i for i in status):
-            remark = 'Unable to clear some tests.'
-            result = False
+    with tools.Contest() as contest:
+        if attempt_id not in contest['attempts']:
+            status, remark = None, 'The attempt has been sent to the judge'
+        else:
+            attempt = contest['attempts'][attempt_id]
+            status = attempt['status']
+            if any(i is None for i in status):
+                remark = attempt['err_message']
+                result = None
+            elif all(i for i in status):
+                remark = 'Cleared {} tests'.format(attempt['tests_cleared'])
+                result = True
+            elif any(not i for i in status):
+                remark = 'Unable to clear some tests.'
+                result = False
     return result, remark
