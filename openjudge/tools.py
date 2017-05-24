@@ -1,5 +1,6 @@
 import os
 import json
+import time
 import bottle
 import random
 import pkgutil
@@ -230,9 +231,9 @@ def get_user(token):
 
 def add_attempt_to_contest(attempt):
     attemptid = attempt['attempt_id']
-    attempt_details = attempt
     with Contest() as contest:
-        contest['attempts'][attemptid] = attempt_details
+        attempt['stamp'] = str(time.time())
+        contest['attempts'][attemptid] = attempt
 
 
 def attempt_is_ok(qpk, lang, code):
@@ -259,3 +260,19 @@ def get_wrap(lang):
         if lang in contest['wrappers']:
             wrap = contest['wrappers'][lang]
     return wrap
+
+
+def get_user_score(user):
+    score = 0
+    with Contest() as contest:
+        if user in contest['users']:
+            attempts = [v for s, v in contest['attempts'] if v['user'] == user]
+            attempts.sort(key=lambda x: x['stamp'])
+            answered_questions, valid = [], []
+            for attempt in attempts:
+                if attempt['qpk'] not in answered_questions:
+                    valid.append(attempt)
+                    if all(attempt['status']):
+                        answered_questions.append(attempt['qpk'])
+            score = sum(1 for a in valid if all(a['status']))
+    return score

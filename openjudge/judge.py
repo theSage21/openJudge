@@ -58,7 +58,7 @@ for tid in range(config.n_threads_to_check_threads):
 # -------------------------------------------------------------
 
 
-def submit_attempt(code, inp_list, out_list, wrap, attempt_id, user):
+def submit_attempt(code, inp_list, out_list, wrap, attempt_id, user, qpk):
     global job_queue
     assert len(inp_list) == len(out_list), 'each inp needs an out'
     codepath = os.path.join(config.working_root, attempt_id)
@@ -76,7 +76,8 @@ def submit_attempt(code, inp_list, out_list, wrap, attempt_id, user):
     job_queue.put({'evaluated': False, 'attempt_id': attempt_id,
                    'inp_paths': inp_paths,
                    'code_path': codepath, 'commands': commands,
-                   'out_list': out_list, 'user': user
+                   'out_list': out_list, 'user': user,
+                   'qpk': qpk
                    })
 
 

@@ -24,7 +24,7 @@ code_checking_threads = {}
 default_contest = {'questions': {},
                    'intro': '',
                    'wrappers': {},
-                   'attempts': {},
+                   'attempts': [],
                    'tokens': {},
                    'users': {}
                    }
