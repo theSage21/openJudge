@@ -67,16 +67,12 @@ def render(template, data=None):
 # ---------------------------------------------------------------------
 
 
-def __copy_intro__():
+def __get_intro__():
     "Copy contest intro to static files"
-    if not os.path.exists(config.static_root):
-        os.mkdir(config.static_root)
     if not os.path.exists(os.path.join(config.variable_root, 'intro.txt')):
         message = "Intro.txt not found in {}".format(config.variable_root)
         raise Exception(message)
-    copyfile(os.path.join(config.variable_root, 'intro.txt'),
-             os.path.join(config.static_root, 'intro'))
-    log('Copied intro.txt')
+    log('Read intro.txt')
     with open(os.path.join(config.variable_root, 'intro.txt'), 'r') as fl:
         intro = fl.read()
     return intro
@@ -155,7 +151,7 @@ def __read_contest_wrappers__():
 
 def setup_contest():
     "Set up the contest"
-    intro = __copy_intro__()
+    intro = __get_intro__()
     __copy_templates__()
     __copy_static__()
     wrappers = __read_contest_wrappers__()
