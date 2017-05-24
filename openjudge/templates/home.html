@@ -26,15 +26,6 @@
         <hr>
         </div>
         <div class='container'>
-            <div class='row' id='intro_part'>
-                <pre>{{intro}}</pre>
-            </div>
-            <div class='row' id='question_list'>
-                % for qpk in questions:
-                <button class='two columns' id='q_{{qpk}}'>Question {{qpk}}</button>
-                % end
-            </div>
-            <hr>
             <div class='row' id='form_area'>
                 <center><p>Fill in the required fields and click on the links at the top of this page to perform some action</p></center>
                 <div class='row'>
@@ -51,6 +42,21 @@
                 </div>
                 <hr>
             </div>
+            <div class='row' id='intro_part'>
+                <pre>{{intro}}</pre>
+            </div>
+            <div class='row' id='question_list'>
+                % for qpk in questions:
+                <button class='two columns question_button' id='q_{{qpk}}'>Question {{qpk}}</button>
+                % end
+            </div>
+            <hr>
+            <div class='row' id='question_area'>
+                <b>Question Satement</b>
+                <p id='question_pre'></p>
+            </div>
+            <hr>
+            <b>Leaderboard</b>
             <div class='container' id='leaderboard_area'>
             </div>
         </div>

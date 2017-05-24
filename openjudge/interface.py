@@ -50,13 +50,15 @@ def register():
 @app.post('/question')
 def question_display():
     pk, = jget('question_pk')
+    statement = 'This question does not exist yet.'
     with tools.Contest() as contest:
         pk = str(pk)
         q = {'statement': 'This question does not exist'}
         if pk.isdigit():
             if pk in contest['questions']:
                 q = contest['questions'][pk]
-    return {'statement': q['statement']}
+                statement = q['statement']
+    return {'statement': statement}
 
 
 @app.post('/attempt')

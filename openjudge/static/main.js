@@ -93,4 +93,15 @@ $( document ).ready(function() {
     });  // signup action
     $("#submit_attempt").click(function (){
     });  // submit action
+    $(".question_button").click(function (){
+        $(".question_button").removeClass('button-primary');
+        $(this).addClass('button-primary');
+        // ----- get relevant question data
+        var qpk = $(this).attr('id').substring(2);
+        var data = JSON.stringify({'question_pk': qpk});
+        postit('/question', data, function(data){
+            console.log(data.statement);
+            $("#question_pre").text(data.statement);
+        });
+    });
 });   // Document ready
