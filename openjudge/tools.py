@@ -10,6 +10,11 @@ from openjudge import config
 __all__ = ['log', 'section', 'render', 'setup_contest', 'Contest']
 
 
+# ---------------------------------------------------------------------
+# ---------------------------------------------------------------------
+# UTILITY
+# ---------------------------------------------------------------------
+# ---------------------------------------------------------------------
 class Contest(dict):
     "Use with `with`. In case of an exception, nothing is comitted"
 
@@ -53,6 +58,12 @@ def render(template, data=None):
     with open(os.path.join(template_dir, template)) as fl:
         html = fl.read()
     return bottle.template(html, **data)
+
+# ---------------------------------------------------------------------
+# ---------------------------------------------------------------------
+# Openjudge setup things
+# ---------------------------------------------------------------------
+# ---------------------------------------------------------------------
 
 
 def __copy_intro__():
@@ -148,20 +159,103 @@ def setup_contest():
     __copy_static__()
     wrappers = __read_contest_wrappers__()
     qdata = __copy_questions__()
-    contest_data = {'questions': qdata,
-                    'intro': intro,
-                    'wrappers': wrappers,
-                    'attempts': {},
-                    'tokens': {},
-                    'users': {}
-                    }
     with Contest() as contest:
-        for k, v in contest_data.items():
-            contest[k] = v
+        contest['questions'] = qdata
+        contest['intro'] = intro
+        contest['wrappers'] = wrappers
+        contest['attempts'] = {}
+        contest['tokens'] = {}
+        contest['users'] = {}
     log('Contest Data Written to contest.json')
-    return contest_data
 
 
-def add_attempt_to_contest(attemptid, attempt_details):
+# ---------------------------------------------------------------------
+# ---------------------------------------------------------------------
+# User management
+# ---------------------------------------------------------------------
+# ---------------------------------------------------------------------
+
+
+def login_user(name, pwd):
+    status, token = False, None
+    with Contest() as contest:
+        if name in contest['users']:
+            if pwd == contest['users']['password']:
+                token = random_id(50)
+                contest['tokens'][token] = name
+                status = True
+    return status, token
+
+
+def logout_user(token):
+    status = False
+    with Contest() as contest:
+        if token in contest['tokens']:
+            contest['tokens'].pop(token)
+            status = True
+    return status
+
+
+def register_user(name, pwd):
+    status = False
+    with Contest() as contest:
+        if name not in contest['users']:
+            contest['users'][name] = {'password': pwd}
+            status = True
+    return status
+
+
+def is_logged_in(token):
+    status = False
+    with Contest() as contest:
+        if token in contest['tokens']:
+            status = True
+    return status
+
+
+def get_user(token):
+    user = None
+    with Contest() as contest:
+        if token in contest['tokens']:
+            user = contest['users'][contest['tokens'][token]]
+    return user
+
+
+# ---------------------------------------------------------------------
+# ---------------------------------------------------------------------
+# Contest management
+# ---------------------------------------------------------------------
+# ---------------------------------------------------------------------
+
+
+def add_attempt_to_contest(attempt):
+    attemptid = attempt['attempt_id']
+    attempt_details = attempt
     with Contest() as contest:
         contest['attempts'][attemptid] = attempt_details
+
+
+def attempt_is_ok(qpk, lang, code):
+    with Contest() as contest:
+        if qpk in contest['questions']:
+            if lang in contest['wrappers']:
+                return True
+    return False
+
+
+def get_question_io(qpk):
+    i, o = [], []
+    with Contest() as contest:
+        if qpk in contest['questions']:
+            for k, v in contest['questions'][qpk]['testcases'].items():
+                i.append(v['in'])
+                o.append(v['out'])
+    return i, o
+
+
+def get_wrap(lang):
+    wrap = None
+    with Contest() as contest:
+        if lang in contest['wrappers']:
+            wrap = contest['wrappers'][lang]
+    return wrap

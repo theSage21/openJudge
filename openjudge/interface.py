@@ -5,53 +5,72 @@ from openjudge import tools, config, judge
 app = bottle.Bottle()
 
 
+def jget(*keys):
+    "Needs to be used like a, b, c = jget(x, ,y, z)"
+    return [bottle.json[key] for key in keys]
+
+
 @app.get('/')
 def home():
     return tools.render('home.html')
 
 
-@app.get('/question/<pk>')
-def question_display(pk):
-    contest = tools.read_contest_json()
-    pk = str(pk)
-    q = {'statement': 'This question does not exist'}
-    if pk.isdigit():
-        if pk in contest['questions'].keys():
-            q = contest['questions'][pk]
-    return tools.render('question.html', {'statement': q['statement']})
+@app.post('/login')
+def login():
+    u, p = jget('username', 'password')
+    status, token = tools.login_user(u, p)
+    return {'status': status, 'token': token}
+
+
+@app.post('/logout')
+def logout():
+    token, = jget('token')
+    return {'status': tools.logout_user(token)}
+
+
+@app.post('/register')
+def register():
+    u, p = jget('username', 'password')
+    status = tools.register_user(u, p)
+    return {'status': status}
+
+
+@app.post('/question')
+def question_display():
+    pk, = jget('question_pk')
+    with tools.Contest() as contest:
+        pk = str(pk)
+        q = {'statement': 'This question does not exist'}
+        if pk.isdigit():
+            if pk in contest['questions']:
+                q = contest['questions'][pk]
+    return {'statement': q['statement']}
 
 
 @app.post('/attempt')
 def question_attempt():
-    question_pk = bottle.json['question']
-    language = bottle.json['language']
-    code = bottle.json['code']
-    message = 'Something Unexpected happened'
-    contest = tools.read_contest_json()
-    all_ok = True
-    if question_pk in contest['questions'].keys():
-        inp, out = [], []
-        for key, val in contest['questions'][question_pk]['testcases'].items():
-            inp.append(val['in'])
-            out.append(val['out'])
+    qpk, lang, code, token = jget('question', 'language', 'code', 'token')
+    user = tools.get_user(token)
+    message, attid = 'Unexpected Error', None
+    if user is not None:
+        if tools.attempt_is_ok(qpk, lang, code):
+            i, o = tools.get_question_io(qpk)
+            wrap = tools.get_wrap(lang)
+            attid = tools.random_id()
+            tools.submit_attempt(code, i, o, wrap, attid, user)
+            message = 'Submitted'
+        else:
+            message = 'Question/Language does not exist'
     else:
-        message, all_ok = 'This question does not exist', False
-    if language in contest['wrappers'].keys():
-        wrap = contest['wrappers'][language]
-    else:
-        message, all_ok = 'This Language is not available', False
-    if all_ok:
-        attid = tools.random_id()
-        tools.check_results_by_running_code(code, inp, out, wrap, attid)
-    else:
-        attid = None
+        message = 'Please login'
+    # -------------------------------------------
     return {'attempt': attid, 'message': message}
 
 
 @app.post('/attempt/status')
 def attempt_status():
-    att_id = bottle.json['attempt']
-    status, message = judge.get_attempt_status(att_id)
+    attid, = jget('attempt')
+    status, message = judge.get_attempt_status(attid)
     return {'status': status, 'message': message}
 
 

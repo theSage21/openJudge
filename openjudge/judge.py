@@ -13,8 +13,9 @@ def __thread_worker__():
     global job_queue
     while True:
         attempt = job_queue.get()
-        if attempt['tests_cleared'] is None:
-            tools.log('Checking attempt {}'.format(attempt['attempt_id']))
+        if not attempt['evaluated']:
+            attid = attempt['attempt_id']
+            tools.log('Checking attempt {}'.format(attid))
             commands = attempt['commands']
             out_list = attempt['out_list']
             attempt['status'] = []
@@ -23,15 +24,13 @@ def __thread_worker__():
                 status = None
                 if res == 0:
                     status = out == out_expected
-                else:
-                    status = None
-                    attempt['err_message'] = err
-                    attempt['out_message'] = out
                 attempt['status'].append(status)
-                tools.log('Attempt {} status {}'.format(attempt['attempt_id'],
-                                                        status))
-            attempt['tests_cleared'] = sum(1 for i in attempt['status'] if i)
-            tools.add_attempt_to_contest(attempt['attempt_id'], attempt)
+                tools.log('Attempt {} status {}'.format(attid, status))
+            tools.add_attempt_to_contest(attempt)
+        else:
+            tools.log('This attempt was in Job queue but checked')
+            tools.log(attempt)
+            tools.log('*'*50)
 
 
 def __run_command__(command, timeout):
@@ -59,7 +58,7 @@ for tid in range(config.n_threads_to_check_threads):
 # -------------------------------------------------------------
 
 
-def check_results_by_running_code(code, inp_list, out_list, wrap, attempt_id):
+def submit_attempt(code, inp_list, out_list, wrap, attempt_id, user):
     global job_queue
     assert len(inp_list) == len(out_list), 'each inp needs an out'
     codepath = os.path.join(config.working_root, attempt_id)
@@ -74,10 +73,10 @@ def check_results_by_running_code(code, inp_list, out_list, wrap, attempt_id):
         command = wrap.format(code=codepath, input=inpath)
         commands.append(command)
     tools.log('Adding attempt {} to job queue'.format(attempt_id))
-    job_queue.put({'tests_cleared': None, 'attempt_id': attempt_id,
+    job_queue.put({'evaluated': False, 'attempt_id': attempt_id,
                    'inp_paths': inp_paths,
                    'code_path': codepath, 'commands': commands,
-                   'out_list': out_list
+                   'out_list': out_list, 'user': user
                    })
 
 
@@ -89,12 +88,13 @@ def get_attempt_status(attempt_id):
             attempt = contest['attempts'][attempt_id]
             status = attempt['status']
             if any(i is None for i in status):
-                remark = attempt['err_message']
-                result = None
-            elif all(i for i in status):
-                remark = 'Cleared {} tests'.format(attempt['tests_cleared'])
+                remark = 'The program raised an error'
+                result = False
+            elif all(status):
+                remark = 'Your Program Cleared {} tests'
+                remark = remark.format(sum(1 for i in status if i))
                 result = True
-            elif any(not i for i in status):
-                remark = 'Unable to clear some tests.'
+            elif not all(status):
+                remark = 'Your Program did not clear some tests.'
                 result = False
     return result, remark
