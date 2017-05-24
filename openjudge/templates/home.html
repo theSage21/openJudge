@@ -26,6 +26,12 @@
         <hr>
         </div>
         <div class='container'>
+            <div class='row' id='question_list'>
+                % for qpk in questions:
+                <button class='two columns' id='q_{{qpk}}'>Question {{qpk}}</button>
+                % end
+            </div>
+            <hr>
             <div class='row' id='form_area'>
                 <div class='row'>
                     <input class='four columns' type='text' id='username' placeholder='User Name'/>
@@ -40,6 +46,8 @@
                     <textarea class='twelve columns' id='code' >print('Hello World')</textarea>
                 </div>
                 <hr>
+            </div>
+            <div class='container' id='leaderboard_area'>
             </div>
         </div>
     </body>
