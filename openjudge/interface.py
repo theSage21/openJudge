@@ -74,6 +74,19 @@ def attempt_status():
     return {'status': status, 'message': message}
 
 
+@app.post('/user/score')
+def user_score():
+    user, = jget('user')
+    score = tools.get_user_score(user)
+    return {'score': score}
+
+
+@app.post('/user/list')
+def user_list():
+    users = tools.get_all_users()
+    return {'users': users}
+
+
 @app.get('/static/<path:path>')
 def static_server(path):
     root = config.static_root

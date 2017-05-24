@@ -276,3 +276,9 @@ def get_user_score(user):
                         answered_questions.append(attempt['qpk'])
             score = sum(1 for a in valid if all(a['status']))
     return score
+
+
+def get_all_users():
+    with Contest() as contest:
+        users = list(contest['users'].keys())
+    return users
