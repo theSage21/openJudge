@@ -43,3 +43,14 @@ What's Changed
 
 
 **A sample `ContestData` is provided in this repository**
+
+
+Todo
+----
+
+- [x] pip install
+- [x] one command runnability
+- [x] minimize dependencies
+- [x] keep contest history
+- [ ] Login/Logout user system
+- [ ] Leaderboard

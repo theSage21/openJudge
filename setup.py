@@ -15,7 +15,7 @@ setup(name='openjudge',
       license='MIT',
       packages=['openjudge'],
       include_package_data=True,
-      install_requires=['bottle'],
+      install_requires=['bottle', 'bottle-cork'],
       entry_points={'console_scripts': ['openjudge=openjudge.cli:main']},
       package_data={'openjudge': ['templates/*', 'static/*']},
       zip_safe=False)
