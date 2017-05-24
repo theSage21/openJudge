@@ -14,7 +14,7 @@ class Contest(dict):
     "Use with `with`. In case of an exception, nothing is comitted"
 
     def __enter__(self):
-        if not os.path.exists(self.path):
+        if not os.path.exists(config.contest_json):
             with open(config.contest_json, 'w') as fl:
                 json.dump(config.default_contest, fl, indent=4)
         with open(config.contest_json, 'r') as fl:
