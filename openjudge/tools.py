@@ -100,7 +100,7 @@ def __copy_static__():
     if not os.path.exists(config.static_root):
         log('{} does not exist. Creating'.format(config.static_root))
         os.mkdir(config.static_root)
-    for static in ['normalize.css', 'skeleton.css']:
+    for static in ['normalize.css', 'skeleton.css', 'main.js', 'main.css']:
         with open(os.path.join(config.static_root, static), 'w') as fl:
             html = pkgutil.get_data('openjudge',
                                     'static/' + static).decode()
