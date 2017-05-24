@@ -6,7 +6,7 @@ app = bottle.Bottle()
 
 
 def jget(*keys):
-    "Needs to be used like a, b, c = jget(x, ,y, z)"
+    "Needs to be used like a, b, c = jget(x, y, z)"
     return [bottle.json[key] for key in keys]
 
 
@@ -15,6 +15,13 @@ def home():
     return tools.render('home.html')
 
 
+@app.get('/static/<path:path>')
+def static_server(path):
+    root = config.static_root
+    return bottle.static_file(path, root=root)
+
+
+# ---------------------------------------------API
 @app.post('/login')
 def login():
     u, p = jget('username', 'password')
@@ -85,9 +92,3 @@ def user_score():
 def user_list():
     users = tools.get_all_users()
     return {'users': users}
-
-
-@app.get('/static/<path:path>')
-def static_server(path):
-    root = config.static_root
-    return bottle.static_file(path, root=root)
