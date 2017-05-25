@@ -20,10 +20,11 @@ def __thread_worker__():
             out_list = attempt['out_list']
             attempt['status'] = []
             for command, out_expected in zip(commands, out_list):
-                res, out, err = __run_command__(command, config.timeout)
-                status = None
-                tools.log(res, out, err, '-'*10)
-                if res is not None:
+                ran_without_error, out, err = __run_command__(command,
+                                                              config.timeout)
+                status = False if ran_without_error else None
+                tools.log(ran_without_error, out, err, '-'*10)
+                if ran_without_error:
                     status = all((i.strip() == j.strip())
                                  for i, j in zip(out, out_expected))
                 attempt['status'].append(status)
@@ -43,8 +44,8 @@ def __run_command__(command, timeout):
                 stderr=PIPE, stdout=PIPE,
                 shell=True)
     except TimeoutExpired:
-        result = None
-        stdout, stderr = b'', b''
+        result = False
+        stdout, stderr = b'', b'Timeout'
     else:
         result = p.returncode == 0
         stdout, stderr = p.stdout, p.stderr

@@ -41,6 +41,7 @@ $( document ).ready(function() {
     }
     function check_attempt_status(){
         $("#attempt_status").addClass('checking_attempt');
+        $("#attempt_message").text('');
         console.log('Checking attempt status');
         var data = JSON.stringify({'attempt': $("#attempt_status").text()});
         postit('/attempt/status', data, function (data){
@@ -49,18 +50,21 @@ $( document ).ready(function() {
                 $("#attempt_status").removeClass('checking_attempt');
                 $("#attempt_status").removeClass('wrong_attempt');
                 $("#attempt_status").addClass('correct_attempt');
+            $("#attempt_message").text(data.message);
                 return;
             }
             if(data.status == false){
                 $("#attempt_status").removeClass('checking_attempt');
                 $("#attempt_status").removeClass('correct_attempt');
                 $("#attempt_status").addClass('wrong_attempt');
+            $("#attempt_message").text(data.message);
                 return;
             }
             if(data.status == null){
                 $("#attempt_status").removeClass('wrong_attempt');
                 $("#attempt_status").removeClass('correct_attempt');
                 $("#attempt_status").addClass('checking_attempt');
+                $("#attempt_message").text(data.message);
                 return;
             }
         });
@@ -101,6 +105,7 @@ $( document ).ready(function() {
             if(data.status == true){
                 console.log('Logout successful');
                 deltoken();
+                logged_in_details();
             } else {
                 console.log('Logout failed');
             }

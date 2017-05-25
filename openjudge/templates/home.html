@@ -21,7 +21,6 @@
                     <a href='#' id='login'>Login</a> ] - [
                     <a href='#' id='logout'>Logout</a> ] - [
                     <span id='user_name_display'>User Score: </span> <b id='score_display'>0</b> ]
-                    --[Last attempt: <span id='attempt_status' class='checking_attempt'>No attempt Yet</span>]--
                 </div>
             </div>
         <hr>
@@ -37,6 +36,9 @@
                         <option value='{{lang}}'>{{lang}}</option>
                         % end
                     </select>
+                </div>
+                <div class='row'>
+                    [Last attempt: <span id='attempt_status' class='checking_attempt'>No attempt Yet</span><span id='attempt_message'></span>]
                 </div>
                 <div class='row'>
                     <textarea class='twelve columns' id='code' >print('Hello World')</textarea>
