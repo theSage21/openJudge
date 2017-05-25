@@ -92,6 +92,18 @@ $( document ).ready(function() {
         }
     });  // signup action
     $("#submit_attempt").click(function (){
+        var url = '/attempt';
+        var qpk = $("#question_number").text();
+        var lang = $("#language").val();
+        var code = $("#code").val();
+        var token = gettoken();
+        var data = JSON.stringify({'question': qpk,
+                                   'language': lang,
+                                   'code': code,
+                                   'token': token});
+        postit(url, data, function (data){
+            console.log(data);  // TODO
+        });
     });  // submit action
     $(".question_button").click(function (){
         $(".question_button").removeClass('button-primary');
@@ -99,6 +111,7 @@ $( document ).ready(function() {
         // ----- get relevant question data
         var qpk = $(this).attr('id').substring(2);
         var data = JSON.stringify({'question_pk': qpk});
+        $("#question_number").text(qpk);
         postit('/question', data, function(data){
             console.log(data.statement);
             $("#question_pre").text(data.statement);
