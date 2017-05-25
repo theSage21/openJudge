@@ -8,7 +8,7 @@ if sys.version_info < (3, 5):
 
 setup(name='openjudge',
       version='.'.join(__version__),
-      description='Programming contest Judging Program',
+      description='LAN Programming Contest Judging Program',
       url='http://github.com/theSage21/openJudge',
       author='Arjoonn Sharma',
       author_email='arjoonn.94@gmail.com',
@@ -18,4 +18,5 @@ setup(name='openjudge',
       install_requires=['bottle'],
       entry_points={'console_scripts': ['openjudge=openjudge.cli:main']},
       package_data={'openjudge': ['templates/*', 'static/*']},
+      keywords=['openjudge', 'lan', 'programming', 'programming', 'contest'],
       zip_safe=False)
