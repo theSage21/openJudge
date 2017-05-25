@@ -6,6 +6,7 @@ import random
 import pkgutil
 from openjudge import config
 from collections import defaultdict
+from multiprocessing import Lock
 
 
 __all__ = ['log', 'section', 'render', 'setup_contest', 'Contest']
@@ -18,13 +19,15 @@ __all__ = ['log', 'section', 'render', 'setup_contest', 'Contest']
 # ---------------------------------------------------------------------
 class Contest(dict):
     "Use with `with`. In case of an exception, nothing is comitted"
-
+    file_lock = Lock()
     def __enter__(self):
         if not os.path.exists(config.contest_json):
-            with open(config.contest_json, 'w') as fl:
-                json.dump(config.default_contest, fl, indent=4)
-        with open(config.contest_json, 'r') as fl:
-            C = json.loads(fl.read())
+            with Contest.file_lock:
+                with open(config.contest_json, 'w') as fl:
+                    json.dump(config.default_contest, fl, indent=4)
+        with Contest.file_lock:
+            with open(config.contest_json, 'r') as fl:
+                C = json.loads(fl.read())
         # _set it on self
         for k, v in C.items():
             self[k] = v
@@ -32,8 +35,9 @@ class Contest(dict):
 
     def __exit__(self, type, value, trace):
         C = {k: v for k, v in self.items()}
-        with open(config.contest_json, 'w') as fl:
-            json.dump(C, fl, indent=4)
+        with Contest.file_lock:
+            with open(config.contest_json, 'w') as fl:
+                json.dump(C, fl, indent=4)
         return True
 
 
@@ -96,7 +100,7 @@ def __copy_static__():
     if not os.path.exists(config.static_root):
         log('{} does not exist. Creating'.format(config.static_root))
         os.mkdir(config.static_root)
-    for static in ['normalize.css', 'skeleton.css', 'main.js', 'main.css']:
+    for static in ['normalize.css', 'skeleton.css', 'main.js', 'main.css', 'jquery.js']:
         with open(os.path.join(config.static_root, static), 'w') as fl:
             html = pkgutil.get_data('openjudge',
                                     'static/' + static).decode()
