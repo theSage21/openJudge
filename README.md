@@ -52,5 +52,6 @@ Todo
 - [x] one command runnability
 - [x] minimize dependencies
 - [x] keep contest history
-- [ ] Login/Logout user system
+- [x] Login/Logout user system
+- [ ] Score Calculation
 - [ ] Leaderboard
