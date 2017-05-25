@@ -22,10 +22,13 @@ def __thread_worker__():
             for command, out_expected in zip(commands, out_list):
                 res, out, err = __run_command__(command, config.timeout)
                 status = None
-                if res == 0:
-                    status = out == out_expected
+                tools.log(res, out, err, '-'*10)
+                if res is not None:
+                    status = all((i.strip() == j.strip())
+                                 for i, j in zip(out, out_expected))
                 attempt['status'].append(status)
                 tools.log('Attempt {} status {}'.format(attid, status))
+            attempt['evaluated'] = True
             tools.add_attempt_to_contest(attempt)
         else:
             tools.log('This attempt was in Job queue but checked')

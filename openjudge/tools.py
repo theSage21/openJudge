@@ -4,7 +4,6 @@ import time
 import bottle
 import random
 import pkgutil
-from shutil import copyfile
 from openjudge import config
 
 
@@ -233,6 +232,7 @@ def get_user(token):
 
 
 def add_attempt_to_contest(attempt):
+    log(attempt)
     attemptid = attempt['attempt_id']
     with Contest() as contest:
         attempt['stamp'] = str(time.time())

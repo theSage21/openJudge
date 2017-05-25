@@ -71,7 +71,7 @@ def question_attempt():
             i, o = tools.get_question_io(qpk)
             wrap = tools.get_wrap(lang)
             attid = tools.random_id()
-            tools.submit_attempt(code, i, o, wrap, attid, user, qpk)
+            judge.submit_attempt(code, i, o, wrap, attid, user, qpk)
             message = 'Submitted'
         else:
             message = 'Question/Language does not exist'
