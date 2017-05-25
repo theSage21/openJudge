@@ -22,6 +22,7 @@ Why?
 Explaining to other people how this is supposed to work was a pain. The philosophy now is
 
 ```bash
+$ pip install openjudge
 $ openjudge
 ```
 
@@ -41,8 +42,35 @@ What's Changed
   languages that the judge supports. This must be valid JSON
 - After this folder is set up, you can run `openjudge` in that folder and it will run as expected.
 
+The `ContestData` folder must follow this tree:
+
+```
+▾ ContestData/
+  ▾ 1/
+      i1
+      o1
+      statement
+  ▾ 2/
+      i1
+      o1
+      statement
+    intro.txt
+    wrappers.json
+```
+
 
 **A sample `ContestData` is provided in this repository**
+
+
+All the contest data is stored in a file called `contest.json` for ease of reading.
+
+
+Scoring
+-------
+
+This is still the same. The score is determined by `(total - correct_valid) / total` attempts on a question by everyone at any given time. Only the first correct attempt by a person on a question counts for the `correct_valid`. Subsequent correct answers are considered wrong.
+
+This leads to very few ties.
 
 
 Todo
@@ -53,5 +81,6 @@ Todo
 - [x] minimize dependencies
 - [x] keep contest history
 - [x] Login/Logout user system
-- [ ] Score Calculation
-- [ ] Leaderboard
+- [x] Score Calculation
+- [x] Leaderboard
+- [ ] Contest Analysis
