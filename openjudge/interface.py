@@ -14,7 +14,8 @@ def jget(*keys):
 def home():
     with tools.Contest() as contest:
         d = {'languages': list(sorted(list(contest['wrappers'].keys()))),
-             'questions': list(sorted(list(contest['questions'].keys()))),
+             'questions': list(sorted(list(contest['questions'].keys()),
+                                      key=lambda x: int(x))),
              'intro': contest['intro']
              }
     return tools.render('home.html', d)
