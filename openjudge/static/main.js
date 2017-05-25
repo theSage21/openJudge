@@ -29,6 +29,7 @@ $( document ).ready(function() {
         if(gettoken() != null){
             var newdata = JSON.stringify({"token": gettoken()});
             postit('/user/details', newdata, function (data){
+                console.log(data);
                 if(data.user != null){
                     $("#user_name_display").text(data.user);
                     $("#score_display").text(data.score);
@@ -185,6 +186,7 @@ $( document ).ready(function() {
         });
     });
     $("#attempt_status").click(check_attempt_status);
+    $("#score_display").click(logged_in_details);
     // --------------------------------Execute on page load
     logged_in_details();
 });   // Document ready

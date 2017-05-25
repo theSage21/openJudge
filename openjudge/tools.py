@@ -5,6 +5,7 @@ import bottle
 import random
 import pkgutil
 from openjudge import config
+from collections import defaultdict
 
 
 __all__ = ['log', 'section', 'render', 'setup_contest', 'Contest']
@@ -269,15 +270,26 @@ def get_user_score(user):
     score = 0
     with Contest() as contest:
         if user in contest['users']:
-            attempts = [v for s, v in contest['attempts'] if v['user'] == user]
-            attempts.sort(key=lambda x: x['stamp'])
-            answered_questions, valid = [], []
-            for attempt in attempts:
-                if attempt['qpk'] not in answered_questions:
-                    valid.append(attempt)
-                    if all(attempt['status']):
-                        answered_questions.append(attempt['qpk'])
-            score = sum(1 for a in valid if all(a['status']))
+            all_attempts = list(contest['attempts'].values())
+            all_attempts = list(sorted(all_attempts,
+                                       key=lambda x: float(x['stamp'])))
+            q_cor = defaultdict(int)
+            q_tot = defaultdict(int)
+            u_q_seen = defaultdict(set)
+            for A in all_attempts:
+                a_user, q = A['user']['name'], A['qpk']
+                q_tot[q] += 1
+                if all(A['status']):
+                    if q not in u_q_seen[a_user]:
+                        # Valid attempt
+                        u_q_seen[a_user].add(q)
+                        if a_user == user:
+                            q_cor[q] += 1
+                            correct, total = q_cor[q], q_tot[q]
+                            frac = float(total - correct) / total
+                            # First attempt correct
+                            elite_attempt = (total == 1 and correct == 1)
+                            score += 1 if elite_attempt else frac
     return score
 
 
