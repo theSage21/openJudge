@@ -39,6 +39,32 @@ $( document ).ready(function() {
                     $("#score_display").text('0');
         }
     }
+    function check_attempt_status(){
+        $("#attempt_status").addClass('checking_attempt');
+        console.log('Checking attempt status');
+        var data = JSON.stringify({'attempt': $("#attempt_status").text()});
+        postit('/attempt/status', data, function (data){
+            console.log(data);
+            if(data.status == true){
+                $("#attempt_status").removeClass('checking_attempt');
+                $("#attempt_status").removeClass('wrong_attempt');
+                $("#attempt_status").addClass('correct_attempt');
+                return;
+            }
+            if(data.status == false){
+                $("#attempt_status").removeClass('checking_attempt');
+                $("#attempt_status").removeClass('correct_attempt');
+                $("#attempt_status").addClass('wrong_attempt');
+                return;
+            }
+            if(data.status == null){
+                $("#attempt_status").removeClass('wrong_attempt');
+                $("#attempt_status").removeClass('correct_attempt');
+                $("#attempt_status").addClass('checking_attempt');
+                return;
+            }
+        });
+    }
     // --------------------------------------------------------- Actual stuff
     $("#login").click(function (){
         var username = $("#username").val();
@@ -117,7 +143,14 @@ $( document ).ready(function() {
                                    'code': code,
                                    'token': token});
         postit(url, data, function (data){
-            console.log(data);  // TODO
+            console.log(data);
+            if(data.attempt != null){
+                $("#attempt_status").text(data.attempt);
+                check_attempt_status();
+                $("#attempt_status").removeClass('wrong_attempt');
+                $("#attempt_status").removeClass('correct_attempt');
+                $("#attempt_status").addClass('checking_attempt');
+            }
         });
     });  // submit action
     $(".question_button").click(function (){
@@ -132,6 +165,7 @@ $( document ).ready(function() {
             $("#question_pre").text(data.statement);
         });
     });
+    $("#attempt_status").click(check_attempt_status);
     // --------------------------------Execute on page load
     logged_in_details();
 });   // Document ready

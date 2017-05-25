@@ -87,7 +87,7 @@ def submit_attempt(code, inp_list, out_list, wrap, attempt_id, user, qpk):
 def get_attempt_status(attempt_id):
     with tools.Contest() as contest:
         if attempt_id not in contest['attempts']:
-            status, remark = None, 'The attempt has been sent to the judge'
+            result, remark = None, 'The attempt has been sent to the judge'
         else:
             attempt = contest['attempts'][attempt_id]
             status = attempt['status']

@@ -1,3 +1,12 @@
 .missingform {
     background-color: pink !important;
 }
+.checking_attempt {
+    background-color: lightblue;
+}
+.wrong_attempt {
+    background-color: pink;
+}
+.correct_attempt {
+    background-color: lightgreen;
+}
