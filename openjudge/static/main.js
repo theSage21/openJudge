@@ -50,14 +50,15 @@ $( document ).ready(function() {
                 $("#attempt_status").removeClass('checking_attempt');
                 $("#attempt_status").removeClass('wrong_attempt');
                 $("#attempt_status").addClass('correct_attempt');
-            $("#attempt_message").text(data.message);
+                $("#attempt_message").text(data.message);
+                logged_in_details();
                 return;
             }
             if(data.status == false){
                 $("#attempt_status").removeClass('checking_attempt');
                 $("#attempt_status").removeClass('correct_attempt');
                 $("#attempt_status").addClass('wrong_attempt');
-            $("#attempt_message").text(data.message);
+                $("#attempt_message").text(data.message);
                 return;
             }
             if(data.status == null){
@@ -139,10 +140,23 @@ $( document ).ready(function() {
     });  // signup action
     $("#submit_attempt").click(function (){
         var url = '/attempt';
+        var token = gettoken();
+        if(token == null){
+            alert('You need to login to attempt');
+            return;
+        }
         var qpk = $("#question_number").text();
+        if(qpk == ''){
+            alert('Please select a question to answer');
+            return;
+        }
         var lang = $("#language").val();
         var code = $("#code").val();
-        var token = gettoken();
+        console.log(code == '');
+        if(code == ''){
+            alert('Copy/Write some code in the box provided');
+            return;
+        }
         var data = JSON.stringify({'question': qpk,
                                    'language': lang,
                                    'code': code,
