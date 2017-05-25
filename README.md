@@ -9,6 +9,12 @@ along the way, I faltered and it became bloated. It's back now in a form which
 is fast and light.
 
 
+Screenshot
+----------
+
+![OpenJudge mainscreen screenshot](op.png)
+
+
 Requirements
 ------------
 
