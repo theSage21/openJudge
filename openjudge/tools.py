@@ -203,7 +203,7 @@ def register_user(name, pwd):
     log('{} {} received for registration'.format(name, pwd))
     with Contest() as contest:
         if name not in contest['users']:
-            contest['users'][name] = {'password': pwd}
+            contest['users'][name] = {'password': pwd, 'name': name}
             status = True
     log(status, 'for registring {} {}'.format(name, pwd))
     return status

@@ -25,6 +25,20 @@ $( document ).ready(function() {
                 dataType: 'json'
         });
     }
+    function logged_in_details(){
+        if(gettoken() != null){
+            var newdata = JSON.stringify({"token": gettoken()});
+            postit('/user/details', newdata, function (data){
+                if(data.user != null){
+                    $("#user_name_display").text(data.user);
+                    $("#score_display").text(data.score);
+                }
+            });//user details postit
+        } else {
+                    $("#user_name_display").text('User');
+                    $("#score_display").text('0');
+        }
+    }
     // --------------------------------------------------------- Actual stuff
     $("#login").click(function (){
         var username = $("#username").val();
@@ -46,6 +60,7 @@ $( document ).ready(function() {
                 if(data.status == true){
                     console.log('Login successful');
                     addtoken(data.token);
+                    logged_in_details();
                 } else{
                     console.log('Login failed');
                 }
@@ -117,4 +132,6 @@ $( document ).ready(function() {
             $("#question_pre").text(data.statement);
         });
     });
+    // --------------------------------Execute on page load
+    logged_in_details();
 });   // Document ready

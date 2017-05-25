@@ -99,3 +99,11 @@ def user_score():
 def user_list():
     users = tools.get_all_users()
     return {'users': users}
+
+
+@app.post('/user/details')
+def user_details():
+    token,  = jget('token')
+    user = tools.get_user(token)['name']
+    score = tools.get_user_score(user)
+    return {'user': user, 'score': score}
