@@ -166,7 +166,7 @@ $( document ).ready(function() {
             console.log(data);
             if(data.attempt != null){
                 $("#attempt_status").text(data.attempt);
-                check_attempt_status();
+                setTimeout(check_attempt_status, 2000);
                 $("#attempt_status").removeClass('wrong_attempt');
                 $("#attempt_status").removeClass('correct_attempt');
                 $("#attempt_status").addClass('checking_attempt');
