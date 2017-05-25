@@ -18,8 +18,9 @@ Screenshot
 Requirements
 ------------
 
-- Python 3.5
-- bottle.py
+- Python 3.5 `There is some subprocessing work which is only available 3.5 onwards`
+- bottle.py ` This is the new website framework instead of Django`
+- paste ` This is the new website server`
 
 
 Why?

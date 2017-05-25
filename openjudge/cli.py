@@ -9,4 +9,4 @@ def main():
     tools.section('Setting Up Openjudge')
     tools.setup_contest()
     tools.section('Starting Webserver')
-    app.run()
+    app.run(server='paste')
