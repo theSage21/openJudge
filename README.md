@@ -91,3 +91,28 @@ Todo
 - [x] Score Calculation
 - [x] Leaderboard
 - [ ] Contest Analysis
+
+
+Benchmarks
+----------
+
+On running `siege -c 100 -t 1M -b http://127.0.0.1:8080` we get the following
+results. Keep in mind that tis is over localhost with 100 concurrent users
+hitting the site simultaneously without any delay.
+
+
+```
+Transactions:                  16403 hits
+Availability:                 100.00 %
+Elapsed time:                  59.44 secs
+Data transferred:             112.46 MB
+Response time:                  0.36 secs
+Transaction rate:             275.96 trans/sec
+Throughput:                     1.89 MB/sec
+Concurrency:                   98.65
+Successful transactions:       16404
+Failed transactions:               0
+Longest transaction:            7.52
+Shortest transaction:           0.06
+
+```
