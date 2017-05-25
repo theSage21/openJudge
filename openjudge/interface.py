@@ -96,10 +96,12 @@ def user_score():
     return {'score': score}
 
 
-@app.post('/user/list')
+@app.post('/user/leader')
 def user_list():
     users = tools.get_all_users()
-    return {'users': users}
+    data = [(tools.get_user_score(u), u) for u in users]
+    data.sort(key=lambda x: x[0], reverse=True)
+    return {'leader': data}
 
 
 @app.post('/user/details')

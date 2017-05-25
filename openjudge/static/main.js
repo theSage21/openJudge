@@ -189,4 +189,20 @@ $( document ).ready(function() {
     $("#score_display").click(logged_in_details);
     // --------------------------------Execute on page load
     logged_in_details();
+    function refresh_leader(){
+        // get userlist
+        postit('/user/leader', '', function (data){
+            console.log(data);
+            $("#leader_table").html('');  // clear the table
+            var table = $("#leader_table");
+            for(d of data.leader){
+                var person = $("<tr><td>"+d[1]+"</td><td>"+d[0]+"</td></tr>");
+                table.append(person);
+            }
+        });
+
+    }
+    refresh_leader();  // call in the beginning
+    setInterval(refresh_leader, 5000);  // Leader update
+    $("#refresh_lb").click(refresh_leader);
 });   // Document ready
