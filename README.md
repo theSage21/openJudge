@@ -12,7 +12,7 @@ is fast and light.
 Screenshot
 ----------
 
-![OpenJudge mainscreen screenshot](op.png)
+![OpenJudge mainscreen screenshot](screen.png)
 
 
 Requirements
