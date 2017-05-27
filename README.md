@@ -22,6 +22,40 @@ Requirements
 - bottle.py ` This is the new website framework instead of Django`
 - paste ` This is the new website server`
 
+Installation
+------------
+
+First get python3.5 or above
+```bash
+sudo apt-get install python-virtualenv
+sudo add-apt-repository ppa:fkrull/deadsnakes
+sudo apt-get update
+sudo apt-get install python3.5
+```
+
+Then make a directory to contain your entire contest. Nothing outside this directory is touched.
+```bash
+cd ~
+mkdir temporary_directory
+cd temporary_directory
+```
+
+Now set up openjudge in this directory
+
+```bash
+cd ~/temporary_directory
+virtualenv -p python3.5 environment
+source environment/bin/activate
+pip install openjudge
+```
+
+To run an actual contest you need a directory called `ContestData` in this folder. Read below to see how to set that up. After that is set up all you need to do is run openjudge like this.
+
+```bash
+cd ~/temporary_directory
+source environment/bin/activate
+openjudge
+```
 
 Why?
 ----
