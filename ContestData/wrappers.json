@@ -1,4 +1,8 @@
 {
     "python2" : "python2 '{code}' < '{input}'",
-    "python3" : "python3 '{code}' < '{input}'"
+    "python3" : "python3 '{code}' < '{input}'",
+    "gcc": "gcc '{code}' -o '{code}.compiled' && '{code}.compiled' <'{input}'",
+    "g++": "g++ '{code}' -o '{code}.compiled' && '{code}.compiled' <'{input}'",
+    "perl5": "perl '{code}' <'{input}'",
+    "lua": "lua '{code}' <'{input}'"
 }
