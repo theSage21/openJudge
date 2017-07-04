@@ -8,6 +8,19 @@ repository was about quick contests for small groups of 20-30 people. Somewhere
 along the way, I faltered and it became bloated. It's back now in a form which
 is fast and light.
 
+Language Support
+----------------
+
+- [x] G++
+- [x] Python
+- [x] C
+- [x] Perl
+- [x] Lua
+- [x] Java
+
+
+You can add your own languages in `wrappers.json`. Create a pull request!
+
 
 Screenshot
 ----------
