@@ -4,5 +4,6 @@
     "gcc": "gcc '{code}' -o '{code}.compiled' && '{code}.compiled' <'{input}'",
     "g++": "g++ '{code}' -o '{code}.compiled' && '{code}.compiled' <'{input}'",
     "perl5": "perl '{code}' <'{input}'",
-    "lua": "lua '{code}' <'{input}'"
+    "lua": "lua '{code}' <'{input}'",
+    "java": "javac Solution.java && java Solution.java < '{input}'"
 }
