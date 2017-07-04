@@ -5,5 +5,5 @@
     "g++": "g++ '{code}' -o '{code}.compiled' && '{code}.compiled' <'{input}'",
     "perl5": "perl '{code}' <'{input}'",
     "lua": "lua '{code}' <'{input}'",
-    "java": "javac Solution.java && java Solution < '{input}'"
+    "java": "mkdir '{code}' && cd '{code}' && javac Solution.java && java Solution < '{input}' && cd .. && rm -rf '{code}'"
 }
