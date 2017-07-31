@@ -21,13 +21,6 @@ Language Support
 
 You can add your own languages in `wrappers.json`. Create a pull request!
 
-
-Screenshot
-----------
-
-![OpenJudge mainscreen screenshot](screen.png)
-
-
 Requirements
 ------------
 
@@ -83,6 +76,7 @@ $ openjudge
 What's Changed
 --------------
 
+- A simple analytics page is available at `/analysis`
 - Each contest requires a new instance of openjudge
 - For every contest create a directory called `ContestData`. This must have the following files in it.
     - `intro.txt`: This is the introduction that is displayed on the home page
@@ -163,3 +157,10 @@ Longest transaction:           55.84
 Shortest transaction:           0.00
 
 ```
+
+Screenshot
+----------
+
+![OpenJudge mainscreen screenshot](screen.png)
+
+
