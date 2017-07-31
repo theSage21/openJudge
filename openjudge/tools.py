@@ -20,6 +20,7 @@ __all__ = ['log', 'section', 'render', 'setup_contest', 'Contest']
 class Contest(dict):
     "Use with `with`. In case of an exception, nothing is comitted"
     file_lock = Lock()
+
     def __enter__(self):
         if not os.path.exists(config.contest_json):
             with Contest.file_lock:
@@ -87,7 +88,7 @@ def __copy_templates__():
     if not os.path.exists(config.template_root):
         log('{} does not exist. Creating'.format(config.template_root))
         os.mkdir(config.template_root)
-    for template in ['home.html']:
+    for template in config.valid_templates:
         with open(os.path.join(config.template_root, template), 'w') as fl:
             html = pkgutil.get_data('openjudge',
                                     'templates/' + template).decode()
@@ -100,7 +101,7 @@ def __copy_static__():
     if not os.path.exists(config.static_root):
         log('{} does not exist. Creating'.format(config.static_root))
         os.mkdir(config.static_root)
-    for static in ['normalize.css', 'skeleton.css', 'main.js', 'main.css', 'jquery.js']:
+    for static in config.valid_static:
         with open(os.path.join(config.static_root, static), 'w') as fl:
             html = pkgutil.get_data('openjudge',
                                     'static/' + static).decode()
