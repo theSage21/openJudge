@@ -8,6 +8,59 @@ repository was about quick contests for small groups of 20-30 people. Somewhere
 along the way, I faltered and it became bloated. It's back now in a form which
 is fast and light.
 
+
+Usage
+------
+
+```bash
+mkdir JanuaryContest
+cd JanuaryContest
+```
+
+Now we create the contest's data. You can follow this general procedure
+
+
+```bash
+mkdir ContestData
+cd ContestData
+```
+
+Now you can create the entire contest structure as a folder tree. The names of the folders carry meaning so please
+don't change those. The folder `1` denotes the first question and so on. Within
+each folder `i1` and `o1` denote the input and output for the first test case.
+In this format you can create as many questions as needed and as many test
+cases per question as you require.Ultimately this is the folder structure we require.
+
+```
+▾ ContestData/
+  ▾ 1/
+      i1
+      o1
+      statement
+  ▾ 2/
+      i1
+      o1
+      statement
+    intro.txt
+    wrappers.json
+```
+
+Now comes the part of installing openjudge to be used with your contest structure. First we create and activate a Python 3.5 virtual environment.
+
+```bash
+virtualenv -p python3 env
+source env/bin/activate
+```
+
+Now we install openjudge. There are two ways of doing this and you can choose any.
+
+```
+pip install openjudge
+pip install openjudge[analysis]
+```
+
+When installed with `analysis` you can go to `/analysis` to see simple analytic charts about the contest.
+
 Language Support
 ----------------
 
@@ -32,7 +85,7 @@ Optional ones are:
 - pandas `it is used for clean DataFrame management. Mostly keeping in mind future features`
 - matplotlib `for plotting those graphs`
 
-Installation
+Detailed Installation
 ------------
 
 First get python3.5 or above
@@ -77,46 +130,6 @@ $ pip install openjudge
 $ openjudge
 ```
 
-What's Changed
---------------
-
-- A simple analytics page is available at `/analysis`
-- Each contest requires a new instance of openjudge
-- For every contest create a directory called `ContestData`. This must have the following files in it.
-    - `intro.txt`: This is the introduction that is displayed on the home page
-- Within `ContestData` folders are created named `1`, `2`, `3`, `4`, `5` denoting question numbers.
-- Each question number folder contains the files:
-    - `statement.txt`: This contains the statement of the question
-    - `i1`: This is the input provided to the program
-    - `o1`: This is the expected output.
-    - Multiple input-output pairs can be set up to have multiple test cases.
-- `ContestData` must contain a single file called `wrappers.json` which contains commands for different
-  languages that the judge supports. This must be valid JSON
-- After this folder is set up, you can run `openjudge` in that folder and it will run as expected.
-
-The `ContestData` folder must follow this tree:
-
-```
-▾ ContestData/
-  ▾ 1/
-      i1
-      o1
-      statement
-  ▾ 2/
-      i1
-      o1
-      statement
-    intro.txt
-    wrappers.json
-```
-
-
-**A sample `ContestData` is provided in this repository**
-
-
-All the contest data is stored in a file called `contest.json` for ease of reading.
-
-
 Scoring
 -------
 
@@ -135,16 +148,17 @@ Todo
 - [x] Login/Logout user system
 - [x] Score Calculation
 - [x] Leaderboard
-- [ ] Contest Analysis
+- [x] Contest Analysis
 
 
 Benchmarks
 ----------
 
 On running `siege -c 100 -t 1M -b http://192.168.0.5:8080` we get the following
-results. Keep in mind that it is is over localhost with 100 concurrent users
-hitting the site simultaneously without any delay.
-
+results. Keep in mind that it is is over local network with 100 concurrent users
+hitting the site simultaneously without any delay. The default server can support up
+to 50 people simultaneously without issues. More people than that will need some server like
+`paste`. Here is the output of siege for those interested.
 
 ```
 Transactions:                  53910 hits
@@ -166,5 +180,3 @@ Screenshot
 ----------
 
 ![OpenJudge mainscreen screenshot](screen.png)
-
-
