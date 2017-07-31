@@ -50,11 +50,6 @@ class Contest(dict):
 
 
 def log(*args):
-    with open(config.log_root, 'a') as log:
-        string = str(time.time()) + '\t'
-        string += '\t'.join(map(str, args))
-        string += '\n'
-        log.write(string)
     print(*args)
 
 
@@ -344,10 +339,7 @@ def plot_and_save_analysis_image(rows):
     df['stamp'] = df['stamp'].astype(float)
     df['seconds'] = df['stamp'].astype(int)
     df['seconds'] = df['seconds'] - df['seconds'].min()
-    plt.subplots(figsize=(25, 15))
-    rows, cols = 1, 2
     # ---------------------------
-    plt.subplot(rows, cols, 1)
     vmap = dict(df.groupby('seconds')['attempt'].count())
     x, y = [], []
     for tm in range(df['seconds'].min(), df['seconds'].max()):
@@ -360,17 +352,20 @@ def plot_and_save_analysis_image(rows):
     plt.xlabel('Seconds since start of contest')
     plt.ylabel('Number of Attempts')
     plt.title('Traffic')
+    path = os.path.join(config.static_root, config.analysis_files['traffic'])
+    plt.savefig(path)
+    plt.close()
     # ----------------------------
-    plt.subplot(rows, cols, 2)
     items = [df.loc[df['question'] == q, 'status'].tolist()
              for q in sorted(df['question'].unique())]
     plt.violinplot(items, showmeans=True)
     plt.xlabel('Question number')
     plt.ylabel('Fraction of test cases passed')
     plt.title('Question performance')
-    # ----------------------------
-    path = os.path.join(config.static_root, config.analysis_file)
+    path = os.path.join(config.static_root, config.analysis_files['questions'])
     plt.savefig(path)
+    plt.close()
+    # ----------------------------
 
 
 def update_analysis():
