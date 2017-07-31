@@ -21,6 +21,17 @@ def home():
     return tools.render('home.html', d)
 
 
+@app.get('/update_analysis')
+def analytics_update():
+    tools.update_analysis()
+    return {'status': True}
+
+
+@app.get('/analysis')
+def analytics():
+    return tools.render('analytics.html')
+
+
 @app.get('/static/<path:path>')
 def static_server(path):
     root = config.static_root

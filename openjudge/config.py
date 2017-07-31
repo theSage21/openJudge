@@ -6,6 +6,14 @@ static_root = os.path.join(os.getcwd(), 'staticroot')
 variable_root = os.path.join(os.getcwd(), 'ContestData')
 template_root = os.path.join(os.getcwd(), 'templatesroot')
 working_root = os.path.join(os.getcwd(), 'workspace')
+log_root = os.path.join(os.getcwd(), 'logs')
+
+valid_static = ['normalize.css', 'skeleton.css', 'main.js',
+                'main.css', 'jquery.js']
+valid_templates = ['home.html', 'analytics.html']
+analysis_files = {'traffic': 'traffic.png',
+                  'questions': 'question.png'}
+plotscale = 10
 
 
 if not os.path.exists(static_root):
