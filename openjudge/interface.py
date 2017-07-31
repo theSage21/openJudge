@@ -22,10 +22,10 @@ def home():
     return tools.render('home.html', d)
 
 
-@app.get('/analytics')
+@app.get('/update_analysis')
 def analytics():
-    d = {'rows': tools.make_df_from_attempts()}
-    return tools.render('analytics.html', d)
+    tools.update_analysis()
+    return {'status': True}
 
 
 @app.get('/static/<path:path>')
@@ -122,8 +122,3 @@ def user_details():
     user = tools.get_user(token)['name']
     score = tools.get_user_score(user)
     return {'user': user, 'score': score}
-
-
-@app.post('/analytics/ping')
-def analytics_data_ping():
-    return {'seen': True}

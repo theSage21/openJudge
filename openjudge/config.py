@@ -10,7 +10,8 @@ log_root = os.path.join(os.getcwd(), 'logs')
 
 valid_static = ['normalize.css', 'skeleton.css', 'main.js',
                 'main.css', 'jquery.js']
-valid_templates = ['home.html', 'analytics.html']
+valid_templates = ['home.html']
+analysis_file = 'analysis.png'
 
 
 if not os.path.exists(static_root):

@@ -4,12 +4,15 @@ import time
 import bottle
 import random
 import pkgutil
+import pandas as pd
 from openjudge import config
-from collections import defaultdict
+import matplotlib.pyplot as plt
 from multiprocessing import Lock
+from collections import defaultdict
 
 
 __all__ = ['log', 'section', 'render', 'setup_contest', 'Contest']
+plt.style.use('ggplot')
 
 
 # ---------------------------------------------------------------------
@@ -323,9 +326,53 @@ def make_df_from_attempts():
     with Contest() as contest:
         for at_key, attempt in contest['attempts'].items():
             evaluated = attempt['evaluated']
-            status = attempt['status']
+            status = sum(i for i in attempt['status'] if i is not None)
+            status /= len(attempt['status'])
             user = attempt['user']['name']
             question = attempt['qpk']
             command = attempt['commands']
-            table.append([at_key, evaluated, status, user, question, command])
+            stamp = attempt['stamp']
+            table.append([at_key, evaluated, status,
+                          user, question, command, stamp])
     return table
+
+
+def plot_and_save_analysis_image(rows):
+    df = pd.DataFrame(rows, columns=['attempt', 'evaluated',
+                                     'status', 'user', 'question',
+                                     'command', 'stamp'])
+    df['stamp'] = df['stamp'].astype(float)
+    df['seconds'] = df['stamp'].astype(int)
+    df['seconds'] = df['seconds'] - df['seconds'].min()
+    plt.subplots(figsize=(25, 15))
+    rows, cols = 1, 2
+    # ---------------------------
+    plt.subplot(rows, cols, 1)
+    vmap = dict(df.groupby('seconds')['attempt'].count())
+    x, y = [], []
+    for tm in range(df['seconds'].min(), df['seconds'].max()):
+        v = vmap.get(tm)
+        v = 0 if v is None else v
+        x.append(tm)
+        y.append(v)
+    plt.plot(x, y, label='Attempt Growth')
+    plt.legend()
+    plt.xlabel('Seconds since start of contest')
+    plt.ylabel('Number of Attempts')
+    plt.title('Traffic')
+    # ----------------------------
+    plt.subplot(rows, cols, 2)
+    items = [df.loc[df['question'] == q, 'status'].tolist()
+             for q in sorted(df['question'].unique())]
+    plt.violinplot(items, showmeans=True)
+    plt.xlabel('Question number')
+    plt.ylabel('Fraction of test cases passed')
+    plt.title('Question performance')
+    # ----------------------------
+    path = os.path.join(config.static_root, config.analysis_file)
+    plt.savefig(path)
+
+
+def update_analysis():
+    rows = make_df_from_attempts()
+    plot_and_save_analysis_image(rows)
