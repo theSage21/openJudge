@@ -143,23 +143,23 @@ Todo
 Benchmarks
 ----------
 
-On running `siege -c 100 -t 1M -b http://127.0.0.1:8080` we get the following
-results. Keep in mind that tis is over localhost with 100 concurrent users
+On running `siege -c 100 -t 1M -b http://192.168.0.5:8080` we get the following
+results. Keep in mind that it is is over localhost with 100 concurrent users
 hitting the site simultaneously without any delay.
 
 
 ```
-Transactions:                  16403 hits
+Transactions:                  53910 hits
 Availability:                 100.00 %
-Elapsed time:                  59.44 secs
-Data transferred:             112.46 MB
-Response time:                  0.36 secs
-Transaction rate:             275.96 trans/sec
-Throughput:                     1.89 MB/sec
-Concurrency:                   98.65
-Successful transactions:       16404
+Elapsed time:                  59.68 secs
+Data transferred:             989.80 MB
+Response time:                  0.06 secs
+Transaction rate:             903.32 trans/sec
+Throughput:                    16.59 MB/sec
+Concurrency:                   50.21
+Successful transactions:       53910
 Failed transactions:               0
-Longest transaction:            7.52
-Shortest transaction:           0.06
+Longest transaction:           55.84
+Shortest transaction:           0.00
 
 ```
