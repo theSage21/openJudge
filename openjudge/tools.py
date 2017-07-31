@@ -18,7 +18,11 @@ __all__ = ['log', 'section', 'render', 'setup_contest', 'Contest']
 # ---------------------------------------------------------------------
 # ---------------------------------------------------------------------
 class Contest(dict):
-    "Use with `with`. In case of an exception, nothing is comitted"
+    """
+    Implements a persistent data storage mechanism based on dictionaries
+    being stored on file.
+    Use with `with`. In case of an exception, nothing is comitted
+    """
     file_lock = Lock()
 
     def __enter__(self):
@@ -43,22 +47,30 @@ class Contest(dict):
 
 
 def log(*args):
+    with open(config.log_root, 'a') as log:
+        string = str(time.time()) + '\t'
+        string += '\t'.join(map(str, args))
+        string += '\n'
+        log.write(string)
     print(*args)
 
 
 def random_id(n=30):
+    "Returns a random string of length n"
     letters = 'abcdefghijklmnopqrstuvwxyz'
     name = ''.join(random.choice(letters) for _ in range(n))
     return name
 
 
 def section(text):
+    "logs things in a section like manner to hilight it"
     log('='*100)
     log('.'*25, text)
     log('='*100)
 
 
 def render(template, data=None):
+    "Render a template"
     data = data if data is not None else dict()
     template_dir = config.template_root
     with open(os.path.join(template_dir, template)) as fl:
@@ -302,3 +314,18 @@ def get_all_users():
     with Contest() as contest:
         users = list(contest['users'].keys())
     return users
+
+
+def make_df_from_attempts():
+    "Makes a data frame of the attempts"
+    # attempt
+    table = []
+    with Contest() as contest:
+        for at_key, attempt in contest['attempts'].items():
+            evaluated = attempt['evaluated']
+            status = attempt['status']
+            user = attempt['user']['name']
+            question = attempt['qpk']
+            command = attempt['commands']
+            table.append([at_key, evaluated, status, user, question, command])
+    return table
