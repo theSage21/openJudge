@@ -18,13 +18,14 @@ def home():
                                       key=lambda x: int(x))),
              'intro': contest['intro']
              }
+    tools.log('/home')
     return tools.render('home.html', d)
 
 
 @app.get('/analytics')
 def analytics():
-        d = {}
-        return tools.render('analytics.html', d)
+    d = {'rows': tools.make_df_from_attempts()}
+    return tools.render('analytics.html', d)
 
 
 @app.get('/static/<path:path>')
@@ -38,12 +39,14 @@ def static_server(path):
 def login():
     u, p = jget('username', 'password')
     status, token = tools.login_user(u, p)
+    tools.log('/login', status, token)
     return {'status': status, 'token': token}
 
 
 @app.post('/logout')
 def logout():
     token, = jget('token')
+    tools.log('/logout', token)
     return {'status': tools.logout_user(token)}
 
 
@@ -51,6 +54,7 @@ def logout():
 def register():
     u, p = jget('username', 'password')
     status = tools.register_user(u, p)
+    tools.log('/register', u, status)
     return {'status': status}
 
 
@@ -85,6 +89,7 @@ def question_attempt():
     else:
         message = 'Please login'
     # -------------------------------------------
+    tools.log('/attempt', token, qpk, attid, message)
     return {'attempt': attid, 'message': message}
 
 
@@ -92,6 +97,7 @@ def question_attempt():
 def attempt_status():
     attid, = jget('attempt')
     status, message = judge.get_attempt_status(attid)
+    tools.log('/attempt', attid, status)
     return {'status': status, 'message': message}
 
 

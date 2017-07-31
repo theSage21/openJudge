@@ -6,6 +6,7 @@ static_root = os.path.join(os.getcwd(), 'staticroot')
 variable_root = os.path.join(os.getcwd(), 'ContestData')
 template_root = os.path.join(os.getcwd(), 'templatesroot')
 working_root = os.path.join(os.getcwd(), 'workspace')
+log_root = os.path.join(os.getcwd(), 'logs')
 
 valid_static = ['normalize.css', 'skeleton.css', 'main.js',
                 'main.css', 'jquery.js']
