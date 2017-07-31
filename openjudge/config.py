@@ -13,6 +13,7 @@ valid_static = ['normalize.css', 'skeleton.css', 'main.js',
 valid_templates = ['home.html', 'analytics.html']
 analysis_files = {'traffic': 'traffic.png',
                   'questions': 'question.png'}
+analysis_available = False
 plotscale = 10
 
 

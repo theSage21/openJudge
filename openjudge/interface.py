@@ -29,7 +29,8 @@ def analytics_update():
 
 @app.get('/analysis')
 def analytics():
-    return tools.render('analytics.html')
+    d = {'available': config.analysis_available}
+    return tools.render('analytics.html', d)
 
 
 @app.get('/static/<path:path>')

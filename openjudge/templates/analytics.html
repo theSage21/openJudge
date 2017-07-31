@@ -19,19 +19,27 @@
         <hr>
         </div>
         <div class='container'>
-            <button id='refresh_button' class='.button-primmary'>Refresh</button>
-            <div class='row'>
-                <img src='/static/traffic.png' alt='traffic graphs' width=400 />
-                <img src='/static/question.png' alt='traffic graphs' width=400 />
+            % if available:
+                <button id='refresh_button' class='.button-primmary'>Refresh</button>
+                <div class='row'>
+                    <img src='/static/traffic.png' alt='traffic graphs' width=400 />
+                    <img src='/static/question.png' alt='traffic graphs' width=400 />
+                </div>
+                <script>
+                    $( document ).ready(function() {
+                        $('#refresh_button').click(function (){
+                            $.get('/update_analysis');
+                            location.reload();
+                        });
+                    });
+                </script>
+            % else:
+            <div>
+                Analysis is not available due to lack of <b>pandas</b> and/or <b>matplotlib</b>. Please install them in the openJudge environment to make use of analysis.
+
+                <pre> pip install openjudge[analysis] </pre> may be used to install the full openJudge.
             </div>
+            % end
         </div>
-        <script>
-            $( document ).ready(function() {
-                $('#refresh_button').click(function (){
-                    $.get('/update_analysis');
-                    location.reload();
-                });
-            });
-        </script>
     </body>
 </html>
