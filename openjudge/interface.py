@@ -21,6 +21,12 @@ def home():
     return tools.render('home.html', d)
 
 
+@app.get('/analytics')
+def analytics():
+        d = {}
+        return tools.render('analytics.html', d)
+
+
 @app.get('/static/<path:path>')
 def static_server(path):
     root = config.static_root
@@ -110,3 +116,8 @@ def user_details():
     user = tools.get_user(token)['name']
     score = tools.get_user_score(user)
     return {'user': user, 'score': score}
+
+
+@app.post('/analytics/ping')
+def analytics_data_ping():
+    return {'seen': True}
