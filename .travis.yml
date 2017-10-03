@@ -5,13 +5,16 @@ install:
     - pip install virtualenv
     - virtualenv venv
     - venv/bin/pip install pytest pytest-cov coveralls
+before_script:
+    - export COVERAGE_PROCESS_START=$PWD/.coveragerc
 script:
     - venv/bin/python setup.py develop
-    - venv/bin/coverage run venv/bin/openjudge '127.0.0.1' &
+    - venv/bin/coverage run --rcfile=.coveragerc venv/bin/openjudge '127.0.0.1' &
     - jobs
     - venv/bin/py.test tests
     - kill -s 2 %-
+    - sleep 2s
     - venv/bin/coverage report
     - cat serverlog
 after_success:
-    coveralls
+    coveralls --rcfile=.coveragerc 
