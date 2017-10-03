@@ -5,9 +5,9 @@ install:
     - pip install pytest pytest-cov coveralls
 script:
     - python setup.py develop
-    - coverage run openjudge >serverlog &
+    - coverage run venv/bin/openjudge &
     - py.test tests
-    - kill %-
+    - kill -s 2 %-
     - coverage report
     - cat serverlog
 after_success:
