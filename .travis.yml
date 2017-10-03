@@ -4,6 +4,7 @@ python:
 install:
     - pip install pytest pytest-cov coveralls
 script:
+    - python setup.py develop
     - coverage run openjudge >serverlog &
     - pytest tests
     - coverage report
