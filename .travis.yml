@@ -2,14 +2,15 @@ language: python
 python:
     - "3.5"
 install:
-    - pip install pytest pytest-cov coveralls
+    - pip install virtualenv
+    - venv/bin/pip install pytest pytest-cov coveralls
 script:
-    - python setup.py develop
-    - coverage run venv/bin/openjudge '127.0.0.1' &
+    - venv/bin/python setup.py develop
+    - venv/bin/coverage run venv/bin/openjudge '127.0.0.1' &
     - jobs
-    - py.test tests
+    - venv/bin/py.test tests
     - kill -s 2 %-
-    - coverage report
+    - venv/bin/coverage report
     - cat serverlog
 after_success:
     coveralls
