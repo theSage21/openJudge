@@ -10,4 +10,4 @@ before_script:
 script:
     - venv/bin/python setup.py develop
     - venv/bin/coverage run --rcfile=.coveragerc venv/bin/openjudge '127.0.0.1' &
-    - venv/bin/py.test tests
+    - "sleep 10s && venv/bin/py.test tests"

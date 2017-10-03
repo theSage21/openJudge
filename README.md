@@ -1,7 +1,7 @@
 OpenJudge
 =========
 
-[![Build Status](https://travis-ci.org/theSage21/openJudge.svg?branch=v0.1)](https://travis-ci.org/theSage21/openJudge)
+[![Build Status](https://travis-ci.org/theSage21/openJudge.svg?branch=master)](https://travis-ci.org/theSage21/openJudge)
 
 **Refactored!**
 
