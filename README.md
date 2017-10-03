@@ -1,6 +1,8 @@
 OpenJudge
 =========
 
+[![Build Status](https://travis-ci.org/theSage21/openJudge.svg?branch=v0.1)](https://travis-ci.org/theSage21/openJudge)
+
 **Refactored!**
 
 OpenJudge has been refactored to be faster and easier to set up! This
