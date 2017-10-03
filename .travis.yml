@@ -13,7 +13,8 @@ script:
     - jobs
     - venv/bin/py.test tests
     - kill -s 2 %-
-    - sleep 2s
+    - kill -s 2 %-
+    - wait
     - venv/bin/coverage report
     - cat serverlog
 after_success:
