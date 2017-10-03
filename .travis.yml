@@ -5,7 +5,7 @@ install:
     - pip install pytest pytest-cov coveralls
 script:
     - python setup.py develop
-    - coverage run venv/bin/openjudge &
+    - coverage run venv/bin/openjudge '127.0.0.1' &
     - py.test tests
     - kill -s 2 %-
     - coverage report
