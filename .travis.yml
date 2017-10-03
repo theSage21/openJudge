@@ -4,9 +4,10 @@ python:
 install:
     - pip install pytest pytest-cov coveralls
 script:
-    - coverage run openjudge &
+    - coverage run openjudge >serverlog &
     - pytest tests
     - coverage report
     - kill %-
+    - cat serverlog
 after_success:
     coveralls
