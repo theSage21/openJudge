@@ -6,9 +6,9 @@ install:
 script:
     - python setup.py develop
     - coverage run openjudge >serverlog &
-    - pytest tests
-    - coverage report
+    - py.test tests
     - kill %-
+    - coverage report
     - cat serverlog
 after_success:
     coveralls
