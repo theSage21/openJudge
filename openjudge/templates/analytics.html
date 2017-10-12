@@ -24,12 +24,14 @@
                 <div class='row'>
                     <img src='/static/traffic.png' alt='Attempt Traffic vs Time plots' width=400 />
                     <img src='/static/question.png' alt='Percent test cases passed violin plots for questions' width=400 />
+                    <img src='/static/performance.png' alt='Percent test cases passed violin plots for questions' width=400 />
                 </div>
                 <script>
                     $( document ).ready(function() {
                         $('#refresh_button').click(function (){
-                            $.get('/update_analysis');
-                            location.reload();
+                            $.get('/update_analysis', function (data){
+                                location.reload();
+                            });
                         });
                     });
                 </script>

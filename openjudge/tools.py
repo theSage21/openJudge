@@ -375,6 +375,25 @@ def plot_and_save_analysis_image(rows):
         plt.savefig(path)
         plt.close()
         # ----------------------------
+        g = df.loc[df.evaluated == 1].groupby(['user'])
+        X = []
+        for user, data in g.groups.items():
+            vec = []
+            d = df.iloc[data]
+            qs = d.loc[d.evaluated == 1]
+            vec.append(len(qs))
+            qs = d.loc[(qs.status == 1)]
+            vec.append(len(qs.question.unique()))
+            X.append(vec)
+        p = pd.DataFrame(X).fillna(0).values
+        plt.scatter(p[:, 0], p[:, 1])
+        plt.xlabel('Questions solved')
+        plt.ylabel('Attempts Made')
+        plt.title('Candidate performance')
+        path = os.path.join(config.static_root,
+                            config.analysis_files['candidate_performance'])
+        plt.savefig(path)
+        plt.close()
 
 
 def update_analysis():
