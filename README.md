@@ -10,6 +10,11 @@ repository was about quick contests for small groups of 20-30 people. Somewhere
 along the way, I faltered and it became bloated. It's back now in a form which
 is fast and light.
 
+Screenshot
+----------
+
+![OpenJudge mainscreen screenshot](screens/main.png)
+![OpenJudge analysis screenshot](screens/analysis.png)
 
 Usage
 ------
@@ -177,8 +182,3 @@ Longest transaction:           55.84
 Shortest transaction:           0.00
 
 ```
-
-Screenshot
-----------
-
-![OpenJudge mainscreen screenshot](screen.png)

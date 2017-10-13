@@ -16,7 +16,6 @@
                 <div class='twelve columns'>
                     <b>OpenJudge</b>  -- [
                     <a href='/'>Home</a> ] - [
-                    <a href='#' id='submit_attempt'>Submit Attempt</a> ] - [
                     <a href='#' id='signup'>Signup</a> ] - [
                     <a href='#' id='login'>Login</a> ] - [
                     <a href='#' id='logout'>Logout</a> ] - [
@@ -31,19 +30,10 @@
                 <div class='row'>
                     <input class='four columns' type='text' id='username' placeholder='User Name'/>
                     <input class='four columns' type='password' id='password' placeholder='********'/>
-                    <select id='language' class='four columns'>
-                        % for lang in languages:
-                        <option value='{{lang}}'>{{lang}}</option>
-                        % end
-                    </select>
                 </div>
                 <div class='row'><center>
                     [Last attempt: <span id='attempt_status' class='checking_attempt'>No attempt Yet</span>] -- [<span id='attempt_message'></span>]
                 </div></center>
-                <div class='row'>
-                    <textarea class='twelve columns' id='code' >print('Hello World')</textarea>
-                </div>
-                <hr>
             </div>
             <div class='row' id='intro_part'>
                 <pre>{{intro}}</pre>
@@ -57,6 +47,16 @@
             <div class='row' id='question_area'>
                 <b>Question <span id='question_number'></span> Statement</b>
                 <p id='question_pre'></p>
+            </div>
+            <hr>
+            <div class='row'>
+                <select id='language' class='four columns'>
+                    % for lang in languages:
+                    <option value='{{lang}}'>{{lang}}</option>
+                    % end
+                </select>
+                <a href='#' id='submit_attempt'><button>Submit Attempt</button></a>
+                <textarea class='twelve columns' id='code' >print('Hello World')</textarea>
             </div>
             <hr>
             <div class='container' id='leaderboard_area'>
