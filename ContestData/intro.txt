@@ -3,3 +3,10 @@ Sample Contest
 
 This contest is meant to provide a starting point for using OpenJudge.
 The text presented here is meant to provide an introduction to the contest.
+
+You can provide lists like so:
+
+- item 1
+- item 2
+
+Essentially you can use the full Github markdown spec.
