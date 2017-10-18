@@ -182,7 +182,8 @@ $( document ).ready(function() {
         $("#question_number").text(qpk);
         postit('/question', data, function(data){
             console.log(data.statement);
-            $("#question_pre").text(data.statement);
+            $("#question_pre").empty();
+            $("#question_pre").append($(marked(data.statement)));
         });
     });
     $("#attempt_status").click(check_attempt_status);

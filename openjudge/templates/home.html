@@ -9,6 +9,7 @@
 	  <link rel="stylesheet" href="/static/main.css">
 	  <script src="/static/jquery.js"></script>
       <script src='/static/main.js'></script>
+      <script src='/static/marked.min.js'></script>
 	</head>
     <body>
         <div class='container'>
@@ -33,11 +34,9 @@
                 </div>
                 <div class='row'><center>
                     [Last attempt: <span id='attempt_status' class='checking_attempt'>No attempt Yet</span>] -- [<span id='attempt_message'></span>]
-                </div></center>
+                </center></div>
             </div>
-            <div class='row' id='intro_part'>
-                <pre>{{intro}}</pre>
-            </div>
+            <div class='row' id='intro_part'>{{intro}}</div>
             <div class='row' id='question_list'>
                 % for qpk in questions:
                 <button class='two columns question_button' id='q_{{qpk}}'>Question {{qpk}}</button>
@@ -46,7 +45,7 @@
             <hr>
             <div class='row' id='question_area'>
                 <b>Question <span id='question_number'></span> Statement</b>
-                <p id='question_pre'></p>
+                <div id='question_pre'></div>
             </div>
             <hr>
             <div class='row'>
@@ -72,5 +71,12 @@
                 </center>
             </div>
         </div>
+        <script>
+            var q = $('#intro_part');
+            console.log(q.text());
+            var m = (marked(q.text()));
+            q.empty();
+            q.append($(m));
+        </script>
     </body>
 </html>

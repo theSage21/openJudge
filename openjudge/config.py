@@ -9,7 +9,7 @@ working_root = os.path.join(os.getcwd(), 'workspace')
 log_root = os.path.join(os.getcwd(), 'logs')
 
 valid_static = ['normalize.css', 'skeleton.css', 'main.js',
-                'main.css', 'jquery.js']
+                'main.css', 'jquery.js', 'marked.min.js']
 valid_templates = ['home.html', 'analytics.html']
 analysis_files = {'traffic': 'traffic.png',
                   'questions': 'question.png',
