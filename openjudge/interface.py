@@ -82,9 +82,10 @@ def question_attempt():
     if user is not None:
         if tools.attempt_is_ok(qpk, lang, code):
             i, o = tools.get_question_io(qpk)
+            limits = tools.get_question_limits(qpk)
             wrap = tools.get_wrap(lang)
             attid = tools.random_id()
-            judge.submit_attempt(code, i, o, wrap, attid, user, qpk)
+            judge.submit_attempt(code, i, o, limits, wrap, attid, user, qpk)
             message = 'Submitted'
         else:
             message = 'Question/Language does not exist'
