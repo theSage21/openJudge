@@ -146,7 +146,9 @@ def __copy_questions__():
             qdata[folder]['limits']={"memory_limit":config.memory_limit,"time_limit":config.time_limit}
             if os.path.isfile(os.path.join(path,'limits.json')):
                 with open(os.path.join(path, 'limits.json'), 'r') as fl:
-                    qdata[folder]['limits']=json.loads(fl.read())
+                    lim=json.loads(fl.read())
+                    qdata[folder]['limits']["memory_limit"]=lim["memory_limit"]
+                    qdata[folder]['limits']["time_limit"]=lim["time_limit"]
                 log('limits read for {}'.format(folder))
 
             io_data = {}
