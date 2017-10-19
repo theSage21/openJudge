@@ -89,13 +89,17 @@ def submit_attempt(code, inp_list, out_list, limits, wrap, attempt_id, user, qpk
 
 def get_attempt_status(attempt_id):
     with tools.Contest() as contest:
-        if attempt_id not in contest['attempts']:
+        print("looking for->",attempt_id,"<-")
+        if attempt_id == "No attempt Yet":
+            result,remark= None, 'No attempt Yet'
+        elif attempt_id not in contest['attempts']:
+            print("not found")
             result, remark = None, 'The attempt has been sent to the judge'
         else:
             attempt = contest['attempts'][attempt_id]
             status = attempt['status']
             if any(i is None for i in status):
-                remark = 'The program raised an error'
+                remark = 'The program raised an error or exceeded its resource limits'
                 result = False
             elif all(status):
                 remark = 'Your Program Cleared {} tests'
