@@ -41,8 +41,6 @@ $( document ).ready(function() {
         }
     }
     function check_attempt_status(){
-        $("#attempt_status").addClass('checking_attempt');
-        $("#attempt_message").text('');
         var data = JSON.stringify({'attempt': $("#attempt_status").text()});
         postit('/attempt/status', data, function (data){
             if(data.status == true){
