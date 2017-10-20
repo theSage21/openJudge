@@ -137,11 +137,20 @@ def __copy_questions__():
     for folder in sorted(os.listdir(vr)):  # QUESTION
         path = os.path.join(vr, folder)
         if os.path.isdir(path):
-            log('Question number {} detected'.format(folder))
+            log('Question number {} detected'.format(folder)) 
             with open(os.path.join(path, 'statement'), 'r') as fl:
                 stmt = fl.read()
             log('statement read for {}'.format(folder))
             qdata[folder] = {'statement': stmt}
+
+            qdata[folder]['limits']={"memory_limit":config.memory_limit,"time_limit":config.time_limit}
+            if os.path.isfile(os.path.join(path,'limits.json')):
+                with open(os.path.join(path, 'limits.json'), 'r') as fl:
+                    lim=json.loads(fl.read())
+                    qdata[folder]['limits']["memory_limit"]=lim["memory_limit"]
+                    qdata[folder]['limits']["time_limit"]=lim["time_limit"]
+                log('limits read for {}'.format(folder))
+
             io_data = {}
             for io in sorted(os.listdir(path)):
                 if io[0] in 'io':
@@ -154,6 +163,7 @@ def __copy_questions__():
                             io_data[io[1:]]['out'] = fl.read()
             log('{} are test cases found'.format(list(io_data.keys())))
             qdata[folder]['testcases'] = io_data
+
     return qdata
 
 
@@ -269,6 +279,12 @@ def attempt_is_ok(qpk, lang, code):
     return False
 
 
+def get_question_limits(qpk):
+    with Contest() as contest:
+        if qpk in contest['questions']:
+           return contest['questions'][qpk]['limits']
+    return {}
+
 def get_question_io(qpk):
     i, o = [], []
     with Contest() as contest:
@@ -277,7 +293,6 @@ def get_question_io(qpk):
                 i.append(v['in'])
                 o.append(v['out'])
     return i, o
-
 
 def get_wrap(lang):
     wrap = None

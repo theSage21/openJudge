@@ -41,33 +41,27 @@ $( document ).ready(function() {
         }
     }
     function check_attempt_status(){
-        $("#attempt_status").addClass('checking_attempt');
-        $("#attempt_message").text('');
-        console.log('Checking attempt status');
         var data = JSON.stringify({'attempt': $("#attempt_status").text()});
         postit('/attempt/status', data, function (data){
-            console.log(data);
             if(data.status == true){
                 $("#attempt_status").removeClass('checking_attempt');
                 $("#attempt_status").removeClass('wrong_attempt');
                 $("#attempt_status").addClass('correct_attempt');
                 $("#attempt_message").text(data.message);
                 logged_in_details();
-                return;
             }
-            if(data.status == false){
+            else if(data.status == false){
                 $("#attempt_status").removeClass('checking_attempt');
                 $("#attempt_status").removeClass('correct_attempt');
                 $("#attempt_status").addClass('wrong_attempt');
                 $("#attempt_message").text(data.message);
-                return;
             }
-            if(data.status == null){
+            else if(data.status == null){
                 $("#attempt_status").removeClass('wrong_attempt');
                 $("#attempt_status").removeClass('correct_attempt');
                 $("#attempt_status").addClass('checking_attempt');
                 $("#attempt_message").text(data.message);
-                return;
+                setTimeout(check_attempt_status,5000);
             }
         });
     }
@@ -139,6 +133,7 @@ $( document ).ready(function() {
             });  // end of postit handler
         }
     });  // signup action
+
     $("#submit_attempt").click(function (){
         var url = '/attempt';
         var token = gettoken();
@@ -166,7 +161,7 @@ $( document ).ready(function() {
             console.log(data);
             if(data.attempt != null){
                 $("#attempt_status").text(data.attempt);
-                setTimeout(check_attempt_status, 2000);
+                setTimeout(check_attempt_status,3000);
                 $("#attempt_status").removeClass('wrong_attempt');
                 $("#attempt_status").removeClass('correct_attempt');
                 $("#attempt_status").addClass('checking_attempt');

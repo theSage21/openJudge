@@ -1,7 +1,8 @@
 import os
 
 
-timeout = 10  # Seconds
+memory_limit=500*1024 #KB
+time_limit = 5  # Seconds
 static_root = os.path.join(os.getcwd(), 'staticroot')
 variable_root = os.path.join(os.getcwd(), 'ContestData')
 template_root = os.path.join(os.getcwd(), 'templatesroot')
@@ -14,7 +15,7 @@ valid_templates = ['home.html', 'analytics.html']
 analysis_files = {'traffic': 'traffic.png',
                   'questions': 'question.png',
                   'candidate_performance': 'performance.png'}
-analysis_available = False
+analysis_available = True
 plotscale = 10
 
 

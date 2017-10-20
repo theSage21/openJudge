@@ -21,7 +21,7 @@ def __thread_worker__():
             attempt['status'] = []
             for command, out_expected in zip(commands, out_list):
                 ran_without_error, out, err = __run_command__(command,
-                                                              config.timeout)
+                                                              config.time_limit)
                 status = False if ran_without_error else None
                 tools.log(ran_without_error, out, err, '-'*10)
                 if ran_without_error:
@@ -37,10 +37,10 @@ def __thread_worker__():
             tools.log('*'*50)
 
 
-def __run_command__(command, timeout):
+def __run_command__(command, time_limit):
     "Run a given command with a set timeout"
     try:
-        p = run(command, timeout=timeout,
+        p = run(command, timeout=time_limit,
                 stderr=PIPE, stdout=PIPE,
                 shell=True)
     except TimeoutExpired:
@@ -62,7 +62,8 @@ for tid in range(config.n_threads_to_check_threads):
 # -------------------------------------------------------------
 
 
-def submit_attempt(code, inp_list, out_list, wrap, attempt_id, user, qpk):
+def submit_attempt(code, inp_list, out_list, limits, wrap, attempt_id, user, qpk):
+    print("limits",limits)
     global job_queue
     assert len(inp_list) == len(out_list), 'each inp needs an out'
     codepath = os.path.join(config.working_root, attempt_id)
@@ -74,12 +75,13 @@ def submit_attempt(code, inp_list, out_list, wrap, attempt_id, user, qpk):
         inp_paths.append(inpath)
         with open(inpath, 'w') as fl:
             fl.write(inp)
-        command = wrap.format(code=codepath, input=inpath)
+        command = wrap.format(code=codepath, input=inpath, time_limit=limits["time_limit"], memory_limit=limits["memory_limit"])
         commands.append(command)
     tools.log('Adding attempt {} to job queue'.format(attempt_id))
     job_queue.put({'evaluated': False, 'attempt_id': attempt_id,
                    'inp_paths': inp_paths,
                    'code_path': codepath, 'commands': commands,
+                   'memory_limit':limits['memory_limit'], 'time_limit': limits['time_limit'],
                    'out_list': out_list, 'user': user,
                    'qpk': qpk
                    })
@@ -87,13 +89,17 @@ def submit_attempt(code, inp_list, out_list, wrap, attempt_id, user, qpk):
 
 def get_attempt_status(attempt_id):
     with tools.Contest() as contest:
-        if attempt_id not in contest['attempts']:
+        print("looking for->",attempt_id,"<-")
+        if attempt_id == "No attempt Yet":
+            result,remark= None, 'No attempt Yet'
+        elif attempt_id not in contest['attempts']:
+            print("not found")
             result, remark = None, 'The attempt has been sent to the judge'
         else:
             attempt = contest['attempts'][attempt_id]
             status = attempt['status']
             if any(i is None for i in status):
-                remark = 'The program raised an error'
+                remark = 'The program raised an error or exceeded its resource limits'
                 result = False
             elif all(status):
                 remark = 'Your Program Cleared {} tests'
