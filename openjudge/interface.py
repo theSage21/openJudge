@@ -120,6 +120,10 @@ def user_list():
 @app.post('/user/details')
 def user_details():
     token,  = jget('token')
-    user = tools.get_user(token)['name']
-    score = tools.get_user_score(user)
+    user = tools.get_user(token)
+    if user is not None:
+        user = user['name']
+        score = tools.get_user_score(user)
+    else:
+        user, score = 'Anon', 0
     return {'user': user, 'score': score}
