@@ -8,7 +8,7 @@ async def is_authenticated(token, db):
 
 async def register(uname, pwd, db):
     uname = normalize(uname)
-    if (await db.credentials.find_one({"uname": uname})) is None:
+    if (await db.credentials.find_one({"uname": uname})) is not None:
         return False, 'Already Exists'
     else:
         salt = random_string(100)

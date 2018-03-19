@@ -18,7 +18,7 @@ async def check_auth(data, db):
         raise web.HTTPNotFound(reason='Not Logged in')
 
 
-@aiohttp_jinja2.template('home.jinja2')
+@aiohttp_jinja2.template('home.html')
 async def home(request):
     questions = []
     async for q in db.questions.find():
@@ -35,7 +35,7 @@ async def question(request):
                                                 'test_cases': False})
     if q is None:
         raise web.HTTPNotFound(reason='No such Question')
-    return web.json_response({"question": q['statement']})
+    return web.json_response({"statement": q['statement']})
 
 
 async def new_attempt(request):
@@ -89,7 +89,7 @@ def run_server(port, host, database, static_folder, wrapmap, wkspace, template_p
     app.router.add_post('/logout', logout)
     app.router.add_post('/signup', signup)
     app.router.add_post('/attempt', new_attempt)
-    app.router.add_get('/question', question)
+    app.router.add_post('/question', question)
     # app.router.add_get('/score', setup)
     # app.router.add_get('/leader', setup)
     app.router.add_get('/', home)

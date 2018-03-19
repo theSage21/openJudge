@@ -43,9 +43,10 @@ class Question:
         q = Question(statement, tests)
         status, log = q(attempt)
     """
-    def __init__(self, statement, test_cases):
+    def __init__(self, qno, statement, test_cases):
         self.statement = statement
         self.test_cases = test_cases
+        self.qno = qno
         self.qid = random_string()
 
     def __call__(self, attempt):
