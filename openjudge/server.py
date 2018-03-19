@@ -1,16 +1,20 @@
+import asyncio
 import aiohttp_cors
 import aiohttp_jinja2
 import jinja2
 from aiohttp import web
+from collections import defaultdict
 from .auth import (is_authenticated, register,
                    generate_token, remove_token,
                    get_user_from_token)
+import datetime
 from .core import Attempt
 
 
 db = None
 workspace = None
 wrapper_map = None
+epoch = datetime.datetime.utcfromtimestamp(0)
 
 
 async def check_auth(data, db):
@@ -50,7 +54,7 @@ async def new_attempt(request):
     wrap = wrapper_map.get(lang)
     attempt = Attempt(code, wrap, workspace, user, qid)
     await db.attempt_queue.insert_one(attempt.__dict__)
-    return web.json_response({})
+    return web.json_response({'attid': attempt.attid})
 
 
 async def languages(request):
@@ -85,6 +89,37 @@ async def logout(request):
     return web.json_response({})
 
 
+async def score_calc(request):
+    data = await request.json()
+    uname = await get_user_from_token(data.get('token'), db)
+    score = 0
+    async for att in db.history.find({"user": uname}):
+        score += 1 if att['status'] else 0
+    return web.json_response({"score": score})
+
+
+async def wait_for_verdict(request):
+    data = await request.json()
+    await check_auth(data, db)
+    attid = data['attid']
+    while True:
+        att = await db.history.find_one({"attid": attid})
+        if att is None:
+            asyncio.sleep(1)
+        else:
+            return web.json_response({'status': att['status']})
+
+
+async def leaderboard(request):
+    history = defaultdict(list)
+    async for attempt in db.history.find({"status": True}).sort('datetime'):
+        att = Attempt()
+        att.__dict__ = attempt
+        stamp = att.datetime - epoch
+        history[att.user].append((stamp.total_seconds(), 1))
+    return web.json_response(history)
+
+
 def run_server(port, host, database, static_folder,
                wrapmap, wkspace, template_path):
     global db, workspace, wrapper_map
@@ -99,8 +134,9 @@ def run_server(port, host, database, static_folder,
     app.router.add_post('/attempt', new_attempt)
     app.router.add_post('/question', question)
     app.router.add_get('/languages', languages)
-    # app.router.add_get('/score', setup)
-    # app.router.add_get('/leader', setup)
+    app.router.add_post('/score', score_calc)
+    app.router.add_post('/wait/for/verdict', wait_for_verdict)
+    app.router.add_get('/leader', leaderboard)
     app.router.add_get('/', home)
     # -----------cors
 

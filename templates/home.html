@@ -5,16 +5,20 @@
         <script src='/static/jquery-3.2.1.min.js'></script>
         <script src='/static/js.cookie.min.js'></script>
         <script src='/static/showdown.min.js'></script>
+        <script src='/static/Chart.min.js'></script>
         <script src='/static/main.js'></script>
     </head>
     <body>
         <nav>
             <ul class='bar'>
+                <li><a>[</a></li>
+                <li><a id='check_status'></a></li>
+                <li><a id='score_display'>Score: -</a></li>
+                <li><a>]</a></li>
                 <li><a href='#' id='login'>Login</a></li>
                 <li><a href='#' id='logout'>Logout</a></li>
                 <li><a href='#' id='signup'>Signup</a></li>
-                <li><a href='#'>Leaderboard</a></li>
-                <li><a href='#'>Questions</a></li>
+                <li><a href='#' id='leaderboard'>Leaderboard</a></li>
             </ul>
         </nav>
             <ul id='login_form'>

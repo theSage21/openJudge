@@ -15,11 +15,19 @@ def _attempt_checker(mongo_uri):
         else:
             att = Attempt()
             att.__dict__ = attempt
-            q = db.questions.find_one({"qid": att.qid})
-            que = Question()
-            que.__dict__ = q
-            que.test_cases = [TestCase(**t) for t in q['test_cases']]
-            checked_attempt = que(att)
+            # has this been answered correctly earlier?
+            query = {"qid": att.qid, "user": att.user,
+                     "status": True}
+            if db.history.find_one(query) is None:
+                q = db.questions.find_one({"qid": att.qid})
+                que = Question()
+                que.__dict__ = q
+                que.test_cases = [TestCase(**t) for t in q['test_cases']]
+                checked_attempt = que(att)
+            else:
+                att['status'] = False
+                att['log'] = None
+                checked_attempt = att
             db.history.insert_one(checked_attempt.__dict__)
 
 

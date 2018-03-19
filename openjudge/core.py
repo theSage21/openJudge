@@ -1,5 +1,6 @@
 from subprocess import (run, PIPE, TimeoutExpired)
 from .utils import random_string, normalize
+from datetime import datetime
 import os
 
 
@@ -80,6 +81,7 @@ class Attempt:
         self.attid = random_string(100)
         self.workspace = None
         self.codepath = None
+        self.datetime = datetime.utcnow()
         if workspace is not None:
             wk = os.path.join(workspace, random_string())
             while os.path.exists(wk):
@@ -89,10 +91,3 @@ class Attempt:
             self.codepath = os.path.join(self.workspace, random_string())
             with open(self.codepath, 'w') as fl:
                 fl.write(self.code)
-
-
-class Contest:
-    def __init__(self, name, questions, running=False):
-        self.name = name
-        self.questions = questions
-        self.running = running
