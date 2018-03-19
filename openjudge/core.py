@@ -62,7 +62,7 @@ class Attempt:
     """
     This defines an attempt on some question
     """
-    def __init__(self, code, wrapper, workspace, user):
+    def __init__(self, code, wrapper, workspace, user, qid):
         """
             a = Attempt(code, wrap, './work/abc')
 
@@ -73,9 +73,14 @@ class Attempt:
         """
         self.code = code
         self.user = normalize(user)
+        self.qid = qid
         self.wrapper = wrapper
         self.attid = random_string(100)
-        self.workspace = os.path.join(workspace, random_string())
+        wk = os.path.join(workspace, random_string())
+        while os.path.exists(wk):
+            wk = os.path.join(workspace, random_string())
+        self.workspace = wk
+        os.mkdir(self.workspace)
         self.codepath = os.path.join(self.workspace, random_string())
         with open(self.codepath, 'w') as fl:
             fl.write(self.code)

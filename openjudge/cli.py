@@ -54,6 +54,8 @@ def main():
                         help="How much total time does each attempt get?")
     args = parser.parse_args()
     database = get_db(args.mongo_uri)
+    if not os.path.exists(args.workspace):
+        os.mkdir(args.workspace)
 
     with open(args.wrapmap, 'r') as fl:
         wrapmap = json.load(fl)

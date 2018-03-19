@@ -1,0 +1,17 @@
+Fibonacci Numbers
+=================
+
+Given a number **n**, your program must print out the **n**'th Fibonacci number.
+
+The sequence starts as 1, 1, 2, 3, 5 ...
+
+
+Sample Input
+-------
+
+5
+
+Sample Output
+-------
+
+5

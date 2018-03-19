@@ -33,3 +33,10 @@ async def generate_token(uname, pwd, db):
 
 async def remove_token(token, db):
     await db.tokens.find_one_and_delete({"token": token})
+
+
+async def get_user_from_token(token, db):
+    u = await db.tokens.find_one({"token": token})
+    if u is None:
+        return None
+    return u['uname']

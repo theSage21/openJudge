@@ -1,6 +1,8 @@
 #content{
     width: 85%;
     float: right;
+    display: inline-grid;
+    grid-template-columns: auto auto;
 }
 .bar {
     list-style-type: none;
@@ -22,7 +24,7 @@
 .bar a:hover {
     background-color: #111;
 }
-.active {
+.vertbaractive {
     background-color: #4CAF50;
 }
 .vertbar {
@@ -51,19 +53,29 @@
     background-color: #555;
     color: white;
 }
-#login_form{
+#login_form, #submission_form{
     list-style-type: none;
+    border-left: 3px solid pink;
+    padding-left: 4px;
 }
-#login_form input{
+#login_form input, #submission_form textarea{
     border: 0;
     box-shadow: none;
     border-radius: 0px;
-    background: lightgreen;
+    background: lightgray;
     color: black;
 }
-#login_form button{
+#submission_form textarea{
+    height: 400px;
+}
+#login_form button, #submission_form button{
     border: 1px solid;
     box-shadow: none;
     border-radius: 0px;
     color: black;
+}
+#submission_form {
+    display: inline-grid;
+    grid-template-rows: auto auto;
+    grid-row-gap: 5px;
 }

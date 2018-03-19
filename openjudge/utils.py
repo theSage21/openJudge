@@ -15,6 +15,7 @@ async def add_questions_from_dir(dirname, time_limit, db):
     questions = [(i, os.path.join(dirname, i))
                  for i in os.listdir(dirname)]
     for qno, qpath in questions:
+        qno = int(qno)
         q = await db.questions.find_one({"qno": qno})
         if q is None:
             print('Adding a new question', qno)

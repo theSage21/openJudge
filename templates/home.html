@@ -25,11 +25,16 @@
             </ul>
         <ul class='vertbar'>
             {% for qid in questions %}
-            <li><a href='#' qid={{qid}} class='question_listing'>{{qid}}</a></li>
+            <li><a href='#' qid={{qid}} class='question_listing'>Question {{loop.index}}</a></li>
             {% endfor %}
         </ul>
         <div id='content'>
             <div id='content_question_space'>
+            </div>
+            <div id='submission_form'>
+				<textarea id='codetext' placeholder='Your code'></textarea>
+                <select id='language_selection'> </select>
+                <button id='submit_code'>Submit Code</button>
             </div>
         </div>
     </body>
