@@ -29,4 +29,4 @@ pipenv install --python 3
 
 To run openjudge two commands need to be issued.  `openjudge` and `openjudge --judge` in two separate terminals. The first is the interface and the second is the "judge".
 
-![Asciinema recording](https://asciinema.org/a/R8HfDSiE3mChch1gwu70zKP0p)
+[![asciicast](https://asciinema.org/a/R8HfDSiE3mChch1gwu70zKP0p.png)](https://asciinema.org/a/R8HfDSiE3mChch1gwu70zKP0p)
