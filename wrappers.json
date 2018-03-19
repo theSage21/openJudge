@@ -1,0 +1,1 @@
+{"python": "python {code_file} < {input_file}"}

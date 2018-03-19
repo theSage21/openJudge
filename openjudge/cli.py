@@ -49,4 +49,4 @@ def main():
                args.static_dir,
                wrapmap,
                args.workspace,
-               args.templatedir)
+               args.template_dir)
