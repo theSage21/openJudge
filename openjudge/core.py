@@ -1,5 +1,5 @@
 from subprocess import (run, PIPE, TimeoutExpired)
-from utils import random_string
+from .utils import random_string, normalize
 import os
 
 
@@ -46,18 +46,22 @@ class Question:
     def __init__(self, statement, test_cases):
         self.statement = statement
         self.test_cases = test_cases
+        self.qid = random_string()
 
     def __call__(self, attempt):
         """Run this attempt on this question"""
         log = [test(attempt) for test in self.test_cases]
-        return all([i[0] for i in log]), log
+        status = all([i[0] for i in log])
+        attempt.status = status
+        attempt.log = log
+        return attempt
 
 
 class Attempt:
     """
     This defines an attempt on some question
     """
-    def __init__(self, code, wrapper, workspace):
+    def __init__(self, code, wrapper, workspace, user):
         """
             a = Attempt(code, wrap, './work/abc')
 
@@ -67,7 +71,9 @@ class Attempt:
             workspace   : The common workspace where this attempt is stored
         """
         self.code = code
+        self.user = normalize(user)
         self.wrapper = wrapper
+        self.attid = random_string(100)
         self.workspace = os.path.join(workspace, random_string())
         self.codepath = os.path.join(self.workspace, random_string())
         with open(self.codepath, 'w') as fl:

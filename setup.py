@@ -1,7 +1,6 @@
 import sys
 from setuptools import setup
-from openjudge import __version__
-__version__ = list(map(str, __version__))
+__version__ = list(map(str, [3, 0, 0]))
 
 if sys.version_info < (3, 5):
     raise Exception('You require Python3.5 or above to run OpenJudge')
