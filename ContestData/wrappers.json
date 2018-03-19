@@ -1,9 +1,0 @@
-{
-    "python2" : "ulimit -m {memory_limit} && ulimit -t {time_limit} && python2 '{code}' < '{input}'",
-    "python3" : "ulimit -m {memory_limit} && ulimit -t {time_limit} && python3 '{code}' < '{input}'",
-    "gcc": "gcc '{code}' -o '{code}.compiled' && ulimit -m {memory_limit} && ulimit -t {time_limit} && '{code}.compiled' <'{input}'",
-    "g++": "g++ '{code}' -o '{code}.compiled' && ulimit -m {memory_limit} && ulimit -t {time_limit} && '{code}.compiled' <'{input}'",
-    "perl5": "ulimit -m {memory_limit} && ulimit -t {time_limit} && perl '{code}' <'{input}'",
-    "lua": "ulimit -m {memory_limit} && ulimit -t {time_limit} && lua '{code}' <'{input}'",
-    "java(use 'class Solution')": "mkdir 'dir_{code}' && mv '{code}' 'dir_{code}/Solution.java' && cd 'dir_{code}' && javac Solution.java && ulimit -m {memory_limit} && ulimit -t {time_limit} && java Solution < '{input}' && cd .. ; rm -rf 'dir_{code}'"
-}
