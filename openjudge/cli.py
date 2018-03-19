@@ -5,6 +5,7 @@ import argparse
 from .server import run_server
 from motor import motor_asyncio
 from .utils import add_questions_from_dir
+from .worker import run_judge
 
 
 def get_db(uri):
@@ -52,6 +53,11 @@ def main():
     parser.add_argument('--timeout', action='store',
                         default=10,
                         help="How much total time does each attempt get?")
+    parser.add_argument('--judge', action='store_true',
+                        default=False,
+                        help='Start the judge')
+    parser.add_argument('--n-judges', action='store',
+                        default=4, help='How many concurrent judges')
     args = parser.parse_args()
     database = get_db(args.mongo_uri)
     if not os.path.exists(args.workspace):
@@ -59,6 +65,9 @@ def main():
 
     with open(args.wrapmap, 'r') as fl:
         wrapmap = json.load(fl)
+
+    if args.judge:
+        run_judge(args.mongo_uri, args.n_judges)
 
     _add_questions(args.add_questions_from, args.timeout, database)
     # ------------------------------------------

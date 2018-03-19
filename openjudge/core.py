@@ -31,8 +31,9 @@ class TestCase:
             result = False
             stdout, stderr = b'', b'Timeout'
         else:
-            result = p.returncode == 0
             stdout, stderr = p.stdout, p.stderr
+            result = p.returncode == 0
+            result = result and stdout.decode().strip() == self.out.strip()
         return result, stdout.decode(), stderr.decode()
 
 
@@ -43,7 +44,7 @@ class Question:
         q = Question(statement, tests)
         status, log = q(attempt)
     """
-    def __init__(self, qno, statement, test_cases):
+    def __init__(self, qno=None, statement=None, test_cases=None):
         self.statement = statement
         self.test_cases = test_cases
         self.qno = qno
@@ -62,7 +63,8 @@ class Attempt:
     """
     This defines an attempt on some question
     """
-    def __init__(self, code, wrapper, workspace, user, qid):
+    def __init__(self, code=None, wrapper=None, workspace=None,
+                 user=None, qid=None):
         """
             a = Attempt(code, wrap, './work/abc')
 
@@ -72,18 +74,21 @@ class Attempt:
             workspace   : The common workspace where this attempt is stored
         """
         self.code = code
-        self.user = normalize(user)
+        self.user = normalize(user) if user is not None else None
         self.qid = qid
         self.wrapper = wrapper
         self.attid = random_string(100)
-        wk = os.path.join(workspace, random_string())
-        while os.path.exists(wk):
+        self.workspace = None
+        self.codepath = None
+        if workspace is not None:
             wk = os.path.join(workspace, random_string())
-        self.workspace = wk
-        os.mkdir(self.workspace)
-        self.codepath = os.path.join(self.workspace, random_string())
-        with open(self.codepath, 'w') as fl:
-            fl.write(self.code)
+            while os.path.exists(wk):
+                wk = os.path.join(workspace, random_string())
+            self.workspace = wk
+            os.mkdir(self.workspace)
+            self.codepath = os.path.join(self.workspace, random_string())
+            with open(self.codepath, 'w') as fl:
+                fl.write(self.code)
 
 
 class Contest:
