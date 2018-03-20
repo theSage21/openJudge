@@ -22,11 +22,22 @@ First install MongoDB by following the instructions [in their docs](https://docs
 ```bash
 sudo apt-get install python3-dev
 pip install --user pipenv
-git clone https://github.com/theSage21/openJudge
-cd openJudge
-pipenv install --python 3
+pipenv install openjudge --python 3.5
+pipenv shell
+
+mkdir questions
+cd questions
+
+mkdir 1
+cd 1
+
+# Create these files
+touch statement i0 o0 i1 o0
+
+# go back to where the questions directory resides
+cd ../../
 ```
 
 To run openjudge two commands need to be issued.  `openjudge` and `openjudge --judge` in two separate terminals. The first is the interface and the second is the "judge".
 
-[![asciicast](https://asciinema.org/a/R8HfDSiE3mChch1gwu70zKP0p.png)](https://asciinema.org/a/R8HfDSiE3mChch1gwu70zKP0p)
+[![asciicast](https://asciinema.org/a/1kaLBpe57efO7FGKEc7dHLxb0.png)](https://asciinema.org/a/1kaLBpe57efO7FGKEc7dHLxb0)
