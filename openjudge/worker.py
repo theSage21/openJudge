@@ -25,8 +25,8 @@ def _attempt_checker(mongo_uri):
                 que.test_cases = [TestCase(**t) for t in q['test_cases']]
                 checked_attempt = que(att)
             else:
-                att['status'] = False
-                att['log'] = None
+                att.status = False
+                att.log = None
                 checked_attempt = att
             db.history.insert_one(checked_attempt.__dict__)
 
