@@ -17,6 +17,6 @@ setup(name='openjudge',
       install_requires=['motor'],
       extras_require={'analysis': ['pandas', 'matplotlib']},
       entry_points={'console_scripts': ['openjudge=openjudge.cli:main']},
-      package_data={'openjudge': ['templates/*', 'static/*']},
+      package_data={'openjudge': ['templates/*', 'staticfiles/*', 'wrappers.json']},
       keywords=['openjudge', 'lan', 'programming', 'programming', 'contest'],
       zip_safe=False)

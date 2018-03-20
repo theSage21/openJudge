@@ -6,6 +6,7 @@ from .server import run_server
 from motor import motor_asyncio
 from .utils import add_questions_from_dir
 from .worker import run_judge
+from .default_interface import copy_defaults
 
 
 def get_db(uri):
@@ -70,6 +71,7 @@ def main():
         run_judge(args.mongo_uri, args.n_judges)
 
     _add_questions(args.add_questions_from, args.timeout, database)
+    copy_defaults(args.template_dir, args.static_dir, args.wrapmap)
     # ------------------------------------------
     print('Initiating Server')
     run_server(args.server_port, args.server_host,

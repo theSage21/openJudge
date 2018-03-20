@@ -1,2 +1,3 @@
 include openjudge/templates/*
-include openjudge/static/*
+include openjudge/staticfiles/*
+include openjudge/wrappers.json
