@@ -1,3 +1,0 @@
-include openjudge/templates/*
-include openjudge/staticfiles/*
-include openjudge/wrappers.json

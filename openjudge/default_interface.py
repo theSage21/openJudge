@@ -32,6 +32,6 @@ def __copy_wrapper(wrapperfile):
 
 
 def copy_defaults(tempdir, staticdir, wrapperfile):
+    __copy_wrapper(wrapperfile)
     __copy_template(tempdir)
     __copy_static(staticdir)
-    __copy_wrapper(wrapperfile)
