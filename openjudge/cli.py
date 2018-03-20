@@ -60,6 +60,7 @@ def main():
     parser.add_argument('--n-judges', action='store',
                         default=4, help='How many concurrent judges')
     args = parser.parse_args()
+    copy_defaults(args.template_dir, args.static_dir, args.wrapmap)
     database = get_db(args.mongo_uri)
     if not os.path.exists(args.workspace):
         os.mkdir(args.workspace)
@@ -71,7 +72,6 @@ def main():
         run_judge(args.mongo_uri, args.n_judges)
 
     _add_questions(args.add_questions_from, args.timeout, database)
-    copy_defaults(args.template_dir, args.static_dir, args.wrapmap)
     # ------------------------------------------
     print('Initiating Server')
     run_server(args.server_port, args.server_host,
