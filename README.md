@@ -11,8 +11,8 @@ is fast and light.
 Screenshots
 ----------
 
-![Normal Screen](screens/home.png)
-![Leader Board Screen](screens/lb.png)
+![Normal Screen](https://raw.githubusercontent.com/theSage21/openJudge/master/screens/home.png)
+![Leader Board Screen](https://raw.githubusercontent.com/theSage21/openJudge/master/screens/lb.png)
 
 Usage
 -----
