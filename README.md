@@ -41,3 +41,6 @@ cd ../../
 To run openjudge two commands need to be issued.  `openjudge` and `openjudge --judge` in two separate terminals. The first is the interface and the second is the "judge".
 
 [![asciicast](https://asciinema.org/a/1kaLBpe57efO7FGKEc7dHLxb0.png)](https://asciinema.org/a/1kaLBpe57efO7FGKEc7dHLxb0)
+
+
+In case you have a lot of people sending in code and you deem that the code check is too slow, you just have to start another judge process with `openjudge --judge`.

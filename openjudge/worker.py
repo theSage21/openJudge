@@ -1,4 +1,3 @@
-from multiprocessing import Pool
 from time import sleep
 from .core import Attempt, Question, TestCase
 import pymongo
@@ -32,6 +31,4 @@ def _attempt_checker(mongo_uri):
 
 
 def run_judge(mongo_uri, n_judges):
-    with Pool() as pool:
-        args = [mongo_uri for _ in range(n_judges)]
-        pool.map(_attempt_checker, args)
+    _attempt_checker(mongo_uri)
