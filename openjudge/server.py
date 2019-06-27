@@ -1,5 +1,9 @@
 from aiohttp import web
+import base64
+from cryptography import fernet
 import inspect
+from aiohttp_session import setup, get_session, session_middleware, new_session
+from aiohttp_session.cookie_storage import EncryptedCookieStorage
 from peewee import IntegrityError
 from functools import wraps
 from . import database
@@ -36,6 +40,20 @@ def fill_args(function):
     return wrapped_fn
 
 
+def login_required(function):
+    @wraps(function)
+    async def new_function(request, *a, **kw):
+        session = await get_session(request)
+        request["session"] = session
+        token = database.Token.get_or_none(database.Token.id == session["token"])
+        if token is None:
+            return web.HTTPUnauthorized(reason="No such token")
+        request["token"] = token
+        return await function(request, *a, **kw)
+
+    return new_function
+
+
 @fill_args
 async def register(request, User, name: str, pwd: str):
     try:
@@ -55,10 +73,41 @@ async def login(request, User, Token, name: str, pwd: str):
         tok = Token.create(user=user)
     except IntegrityError:
         return web.HTTPTemporaryRedirect("/login")
-    # TODO: set cookie
+    session = await new_session(request)
+    session["token"] = token.id
+    return web.json_response({"ok": True})
 
 
-app = web.Application()
-app.add_routes([web.post("/register", register), web.post("/login", login)])
+@fill_args
+async def login(request, User, Token, name: str, pwd: str):
+    try:
+        user = User.get(User.name == name, User.pwd == pwd)
+    except User.DoesNotExist:
+        return web.HTTPNotFound(reason="no such user")
+    try:
+        tok = Token.create(user=user)
+    except IntegrityError:
+        return web.HTTPTemporaryRedirect("/login")
+    session = await new_session(request)
+    session["token"] = token.id
+    return web.json_response({"ok": True})
+
+
+@login_required
+async def logout(request):
+    request["token"].delete_instance()
+    request["session"].invalidate()
+
+
+async def app():
+    app = web.Application()
+    # secret_key must be 32 url-safe base64-encoded bytes
+    fernet_key = fernet.Fernet.generate_key()
+    secret_key = base64.urlsafe_b64decode(fernet_key)
+    setup(app, EncryptedCookieStorage(secret_key))
+    app.add_routes([web.post("/register", register), web.post("/login", login)])
+    app["User"] = database.User
+    return app
+
+
 # -------------------------
-app["User"] = database.User

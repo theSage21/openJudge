@@ -15,6 +15,7 @@ requests = "*"
 cchardet = "*"
 aiodns = "*"
 uvloop = "*"
+aiohttp-session = "*"
 
 [requires]
 python_version = "3.7"
