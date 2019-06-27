@@ -1,17 +1,23 @@
 [[source]]
-
-url = "https://pypi.python.org/simple"
-verify_ssl = true
 name = "pypi"
-
-
-[packages]
-
-motor = "*"
-"aiohttp-jinja2" = "*"
-"e1839a8" = {path = ".", editable = true}
-aiohttp-cors = "*"
-
+url = "https://pypi.org/simple"
+verify_ssl = true
 
 [dev-packages]
+pre-commit = "*"
+black = "*"
+pytype = "*"
 
+[packages]
+aiohttp = "*"
+peewee = "*"
+requests = "*"
+cchardet = "*"
+aiodns = "*"
+uvloop = "*"
+
+[requires]
+python_version = "3.7"
+
+[pipenv]
+allow_prereleases = true
