@@ -67,3 +67,4 @@ media_root/
 contest.json
 workspace/
 .pytype
+.hypothesis/
