@@ -94,7 +94,7 @@ async def job_is_done(
     stdout: str,
     stderr: str,
     exit_code: int,
-    is_timeout: bool,
+    is_timeout: bool = False,
 ):
     try:
         check = AttemptCheck.get_by_id(checkid)
