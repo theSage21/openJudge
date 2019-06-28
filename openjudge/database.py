@@ -59,7 +59,7 @@ class Contest(Table):
 
 class ContestQuestion(Table):
     contest = pw.ForeignKeyField(Contest)
-    question = pw.ForeignKeyField(Questio)
+    question = pw.ForeignKeyField(Question)
 
 
 class TestCase(Table):

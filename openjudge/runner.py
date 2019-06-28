@@ -9,7 +9,10 @@ logger = logging.getLogger(__name__)
 def run(endpoint, workdir):
     while True:
         try:
-            job = requests.get(endpoint + "/runnerjob").json()
+            job = requests.get(endpoint + "/runnerjob")
+            print(job.status_code)
+            print(job.text)
+            job = job.json()
             checkid = job["checkid"]
             root = workdir / checkid
             os.mkdir(root)

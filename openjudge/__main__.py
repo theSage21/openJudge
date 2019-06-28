@@ -1,8 +1,15 @@
 import argparse
+import logging
 
-parser = parser.ArgumentParser()
+stdio_handler = logging.StreamHandler()
+stdio_handler.setLevel(logging.INFO)
+_logger = logging.getLogger("aiohttp.access")
+_logger.addHandler(stdio_handler)
+_logger.setLevel(logging.DEBUG)
+
+parser = argparse.ArgumentParser()
 parser.add_argument(
-    "--runner", default=False, type=bool, help="Run runner instead of server"
+    "--runner", default=False, action="store_true", help="Run runner instead of server"
 )
 parser.add_argument(
     "--endpoint",

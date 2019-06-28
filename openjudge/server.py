@@ -7,6 +7,7 @@ from aiohttp_session import SimpleCookieStorage
 from peewee import IntegrityError
 from functools import wraps
 from . import database
+import json
 
 
 def fill_args(function):
@@ -20,17 +21,25 @@ def fill_args(function):
 
     @wraps(function)
     async def wrapped_fn(request):
-        given = await request.json()
+        try:
+            given = await request.json()
+        except json.decoder.JSONDecodeError:
+            given = {}
         kwargs = dict()
         for name in spec.args:
-            if name not in given and name not in defaults and name != "request":
+            if (
+                name not in given
+                and name not in defaults
+                and name != "request"
+                and name not in request.app
+            ):
                 raise web.HTTPBadRequest(
                     reason="Please provide `{name}`".format(name=name)
                 )
             if name in given:
                 val = given[name]
                 val = anno.get(name, lambda x: x)(val)
-            elif hasattr(request.app, name):
+            elif name in request.app:
                 val = request.app[name]
                 val = anno.get(name, lambda x: x)(val)
                 kwargs[name] = val
@@ -145,7 +154,7 @@ async def get_a_job(request, Attempt, AttemptCheck):
 
 
 async def app():
-    app = web.Application()
+    app = web.Application(debug=True)
     setup(app, SimpleCookieStorage())
     # -----------------------------------
     app.add_routes(
