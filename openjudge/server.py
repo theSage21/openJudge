@@ -1,4 +1,5 @@
 from aiohttp import web
+import asyncio
 import base64
 import inspect
 from aiohttp_session import setup, get_session, session_middleware, new_session
@@ -85,6 +86,62 @@ async def logout(request):
     request["session"].invalidate()
 
 
+@fill_args
+async def job_is_done(
+    request,
+    AttemptCheck,
+    checkid: str,
+    stdout: str,
+    stderr: str,
+    exit_code: int,
+    is_timeout: bool,
+):
+    try:
+        check = AttemptCheck.get_by_id(checkid)
+    except AttemptCheck.DoesNotExist:
+        await asyncio.sleep(2)  # defensive rate limit
+        return web.HTTPDoesNotExist(reason="no such check job issued")
+    check.is_timeout = is_timeout
+    check.exit_code = exit_code
+    check.stdout = stdout
+    check.stderr = stderr
+    check.save()
+    check.attempt.is_being_checked = False
+    check.attempt.is_checked = True
+    check.attempt.save()
+    return web.json_response({"ok": True})
+
+
+@fill_args
+async def get_a_job(request, Attempt, AttemptCheck):
+    attempts = list(
+        Attempt.select()
+        .where(Attempt.is_checked == False)
+        .order_by(Attempt.is_being_checked == True)
+        .limit(1)
+    )
+    if len(attempts) == 0:
+        await asyncio.sleep(1)
+        return web.HTTPTemporaryRedirect("/runnerjob")
+    else:
+        attempt = attempts[0]
+        try:
+            check = AttemptCheck.create(attempt=attempt)
+        except IntegrityError:
+            return web.HTTPTemporaryRedirect("/runnerjob")
+        else:
+            attempt.is_being_checked = True
+            attempt.save()
+            return web.json_response(
+                {
+                    "checkid": check.id,
+                    "inp": attempt.testcase.inp,
+                    "cmd": attempt.program.language.shell_cmd,
+                    "code": attempt.program.code,
+                }
+            )
+
+
 async def app():
     app = web.Application()
     setup(app, SimpleCookieStorage())
@@ -94,6 +151,8 @@ async def app():
             web.post("/register", register),
             web.post("/login", login),
             web.get("/logout", logout),
+            web.get("/runnerjob", get_a_job),
+            web.post("/runnerjob", job_is_done),
         ]
     )
     # -----------------------------------

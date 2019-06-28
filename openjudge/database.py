@@ -72,8 +72,8 @@ class Attempt(Table):
     program = pw.ForeignKeyField(Program)
     testcase = pw.ForeignKeyField(TestCase)
     # ------------------------------
-    is_correct = pw.BooleanField(null=True)
     is_being_checked = pw.BooleanField(default=False)
+    is_checked = pw.BooleanField(default=False)
     stamp = pw.DateTimeField(default=datetime.utcnow)
 
 
@@ -84,7 +84,7 @@ class AttemptCheck(Table):
     attempt = pw.ForeignKeyField(Attempt)
     stdout = pw.TextField(null=True)
     stderr = pw.TextField(null=True)
-    exit_code = pw.IntegerField()
+    exit_code = pw.IntegerField(null=True)
     is_timeout = pw.BooleanField(default=False)
 
 
