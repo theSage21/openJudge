@@ -11,15 +11,21 @@ def run(endpoint, workdir):
         try:
             job = requests.get(endpoint + "/runnerjob").json()
             checkid = job["checkid"]
-            cmd, inp, code, fname = job["cmd"], job["inp"], job["code"], job["fname"]
             root = workdir / checkid
             os.mkdir(root)
-            with open(root / fname, "w") as fl:
-                fl.write(code)
-            with open(root / "inp", "w") as fl:
-                fl.write(inp)
-            cmd = cmd.format(fpath=fpath, inp=root / "inp")
-            proc = subprocess.run([cmd], shell=True, capture_output=True)
+            fpath, inpath = root / job["fname"], root / "input"
+            with open(fpath, "w") as fl:
+                fl.write(job["code"])
+            with open(inpath, "w") as fl:
+                fl.write(job["inp"])
+            cmd = cmd.format(fpath=fpath, inp=inpath)
+            try:
+                proc = subprocess.run(
+                    [cmd], shell=True, capture_output=True, timeout=job["timeout"]
+                )
+                is_timeout = False
+            except subprocess.TimeoutExpired:
+                is_timeout = True
             requests.post(
                 endpoint + "/runnerjob",
                 json={
@@ -27,6 +33,7 @@ def run(endpoint, workdir):
                     "stdout": proc.stdout.decode(),
                     "stderr": proc.stderr.decode(),
                     "exit_code": proc.returncode,
+                    "is_timeout": is_timeout,
                 },
             )
         except Exception as e:

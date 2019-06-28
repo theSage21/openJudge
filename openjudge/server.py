@@ -138,6 +138,8 @@ async def get_a_job(request, Attempt, AttemptCheck):
                     "inp": attempt.testcase.inp,
                     "cmd": attempt.program.language.shell_cmd,
                     "code": attempt.program.code,
+                    "timeout": attempt.testcase.question.time_limit
+                    * attempt.program.language.time_multiplier,
                 }
             )
 
@@ -158,4 +160,13 @@ async def app():
     # -----------------------------------
     app["User"] = database.User
     app["Token"] = database.Token
+    app["Language"] = database.Language
+    app["Program"] = database.Program
+    app["Question"] = database.Question
+    app["Contest"] = database.Contest
+    app["ContestQuestion"] = database.ContestQuestion
+    app["TestCase"] = database.TestCase
+    app["Attempt"] = database.Attempt
+    app["AttemptCheck"] = database.AttemptCheck
+
     return app
