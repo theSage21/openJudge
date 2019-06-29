@@ -19,12 +19,8 @@ def fill_args(function):
         else set([name for _, name in zip(reversed(defaults), reversed(args))])
     )
 
-    @wraps(function)
     async def wrapped_fn(request):
-        try:
-            given = await request.json()
-        except json.decoder.JSONDecodeError:
-            given = {}
+        given = await request.json()
         kwargs = dict()
         for name in spec.args:
             if (
@@ -39,12 +35,15 @@ def fill_args(function):
             if name in given:
                 val = given[name]
                 val = anno.get(name, lambda x: x)(val)
+                kwargs[name] = val
             elif name in request.app:
                 val = request.app[name]
                 val = anno.get(name, lambda x: x)(val)
                 kwargs[name] = val
         final = await function(request, **kwargs)
         return final
+
+    wrapped_fn = wraps(function)(wrapped_fn)
 
     return wrapped_fn
 
@@ -55,7 +54,7 @@ def login_required(function):
         session = await get_session(request)
         request["session"] = session
         token = request.app["Token"].get_or_none(
-            request.app["Token"].id == session["token"]
+            request.app["Token"].id == session["token_id"]
         )
         if token is None:
             return web.HTTPUnauthorized(reason="No such token")
@@ -81,11 +80,11 @@ async def login(request, User, Token, name: str, pwd: str):
     except User.DoesNotExist:
         return web.HTTPNotFound(reason="no such user")
     try:
-        tok = Token.create(user=user)
+        token = Token.create(user=user)
     except IntegrityError:
         return web.HTTPTemporaryRedirect("/login")
     session = await new_session(request)
-    session["token"] = token.id
+    session["token_id"] = token.id
     return web.json_response({"ok": True})
 
 
@@ -154,7 +153,24 @@ async def get_a_job(request, Attempt, AttemptCheck):
 
 
 async def app():
-    app = web.Application(debug=True)
+    @web.middleware
+    async def add_cors(request, handler):
+        origin = request.headers.get("Origin", "*")
+        cors_string = "Origin, Accept , Content-Type, X-Requested-With, X-CSRF-Token"
+        d = {
+            "Access-Control-Allow-Methods": "POST, OPTIONS, GET",
+            "Access-Control-Allow-Headers": cors_string,
+            "Access-Control-Allow-Credentials": "true",
+            "Access-Control-Allow-Origin": origin,
+        }
+        response = await handler(request)
+        response.headers.update(d)
+        return response
+
+    async def cors(request):
+        return web.Response(text="")
+
+    app = web.Application(debug=True, middlewares=[add_cors])
     setup(app, SimpleCookieStorage())
     # -----------------------------------
     app.add_routes(
@@ -166,6 +182,7 @@ async def app():
             web.post("/runnerjob", job_is_done),
         ]
     )
+    app.router.add_route("OPTIONS", "/{url:.*}", cors)
     # -----------------------------------
     app["User"] = database.User
     app["Token"] = database.Token

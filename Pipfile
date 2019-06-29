@@ -19,6 +19,7 @@ aiodns = "*"
 uvloop = "*"
 aiohttp-session = "*"
 cryptography = "*"
+aiohttp-cors = "*"
 
 [requires]
 python_version = "3.7"
