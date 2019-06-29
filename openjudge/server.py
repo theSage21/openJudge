@@ -85,7 +85,7 @@ async def login(request, User, Token, name: str, pwd: str):
         return web.HTTPTemporaryRedirect("/login")
     session = await new_session(request)
     session["token_id"] = token.id
-    return web.json_response({"ok": True})
+    return web.json_response({"userid": user.id, "name": user.name})
 
 
 @login_required
