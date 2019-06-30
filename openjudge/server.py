@@ -53,9 +53,11 @@ def login_required(function):
     async def new_function(request, *a, **kw):
         session = await get_session(request)
         request["session"] = session
-        token = request.app["Token"].get_or_none(
-            request.app["Token"].id == session["token_id"]
-        )
+        token = None
+        if "token_id" in session:
+            token = request.app["Token"].get_or_none(
+                request.app["Token"].id == session["token_id"]
+            )
         if token is None:
             return web.HTTPUnauthorized(reason="No such token")
         request["token"] = token
@@ -92,6 +94,7 @@ async def login(request, User, Token, name: str, pwd: str):
 async def logout(request):
     request["token"].delete_instance()
     request["session"].invalidate()
+    return web.HTTPTemporaryRedirect("/")
 
 
 @fill_args
@@ -152,6 +155,27 @@ async def get_a_job(request, Attempt, AttemptCheck):
             )
 
 
+@login_required
+async def user_details(request, User):
+    user = request["token"].user
+    return web.json_response({"userid": user.id, "name": user.name})
+
+
+@login_required
+@fill_args
+async def contestList(request, Contest):
+    return web.json_response(
+        {
+            "contests": list(
+                Contest.select()
+                .where(Contest.is_published == True)
+                .order_by(Contest.end.desc())
+                .dicts()
+            )
+        }
+    )
+
+
 async def app():
     @web.middleware
     async def add_cors(request, handler):
@@ -178,8 +202,10 @@ async def app():
             web.post("/register", register),
             web.post("/login", login),
             web.get("/logout", logout),
+            web.post("/me", user_details),
             web.get("/runnerjob", get_a_job),
             web.post("/runnerjob", job_is_done),
+            web.post("/contestList", contestList),
         ]
     )
     app.router.add_route("OPTIONS", "/{url:.*}", cors)

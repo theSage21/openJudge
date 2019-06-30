@@ -1,14 +1,14 @@
 <script>
     import Cookies from 'js-cookie';
+    import { post } from './common.js';
     import Contests from './Contests.svelte';
     import { fade } from 'svelte/transition';
 
     let username = 'username';
     let password = 'password';
-    let userid = Cookies.get('userid');
+    let userid = '';
     let userinfo = '';
-    let root = 'http://localhost:8080';
-    $: is_logged_in = typeof userid === 'undefined';
+    $: is_logged_in = userid !== '';
 
     try{
         let userinfo = JSON.parse(Cookies.get('userinfo'));
@@ -19,18 +19,13 @@
         }
     }
 
-    function post(url, data, completed){
-        console.log(root+url);
-        var data = JSON.stringify(data);
-        var xmlhttp = new XMLHttpRequest();
-        xmlhttp.open("POST", root+url, true);
-        xmlhttp.setRequestHeader("Content-Type", "application/json");
-        xmlhttp.withCredentials = true;
-        xmlhttp.onreadystatechange = function(){
-                    if (xmlhttp.readyState == 4){ completed(xmlhttp);}
+    post('/me', {}, function (ajax){
+        if (ajax.status == 200){
+            var data = JSON.parse(ajax.responseText);
+            userid = data['userid'];
+            userinfo = data;
         }
-        xmlhttp.send(data);
-    }
+    });
 
     function handleClick(){
         post('/register', {'name': username, 'pwd': password}, function (ajax){
@@ -47,8 +42,10 @@
     }
 </script>
 
-<h1>OpenJudge</h1>
-{#if is_logged_in }
+<nav><b>OpenJudge</b>|
+    {#if is_logged_in }{userinfo.name} <a href='/logout'>Logout</a>{/if}</nav>
+<hr>
+{#if !is_logged_in }
     <div>
         <div><label>Username</label><input bind:value={username}></div>
         <div><label>Password</label><input bind:value={password}></div>
